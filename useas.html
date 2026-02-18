@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USEAS Study Portal</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI, sans-serif;
+  background:#f4f6f9;
+}
+
+header{
+  background:linear-gradient(135deg,#4e73df,#1cc88a);
+  color:white;
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+header h1{
+  margin:0;
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.profile img{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+}
+
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  background:#1cc88a;
+  color:white;
+  font-weight:600;
+}
+
+.container{
+  padding:20px;
+}
+
+h2{
+  margin-top:40px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.08);
+  transition:0.3s;
+  position:relative;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:red;
+  color:white;
+  font-size:12px;
+  padding:3px 6px;
+  border-radius:4px;
+}
+
+.admin-panel{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  margin-top:30px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+input,textarea,select{
+  width:100%;
+  padding:8px;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+.spinner{
+  text-align:center;
+  margin:20px;
+}
+
+@media(max-width:600px){
+  header h1{font-size:18px;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>USEAS</h1>
+  <div class="profile" id="profileArea"></div>
+</header>
+
+<div class="container">
+
+<div id="adminPanel" class="admin-panel" style="display:none;">
+  <h2>Admin Upload Panel</h2>
+
+  <input type="text" id="title" placeholder="Title">
+  <textarea id="description" placeholder="Description"></textarea>
+  <input type="text" id="subject" placeholder="Subject">
+
+  <select id="section">
+    <option value="notes">Notes</option>
+    <option value="previous_papers">Previous Papers</option>
+    <option value="easy_notes">Easy Notes</option>
+  </select>
+
+  <input type="file" id="fileInput">
+  <button onclick="uploadContent()">Upload</button>
+</div>
+
+<h2>Latest Notes</h2>
+<div class="cards" id="notes"></div>
+
+<h2>Previous Papers</h2>
+<div class="cards" id="previous_papers"></div>
+
+<h2>Easy Notes</h2>
+<div class="cards" id="easy_notes"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithRedirect, 
+  getRedirectResult,
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  onSnapshot, 
+  query, 
+  orderBy, 
+  serverTimestamp,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import { 
+  getStorage, 
+  ref, 
+  uploadBytes, 
+  getDownloadURL, 
+  deleteObject 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+const ADMIN_EMAIL = "adminemail@gmail.com";
+const provider = new GoogleAuthProvider();
+
+const profileArea = document.getElementById("profileArea");
+const adminPanel = document.getElementById("adminPanel");
+
+// LOGIN
+window.login = function(){
+  signInWithRedirect(auth, provider);
+};
+
+// HANDLE REDIRECT
+getRedirectResult(auth).catch(console.error);
+
+// AUTH STATE
+onAuthStateChanged(auth, user => {
+
+  if(user){
+
+    profileArea.innerHTML = `
+      <img src="${user.photoURL}">
+      <span>${user.displayName}</span>
+      <button onclick="logout()">Logout</button>
+    `;
+
+    if(user.email === ADMIN_EMAIL){
+      adminPanel.style.display="block";
+    }
+
+    loadData("notes");
+    loadData("previous_papers");
+    loadData("easy_notes");
+
+  } else {
+
+    profileArea.innerHTML = `
+      <button onclick="login()">Login with Google</button>
+    `;
+    adminPanel.style.display="none";
+  }
+
+});
+
+// LOGOUT
+window.logout = function(){
+  signOut(auth);
+};
+
+// UPLOAD
+window.uploadContent = async function(){
+
+  const file = document.getElementById("fileInput").files[0];
+  if(!file){ alert("Select file"); return; }
+
+  const title = document.getElementById("title").value;
+  const description = document.getElementById("description").value;
+  const subject = document.getElementById("subject").value;
+  const section = document.getElementById("section").value;
+
+  const storageRef = ref(storage, section + "/" + Date.now() + "_" + file.name);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+
+  await addDoc(collection(db, section), {
+    title,
+    description,
+    subject,
+    fileURL: url,
+    date: serverTimestamp(),
+    uploadedBy: auth.currentUser.email
+  });
+
+  alert("Uploaded Successfully!");
+};
+
+// LOAD DATA
+function loadData(section){
+
+  const q = query(collection(db, section), orderBy("date","desc"));
+
+  onSnapshot(q, snapshot => {
+
+    document.getElementById(section).innerHTML="";
+
+    snapshot.forEach(docSnap => {
+
+      const data = docSnap.data();
+      const date = data.date?.toDate();
+      const isNew = date && (new Date() - date < 86400000);
+
+      document.getElementById(section).innerHTML += `
+        <div class="card">
+          ${isNew ? '<div class="badge">NEW</div>' : ''}
+          <h3>${data.title}</h3>
+          <p>${data.description}</p>
+          <p><b>Subject:</b> ${data.subject}</p>
+          <p>${date ? date.toLocaleString() : ''}</p>
+          <a href="${data.fileURL}" target="_blank">
+            <button>Download</button>
+          </a>
+          ${auth.currentUser?.email === ADMIN_EMAIL ?
+          `<button onclick="deleteItem('${section}','${docSnap.id}','${data.fileURL}')">Delete</button>` : ''}
+        </div>
+      `;
+    });
+
+  });
+}
+
+// DELETE
+window.deleteItem = async function(section,id,fileURL){
+  await deleteDoc(doc(db,section,id));
+  const fileRef = ref(storage,fileURL);
+  await deleteObject(fileRef);
+};
+
+</script>
+
+</body>
+</html>
