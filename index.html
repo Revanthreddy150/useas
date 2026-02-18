@@ -1,247 +1,164 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>USEAS Study Portal</title>
+  <meta charset="UTF-8">
+  <title>USEAS - Study Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  margin:0;
-  font-family:Segoe UI, sans-serif;
-  background:#f4f6f9;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+    }
 
-header{
-  background:linear-gradient(135deg,#4e73df,#1cc88a);
-  color:white;
-  padding:15px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
+    header {
+      background: linear-gradient(90deg,#4e73df,#1cc88a);
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-header h1{
-  margin:0;
-}
+    .btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #fff;
+      font-weight: bold;
+    }
 
-.profile{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+    .container {
+      padding: 20px;
+    }
 
-.profile img{
-  width:35px;
-  height:35px;
-  border-radius:50%;
-}
+    .section-title {
+      margin-top: 30px;
+    }
 
-button{
-  padding:8px 12px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  background:#1cc88a;
-  color:white;
-  font-weight:600;
-}
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
 
-.container{
-  padding:20px;
-}
+    .new-badge {
+      color: red;
+      font-weight: bold;
+    }
 
-h2{
-  margin-top:40px;
-}
+    .hidden {
+      display: none;
+    }
 
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
-}
-
-.card{
-  background:white;
-  padding:15px;
-  border-radius:10px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
-  transition:0.3s;
-  position:relative;
-}
-
-.card:hover{
-  transform:translateY(-5px);
-}
-
-.badge{
-  position:absolute;
-  top:10px;
-  right:10px;
-  background:red;
-  color:white;
-  font-size:12px;
-  padding:3px 6px;
-  border-radius:4px;
-}
-
-.admin-panel{
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  margin-top:30px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
-
-input,textarea,select{
-  width:100%;
-  padding:8px;
-  margin:8px 0;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-
-@media(max-width:600px){
-  header h1{font-size:18px;}
-}
-</style>
+    input, select {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+    }
+  </style>
 </head>
-
 <body>
 
 <header>
-  <h1>USEAS</h1>
-  <div class="profile" id="profileArea"></div>
+  <h2>USEAS</h2>
+  <div id="authArea">
+    <button class="btn" onclick="login()">Login</button>
+  </div>
 </header>
 
 <div class="container">
 
-<div id="adminPanel" class="admin-panel" style="display:none;">
-  <h2>Admin Upload Panel</h2>
+  <div id="adminPanel" class="hidden">
+    <h3>Admin Upload Panel</h3>
+    <input type="text" id="title" placeholder="Title">
+    <input type="text" id="description" placeholder="Description">
+    <input type="text" id="subject" placeholder="Subject">
+    <select id="section">
+      <option value="notes">Notes</option>
+      <option value="previous_papers">Previous Papers</option>
+      <option value="easy_notes">Easy Notes</option>
+    </select>
+    <input type="file" id="file">
+    <button class="btn" onclick="upload()">Upload</button>
+  </div>
 
-  <input type="text" id="title" placeholder="Title">
-  <textarea id="description" placeholder="Description"></textarea>
-  <input type="text" id="subject" placeholder="Subject">
+  <h3 class="section-title">Latest Notes</h3>
+  <div id="notes"></div>
 
-  <select id="section">
-    <option value="notes">Notes</option>
-    <option value="previous_papers">Previous Papers</option>
-    <option value="easy_notes">Easy Notes</option>
-  </select>
+  <h3 class="section-title">Previous Papers</h3>
+  <div id="previous_papers"></div>
 
-  <input type="file" id="fileInput">
-  <button onclick="uploadContent()">Upload</button>
-</div>
-
-<h2>Latest Notes</h2>
-<div class="cards" id="notes"></div>
-
-<h2>Previous Papers</h2>
-<div class="cards" id="previous_papers"></div>
-
-<h2>Easy Notes</h2>
-<div class="cards" id="easy_notes"></div>
+  <h3 class="section-title">Easy Notes</h3>
+  <div id="easy_notes"></div>
 
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup,
-  onAuthStateChanged, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  onSnapshot, 
-  query, 
-  orderBy, 
-  serverTimestamp,
-  deleteDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import { 
-  getStorage, 
-  ref, 
-  uploadBytes, 
-  getDownloadURL, 
-  deleteObject 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
+  apiKey: "AIzaSyArqJycgZtlLpM7KQ2T9h-e2eJUHtMg-TY",
+  authDomain: "tff-earns.firebaseapp.com",
+  projectId: "tff-earns",
+  storageBucket: "tff-earns.firebasestorage.app",
+  messagingSenderId: "762695597074",
+  appId: "1:762695597074:web:bd7a8df2df2806d5b26ccb"
 };
+
+const ADMIN_EMAIL = "ADMIN_EMAIL_HERE@gmail.com";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const ADMIN_EMAIL = "adminemail@gmail.com";
-const provider = new GoogleAuthProvider();
-
-const profileArea = document.getElementById("profileArea");
-const adminPanel = document.getElementById("adminPanel");
-
-window.login = function(){
+// LOGIN (POPUP FIXED)
+window.login = function() {
   signInWithPopup(auth, provider)
-    .catch(error => console.error(error));
+    .then(result => console.log("Login success"))
+    .catch(error => alert(error.message));
 };
 
-window.logout = function(){
+window.logout = function() {
   signOut(auth);
 };
 
 onAuthStateChanged(auth, user => {
-
-  if(user){
-
-    profileArea.innerHTML = `
-      <img src="${user.photoURL}">
-      <span>${user.displayName}</span>
-      <button onclick="logout()">Logout</button>
+  const authArea = document.getElementById("authArea");
+  if (user) {
+    authArea.innerHTML = `
+      <img src="${user.photoURL}" width="30" style="border-radius:50%">
+      ${user.displayName}
+      <button class="btn" onclick="logout()">Logout</button>
     `;
-
-    if(user.email === ADMIN_EMAIL){
-      adminPanel.style.display="block";
+    if (user.email === ADMIN_EMAIL) {
+      document.getElementById("adminPanel").classList.remove("hidden");
     }
-
-    loadData("notes");
-    loadData("previous_papers");
-    loadData("easy_notes");
-
   } else {
-
-    profileArea.innerHTML = `
-      <button onclick="login()">Login with Google</button>
-    `;
-    adminPanel.style.display="none";
+    authArea.innerHTML = `<button class="btn" onclick="login()">Login</button>`;
+    document.getElementById("adminPanel").classList.add("hidden");
   }
-
 });
 
-window.uploadContent = async function(){
-
-  const file = document.getElementById("fileInput").files[0];
-  if(!file){ alert("Select file"); return; }
-
+// UPLOAD
+window.upload = async function() {
   const title = document.getElementById("title").value;
   const description = document.getElementById("description").value;
   const subject = document.getElementById("subject").value;
   const section = document.getElementById("section").value;
+  const file = document.getElementById("file").files[0];
+
+  if (!file) return alert("Select file");
 
   const storageRef = ref(storage, section + "/" + Date.now() + "_" + file.name);
   await uploadBytes(storageRef, file);
@@ -256,47 +173,33 @@ window.uploadContent = async function(){
     uploadedBy: auth.currentUser.email
   });
 
-  alert("Uploaded Successfully!");
+  alert("Uploaded!");
 };
 
-function loadData(section){
-
-  const q = query(collection(db, section), orderBy("date","desc"));
-
+// LOAD DATA REALTIME
+function loadSection(section) {
+  const q = query(collection(db, section), orderBy("date", "desc"));
   onSnapshot(q, snapshot => {
-
-    document.getElementById(section).innerHTML="";
-
+    const container = document.getElementById(section);
+    container.innerHTML = "";
     snapshot.forEach(docSnap => {
-
       const data = docSnap.data();
-      const date = data.date?.toDate();
-      const isNew = date && (new Date() - date < 86400000);
-
-      document.getElementById(section).innerHTML += `
+      const isNew = data.date?.seconds > (Date.now()/1000 - 86400);
+      container.innerHTML += `
         <div class="card">
-          ${isNew ? '<div class="badge">NEW</div>' : ''}
-          <h3>${data.title}</h3>
+          <h4>${data.title} ${isNew ? '<span class="new-badge">NEW</span>' : ''}</h4>
           <p>${data.description}</p>
           <p><b>Subject:</b> ${data.subject}</p>
-          <p>${date ? date.toLocaleString() : ''}</p>
-          <a href="${data.fileURL}" target="_blank">
-            <button>Download</button>
-          </a>
-          ${auth.currentUser?.email === ADMIN_EMAIL ?
-          `<button onclick="deleteItem('${section}','${docSnap.id}','${data.fileURL}')">Delete</button>` : ''}
+          <a href="${data.fileURL}" target="_blank">Download</a>
         </div>
       `;
     });
-
   });
 }
 
-window.deleteItem = async function(section,id,fileURL){
-  await deleteDoc(doc(db,section,id));
-  const fileRef = ref(storage,fileURL);
-  await deleteObject(fileRef);
-};
+loadSection("notes");
+loadSection("previous_papers");
+loadSection("easy_notes");
 
 </script>
 
