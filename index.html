@@ -102,11 +102,6 @@ input,textarea,select{
   border:1px solid #ccc;
 }
 
-.spinner{
-  text-align:center;
-  margin:20px;
-}
-
 @media(max-width:600px){
   header h1{font-size:18px;}
 }
@@ -156,8 +151,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { 
   getAuth, 
   GoogleAuthProvider, 
-  signInWithRedirect, 
-  getRedirectResult,
+  signInWithPopup,
   onAuthStateChanged, 
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -202,15 +196,15 @@ const provider = new GoogleAuthProvider();
 const profileArea = document.getElementById("profileArea");
 const adminPanel = document.getElementById("adminPanel");
 
-// LOGIN
 window.login = function(){
-  signInWithRedirect(auth, provider);
+  signInWithPopup(auth, provider)
+    .catch(error => console.error(error));
 };
 
-// HANDLE REDIRECT
-getRedirectResult(auth).catch(console.error);
+window.logout = function(){
+  signOut(auth);
+};
 
-// AUTH STATE
 onAuthStateChanged(auth, user => {
 
   if(user){
@@ -239,12 +233,6 @@ onAuthStateChanged(auth, user => {
 
 });
 
-// LOGOUT
-window.logout = function(){
-  signOut(auth);
-};
-
-// UPLOAD
 window.uploadContent = async function(){
 
   const file = document.getElementById("fileInput").files[0];
@@ -271,7 +259,6 @@ window.uploadContent = async function(){
   alert("Uploaded Successfully!");
 };
 
-// LOAD DATA
 function loadData(section){
 
   const q = query(collection(db, section), orderBy("date","desc"));
@@ -305,7 +292,6 @@ function loadData(section){
   });
 }
 
-// DELETE
 window.deleteItem = async function(section,id,fileURL){
   await deleteDoc(doc(db,section,id));
   const fileRef = ref(storage,fileURL);
