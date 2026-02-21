@@ -1,207 +1,288 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>USEAS - Study Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS | Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-    }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --accent-gradient: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
+            --card-glass: rgba(255, 255, 255, 0.95);
+            --primary: #4f46e5;
+            --text-dark: #1e293b;
+        }
 
-    header {
-      background: linear-gradient(90deg,#4e73df,#1cc88a);
-      color: white;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-    .btn {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #fff;
-      font-weight: bold;
-    }
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-dark);
+            overflow: hidden; 
+        }
 
-    .container {
-      padding: 20px;
-    }
+        /* --- Header Base --- */
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; width: 100%;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
 
-    .section-title {
-      margin-top: 30px;
-    }
+        /* --- Minimal Mode (Transparency & Centered) --- */
+        header.minimal {
+            background: transparent !important;
+            backdrop-filter: none !important;
+            border-bottom: none !important;
+        }
 
-    .card {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    }
+        header.minimal .logo-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
 
-    .new-badge {
-      color: red;
-      font-weight: bold;
-    }
+        header.minimal #help-btn {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
 
-    .hidden {
-      display: none;
-    }
+        /* --- UI Elements --- */
+        .logo-container {
+            font-weight: 800; font-size: 1.6rem; letter-spacing: -1.5px;
+            background: var(--accent-gradient); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: textShine 3s linear infinite;
+            transition: all 0.4s ease;
+        }
+        @keyframes textShine { to { background-position: 200% center; } }
 
-    input, select {
-      padding: 8px;
-      margin: 5px 0;
-      width: 100%;
-    }
-  </style>
+        .header-btn {
+            background: rgba(239, 246, 255, 0.8);
+            color: var(--primary); border: none;
+            width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background: white; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1); padding: 40px 20px;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 1500; display: none; backdrop-filter: blur(2px);
+        }
+
+        .menu-link { padding: 14px; border-radius: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; color: var(--text-dark); font-weight: 600; text-decoration: none;}
+        .menu-link:hover { background: #f1f5f9; color: var(--primary); }
+
+        /* --- Viewport Containers --- */
+        .iframe-container { 
+            width: 100%; 
+            height: 100vh; 
+            border: none; 
+            display: none; 
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+        }
+        .iframe-container.active { display: block; }
+        
+        /* Study content frames sit higher because of transparent header */
+        #notesFrame.active, #labFrame.active {
+            top: 0;
+            height: 100vh;
+        }
+        
+        /* PDF Frame keeps solid header space */
+        #pdfFrame.active {
+            top: 70px;
+            height: calc(100vh - 70px);
+        }
+
+        .page { display: none; padding: 20px; padding-top: 85px; max-width: 600px; margin: 0 auto; animation: slideUp 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero-card { background: var(--accent-gradient); border-radius: 24px; padding: 25px; color: white; margin-bottom: 25px; }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 100px; }
+        .grid-item { background: white; border: 1px solid #eef2f6; padding: 25px 15px; border-radius: 20px; text-align: center; cursor: pointer; }
+        .icon-circle { width: 55px; height: 55px; border-radius: 18px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+
+        /* --- Bottom Nav --- */
+        #bottom-nav {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 96%; max-width: 480px; background: #0f172a;
+            padding: 10px 5px; border-radius: 24px; display: flex; justify-content: space-around; z-index: 1000;
+        }
+        .nav-btn { color: #64748b; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.6rem; min-width: 50px;}
+        .nav-btn.active { color: #fff; }
+    </style>
 </head>
 <body>
 
-<header>
-  <h2>USEAS</h2>
-  <div id="authArea">
-    <button class="btn" onclick="login()">Login</button>
-  </div>
-</header>
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <h2 style="margin-bottom: 25px; letter-spacing: -1px;">USEAS Menu</h2>
+        <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
+        <div class="menu-link" onclick="showProfile()"><i class="fa-solid fa-circle-user"></i> My Profile</div>
+        <div class="menu-link" onclick="showPDFTools()"><i class="fa-solid fa-file-pdf"></i> PDF Tools</div>
+    </div>
 
-<div class="container">
+    <header id="main-header">
+        <button class="header-btn" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+        <div class="logo-container">USEAS</div>
+        <button class="header-btn" id="help-btn" onclick="alert('USEAS Support')">
+            <i class="fa-solid fa-circle-question"></i>
+        </button>
+    </header>
 
-  <div id="adminPanel" class="hidden">
-    <h3>Admin Upload Panel</h3>
-    <input type="text" id="title" placeholder="Title">
-    <input type="text" id="description" placeholder="Description">
-    <input type="text" id="subject" placeholder="Subject">
-    <select id="section">
-      <option value="notes">Notes</option>
-      <option value="previous_papers">Previous Papers</option>
-      <option value="easy_notes">Easy Notes</option>
-    </select>
-    <input type="file" id="file">
-    <button class="btn" onclick="upload()">Upload</button>
-  </div>
+    <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
+    <iframe id="labFrame" class="iframe-container" src="https://sites.google.com/view/adityalabkeys/home"></iframe>
+    <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
+    <iframe id="notesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhub/"></iframe>
 
-  <h3 class="section-title">Latest Notes</h3>
-  <div id="notes"></div>
-
-  <h3 class="section-title">Previous Papers</h3>
-  <div id="previous_papers"></div>
-
-  <h3 class="section-title">Easy Notes</h3>
-  <div id="easy_notes"></div>
-
-</div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyArqJycgZtlLpM7KQ2T9h-e2eJUHtMg-TY",
-  authDomain: "tff-earns.firebaseapp.com",
-  projectId: "tff-earns",
-  storageBucket: "tff-earns.firebasestorage.app",
-  messagingSenderId: "762695597074",
-  appId: "1:762695597074:web:bd7a8df2df2806d5b26ccb"
-};
-
-const ADMIN_EMAIL = "ADMIN_EMAIL_HERE@gmail.com";
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-// LOGIN (POPUP FIXED)
-window.login = function() {
-  signInWithPopup(auth, provider)
-    .then(result => console.log("Login success"))
-    .catch(error => alert(error.message));
-};
-
-window.logout = function() {
-  signOut(auth);
-};
-
-onAuthStateChanged(auth, user => {
-  const authArea = document.getElementById("authArea");
-  if (user) {
-    authArea.innerHTML = `
-      <img src="${user.photoURL}" width="30" style="border-radius:50%">
-      ${user.displayName}
-      <button class="btn" onclick="logout()">Logout</button>
-    `;
-    if (user.email === ADMIN_EMAIL) {
-      document.getElementById("adminPanel").classList.remove("hidden");
-    }
-  } else {
-    authArea.innerHTML = `<button class="btn" onclick="login()">Login</button>`;
-    document.getElementById("adminPanel").classList.add("hidden");
-  }
-});
-
-// UPLOAD
-window.upload = async function() {
-  const title = document.getElementById("title").value;
-  const description = document.getElementById("description").value;
-  const subject = document.getElementById("subject").value;
-  const section = document.getElementById("section").value;
-  const file = document.getElementById("file").files[0];
-
-  if (!file) return alert("Select file");
-
-  const storageRef = ref(storage, section + "/" + Date.now() + "_" + file.name);
-  await uploadBytes(storageRef, file);
-  const url = await getDownloadURL(storageRef);
-
-  await addDoc(collection(db, section), {
-    title,
-    description,
-    subject,
-    fileURL: url,
-    date: serverTimestamp(),
-    uploadedBy: auth.currentUser.email
-  });
-
-  alert("Uploaded!");
-};
-
-// LOAD DATA REALTIME
-function loadSection(section) {
-  const q = query(collection(db, section), orderBy("date", "desc"));
-  onSnapshot(q, snapshot => {
-    const container = document.getElementById(section);
-    container.innerHTML = "";
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const isNew = data.date?.seconds > (Date.now()/1000 - 86400);
-      container.innerHTML += `
-        <div class="card">
-          <h4>${data.title} ${isNew ? '<span class="new-badge">NEW</span>' : ''}</h4>
-          <p>${data.description}</p>
-          <p><b>Subject:</b> ${data.subject}</p>
-          <a href="${data.fileURL}" target="_blank">Download</a>
+    <div class="content-area">
+        <div id="home" class="page active">
+            <div class="hero-card">
+                <h2 style="font-weight: 800;">Welcome back!</h2>
+                <p style="opacity: 0.9; font-size: 0.8rem;">Select a tool to get started.</p>
+            </div>
+            <div class="grid-menu">
+                <div class="grid-item" onclick="showNotes()">
+                    <div class="icon-circle" style="background: #eef2ff; color: #4f46e5;"><i class="fa-solid fa-book"></i></div>
+                    <span style="font-weight: 700;">Notes</span>
+                </div>
+                <div class="grid-item" onclick="showPage('short-notes')">
+                    <div class="icon-circle" style="background: #fdf2f8; color: #db2777;"><i class="fa-solid fa-bolt"></i></div>
+                    <span style="font-weight: 700;">Smart Notes</span>
+                </div>
+                <div class="grid-item" onclick="showExternal('labFrame', 'lab')">
+                    <div class="icon-circle" style="background: #f0fdf4; color: #16a34a;"><i class="fa-solid fa-terminal"></i></div>
+                    <span style="font-weight: 700;">Lab Codes</span>
+                </div>
+                <div class="grid-item" onclick="showPage('papers')">
+                    <div class="icon-circle" style="background: #fffbeb; color: #d97706;"><i class="fa-solid fa-paste"></i></div>
+                    <span style="font-weight: 700;">Papers</span>
+                </div>
+            </div>
         </div>
-      `;
-    });
-  });
-}
 
-loadSection("notes");
-loadSection("previous_papers");
-loadSection("easy_notes");
+        <div id="papers" class="page"><h2>Previous Papers</h2><p>Past paper repository loading...</p></div>
+        <div id="short-notes" class="page"><h2>Smart Revision</h2><p>Flashcards loading...</p></div>
+        <div id="classes" class="page"><h2>Daily Classes</h2><p>Schedule loading...</p></div>
+    </div>
 
-</script>
+    <nav id="bottom-nav">
+        <a href="#" class="nav-btn active" id="btn-home" onclick="showPage('home')">
+            <i class="fa-solid fa-house"></i><span>Home</span>
+        </a>
+        <a href="#" class="nav-btn" id="btn-papers" onclick="showPage('papers')">
+            <i class="fa-solid fa-file-lines"></i><span>Papers</span>
+        </a>
+        <a href="#" class="nav-btn" id="btn-notes" onclick="showNotes()">
+            <i class="fa-solid fa-book"></i><span>Notes</span>
+        </a>
+        <a href="#" class="nav-btn" id="btn-short-notes" onclick="showPage('short-notes')">
+            <i class="fa-solid fa-clone"></i><span>Shorts</span>
+        </a>
+        <a href="#" class="nav-btn" id="btn-lab" onclick="showExternal('labFrame', 'lab')">
+            <i class="fa-solid fa-code"></i><span>Lab</span>
+        </a>
+        <a href="#" class="nav-btn" id="btn-classes" onclick="showPage('classes')">
+            <i class="fa-solid fa-graduation-cap"></i><span>Classes</span>
+        </a>
+    </nav>
 
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainHeader = document.getElementById('main-header');
+        const bottomNav = document.getElementById('bottom-nav');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = (overlay.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        /**
+         * isFull: Home, Profile, PDF (Glass background, Help icon visible)
+         * minimal: Notes, Papers, Lab, etc. (Transparent, Centered Logo, Help hidden)
+         */
+        function configureUI(isFull, showNav = true) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.iframe-container').forEach(f => f.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            bottomNav.style.display = showNav ? 'flex' : 'none';
+
+            if (isFull) {
+                mainHeader.classList.remove('minimal');
+            } else {
+                mainHeader.classList.add('minimal');
+            }
+        }
+
+        function showPage(pageId) {
+            // "home" gets full header; "papers", "short-notes", "classes" get minimal/transparent
+            const isFullHeader = (pageId === 'home');
+            configureUI(isFullHeader, true);
+            document.getElementById(pageId).classList.add('active');
+            const btn = document.getElementById('btn-' + pageId);
+            if(btn) btn.classList.add('active');
+            closeSidebar();
+        }
+
+        function showNotes() {
+            configureUI(false, true); // Minimal, Centered, Transparent
+            document.getElementById('notesFrame').classList.add('active');
+            document.getElementById('btn-notes').classList.add('active');
+            closeSidebar();
+        }
+
+        function showExternal(frameId, navId) {
+            configureUI(false, true); // Minimal, Centered, Transparent
+            document.getElementById(frameId).classList.add('active');
+            if(navId) document.getElementById('btn-' + navId).classList.add('active');
+            closeSidebar();
+        }
+
+        function showProfile() {
+            configureUI(true, false); // Full Header
+            document.getElementById('profileFrame').classList.add('active');
+            closeSidebar();
+        }
+
+        function showPDFTools() {
+            configureUI(true, false); // Full Header
+            document.getElementById('pdfFrame').classList.add('active');
+            closeSidebar();
+        }
+    </script>
 </body>
 </html>
