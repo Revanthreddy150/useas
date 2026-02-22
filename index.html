@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USEAS | Student Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -20,9 +20,10 @@
 
         body {
             background: var(--bg-gradient);
-            min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
             color: var(--text-dark);
-            overflow: hidden; 
+            overflow: hidden;
         }
 
         /* --- Header Logic --- */
@@ -32,12 +33,32 @@
             justify-content: space-between;
             align-items: center;
             position: fixed;
-            top: 0; width: 100%;
-            z-index: 1001; /* Above everything except sidebar */
+            top: 0; 
+            width: 100%;
+            /* High z-index ensures buttons are ALWAYS clickable over iframes */
+            z-index: 9999; 
             transition: all 0.4s ease;
             background: var(--card-glass);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            pointer-events: none; /* Allows clicks to pass through header container... */
+        }
+
+        /* ...But we re-enable pointer-events for the actual buttons */
+        .header-btn {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary); 
+            border: none;
+            width: 40px; 
+            height: 40px; 
+            border-radius: 12px; 
+            cursor: pointer;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         header.minimal {
@@ -47,102 +68,84 @@
         }
 
         header.minimal .logo-container {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
         }
 
-        header.minimal #help-btn { display: none !important; }
+        header.minimal #help-btn { 
+            opacity: 0; 
+            pointer-events: none; 
+        }
 
         .logo-container {
+            pointer-events: auto;
             font-weight: 800; font-size: 1.6rem; letter-spacing: -1.5px;
             background: var(--accent-gradient); background-size: 200% auto;
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: textShine 3s linear infinite;
+            transition: all 0.3s ease;
         }
         @keyframes textShine { to { background-position: 200% center; } }
-
-        .header-btn {
-            background: rgba(239, 246, 255, 0.8);
-            color: var(--primary); border: none;
-            width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
 
         /* --- Sidebar --- */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background: white; z-index: 3000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white; z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 10px 0 30px rgba(0,0,0,0.1); padding: 40px 20px;
         }
         .sidebar.active { left: 0; }
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); z-index: 2500; display: none; backdrop-filter: blur(2px);
+            background: rgba(0,0,0,0.4); z-index: 9998; display: none; backdrop-filter: blur(2px);
         }
 
         .menu-link { padding: 14px; border-radius: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; color: var(--text-dark); font-weight: 600; text-decoration: none;}
         .menu-link:hover { background: #f1f5f9; color: var(--primary); }
 
-        /* --- Content Containers --- */
+        /* --- Containers --- */
         .iframe-container { 
-            width: 100%; height: 100vh; border: none; 
-            display: none; position: absolute; top: 0; left: 0; z-index: 1;
+            width: 100%; border: none; display: none; position: absolute; left: 0; 
+            z-index: 100; /* Lower than header */
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
         .iframe-container.active { display: block; }
         
-        /* Ensure frames don't block the nav click area at the bottom */
-        #notesFrame.active, #labFrame.active { 
-            top: 0; 
-            height: calc(100vh - 80px); 
-        }
-        #pdfFrame.active, #profileFrame.active { 
-            top: 70px; 
-            height: calc(100vh - 150px); 
+        #notesFrame.active, #labFrame.active, #shortNotesFrame.active { 
+            top: 0; height: calc(100vh - 85px); 
         }
 
-        .page { display: none; padding: 20px; padding-top: 85px; max-width: 600px; margin: 0 auto; animation: slideUp 0.4s ease-out; }
+        #profileFrame.active, #pdfFrame.active, #chatFrame.active {
+            height: 100vh;
+            top: 0;
+        }
+
+        .page { 
+            display: none; padding: 20px; padding-top: 85px; max-width: 600px; 
+            margin: 0 auto; height: 100vh; overflow-y: auto;
+            animation: slideUp 0.4s ease-out; 
+        }
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* UI Dashboard */
         .hero-card { background: var(--accent-gradient); border-radius: 24px; padding: 25px; color: white; margin-bottom: 25px; }
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 100px; }
-        .grid-item { background: white; border: 1px solid #eef2f6; padding: 25px 15px; border-radius: 20px; text-align: center; cursor: pointer; }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 120px; }
+        .grid-item { background: white; border: 1px solid #eef2f6; padding: 25px 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .grid-item:active { transform: scale(0.95); }
         .icon-circle { width: 55px; height: 55px; border-radius: 18px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
 
-        /* --- Bottom Nav (FIXED CLICKABILITY) --- */
+        /* --- Bottom Nav --- */
         #bottom-nav {
-            position: fixed; 
-            bottom: 15px; 
-            left: 50%; 
-            transform: translateX(-50%);
-            width: 96%; 
-            max-width: 480px; 
-            background: #0f172a;
-            padding: 10px 5px; 
-            border-radius: 24px; 
-            display: flex; 
-            justify-content: space-around; 
-            z-index: 2000; /* High Z-index so it's always on top */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            pointer-events: auto; /* Force clicks to work */
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 96%; max-width: 520px; background: #0f172a; padding: 10px 2px; 
+            border-radius: 24px; display: flex; justify-content: space-around; 
+            z-index: 9000; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
         .nav-btn { 
-            color: #64748b; 
-            text-decoration: none; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 4px; 
-            font-size: 0.65rem; 
-            min-width: 50px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+            color: #64748b; text-decoration: none; display: flex; flex-direction: column; 
+            align-items: center; gap: 4px; font-size: 0.6rem; min-width: 45px; cursor: pointer;
         }
         .nav-btn.active { color: #fff; }
-        .nav-btn i { font-size: 1.2rem; }
+        .nav-btn i { font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -150,10 +153,12 @@
     <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
-        <h2 style="margin-bottom: 25px; letter-spacing: -1px;">USEAS Menu</h2>
+        <h2 style="margin-bottom: 25px; letter-spacing: -1px;">USEAS MENU</h2>
         <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
         <div class="menu-link" onclick="showProfile()"><i class="fa-solid fa-circle-user"></i> My Profile</div>
         <div class="menu-link" onclick="showPDFTools()"><i class="fa-solid fa-file-pdf"></i> PDF Tools</div>
+        <div class="menu-link" onclick="showChatbot()"><i class="fa-solid fa-comment-dots"></i> Support Chat</div>
+        <div class="menu-link" onclick="showPage('notifications')"><i class="fa-solid fa-bell"></i> Notifications</div>
     </div>
 
     <header id="main-header">
@@ -161,15 +166,17 @@
             <i class="fa-solid fa-bars-staggered"></i>
         </button>
         <div class="logo-container">USEAS</div>
-        <button class="header-btn" id="help-btn" onclick="alert('Support Center')">
+        <button class="header-btn" id="help-btn" onclick="showChatbot()">
             <i class="fa-solid fa-circle-question"></i>
         </button>
     </header>
 
     <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
-    <iframe id="labFrame" class="iframe-container" src="https://sites.google.com/view/adityalabkeys/home"></iframe>
+    <iframe id="labFrame" class="iframe-container" src="https://tinyurl.com/abhyaslabkeys1"></iframe>
     <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
     <iframe id="notesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhub/"></iframe>
+    <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
+    <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
 
     <div class="content-area">
         <div id="home" class="page active">
@@ -182,7 +189,7 @@
                     <div class="icon-circle" style="background: #eef2ff; color: #4f46e5;"><i class="fa-solid fa-book"></i></div>
                     <span style="font-weight: 700;">Notes</span>
                 </div>
-                <div class="grid-item" onclick="showPage('short-notes')">
+                <div class="grid-item" onclick="showShortNotes()">
                     <div class="icon-circle" style="background: #fdf2f8; color: #db2777;"><i class="fa-solid fa-bolt"></i></div>
                     <span style="font-weight: 700;">Smart Notes</span>
                 </div>
@@ -190,16 +197,15 @@
                     <div class="icon-circle" style="background: #f0fdf4; color: #16a34a;"><i class="fa-solid fa-terminal"></i></div>
                     <span style="font-weight: 700;">Lab Codes</span>
                 </div>
-                <div class="grid-item" onclick="showPage('papers')">
-                    <div class="icon-circle" style="background: #fffbeb; color: #d97706;"><i class="fa-solid fa-paste"></i></div>
-                    <span style="font-weight: 700;">Papers</span>
+                <div class="grid-item" onclick="showPage('notifications')">
+                    <div class="icon-circle" style="background: #fff1f2; color: #e11d48;"><i class="fa-solid fa-bell"></i></div>
+                    <span style="font-weight: 700;">Alerts</span>
                 </div>
             </div>
         </div>
 
         <div id="papers" class="page"><h2>Previous Papers</h2><p>Library loading...</p></div>
-        <div id="short-notes" class="page"><h2>Smart Revision</h2><p>Flashcards loading...</p></div>
-        <div id="classes" class="page"><h2>Daily Classes</h2><p>Schedule loading...</p></div>
+        <div id="notifications" class="page"><h2>Notifications</h2><p>No new alerts at this time.</p></div>
     </div>
 
     <nav id="bottom-nav">
@@ -212,27 +218,107 @@
         <div class="nav-btn" id="btn-notes" onclick="showNotes()">
             <i class="fa-solid fa-book"></i><span>Notes</span>
         </div>
-        <div class="nav-btn" id="btn-short-notes" onclick="showPage('short-notes')">
+        <div class="nav-btn" id="btn-short-notes" onclick="showShortNotes()">
             <i class="fa-solid fa-clone"></i><span>Shorts</span>
         </div>
         <div class="nav-btn" id="btn-lab" onclick="showExternal('labFrame', 'lab')">
             <i class="fa-solid fa-code"></i><span>Lab</span>
         </div>
-        <div class="nav-btn" id="btn-classes" onclick="showPage('classes')">
-            <i class="fa-solid fa-graduation-cap"></i><span>Classes</span>
+        <div class="nav-btn" id="btn-notifications" onclick="showPage('notifications')">
+            <i class="fa-solid fa-bell"></i><span>Alerts</span>
         </div>
     </nav>
 
     <script>
         const sidebar = document.getElementById('sidebar');
-        const mainHeader = document.getElementById('main-header');
         const bottomNav = document.getElementById('bottom-nav');
-        let currentPage = 'home';
+        const mainHeader = document.getElementById('main-header');
+        let isHome = true;
 
-        // Back navigation handling
-        window.onpopstate = function() {
-            if (currentPage !== 'home') showPage('home');
-        };
+        window.addEventListener('popstate', function (event) {
+            if (!isHome) {
+                showPage('home', false);
+            }
+        });
+
+        function resetViews(isHomeView) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.iframe-container').forEach(f => f.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            bottomNav.style.display = 'flex';
+            
+            if (isHomeView) {
+                mainHeader.classList.remove('minimal');
+            } else {
+                mainHeader.classList.add('minimal');
+            }
+        }
+
+        function showPage(pageId, pushState = true) {
+            const isH = (pageId === 'home');
+            resetViews(isH);
+            document.getElementById(pageId).classList.add('active');
+            const btn = document.getElementById('btn-' + pageId);
+            if(btn) btn.classList.add('active');
+            closeSidebar();
+            
+            isHome = isH;
+            if (!isH && pushState) history.pushState({page: pageId}, "");
+        }
+
+        function showNotes() {
+            resetViews(false);
+            document.getElementById('notesFrame').classList.add('active');
+            document.getElementById('btn-notes').classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: 'notes'}, "");
+        }
+
+        function showShortNotes() {
+            resetViews(false);
+            document.getElementById('shortNotesFrame').classList.add('active');
+            document.getElementById('btn-short-notes').classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: 'short-notes'}, "");
+        }
+
+        function showExternal(frameId, navId) {
+            resetViews(false);
+            document.getElementById(frameId).classList.add('active');
+            if(navId) document.getElementById('btn-' + navId).classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: navId}, "");
+        }
+
+        function showProfile() {
+            resetViews(false);
+            bottomNav.style.display = 'none';
+            document.getElementById('profileFrame').classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: 'profile'}, "");
+        }
+
+        function showPDFTools() {
+            resetViews(false);
+            bottomNav.style.display = 'none';
+            document.getElementById('pdfFrame').classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: 'pdf'}, "");
+        }
+
+        function showChatbot() {
+            resetViews(false);
+            bottomNav.style.display = 'none';
+            document.getElementById('chatFrame').classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: 'chatbot'}, "");
+        }
 
         function toggleSidebar() {
             sidebar.classList.toggle('active');
@@ -242,58 +328,6 @@
         function closeSidebar() {
             sidebar.classList.remove('active');
             document.getElementById('overlay').style.display = 'none';
-        }
-
-        function configureUI(isFull, showNav = true, pageId) {
-            const prevPage = currentPage;
-            currentPage = pageId;
-
-            if (prevPage === 'home' && pageId !== 'home') {
-                history.pushState({view: pageId}, "");
-            }
-
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.iframe-container').forEach(f => f.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            bottomNav.style.display = showNav ? 'flex' : 'none';
-
-            if (isFull) mainHeader.classList.remove('minimal');
-            else mainHeader.classList.add('minimal');
-        }
-
-        function showPage(pageId) {
-            configureUI((pageId === 'home'), true, pageId);
-            document.getElementById(pageId).classList.add('active');
-            const btn = document.getElementById('btn-' + pageId);
-            if(btn) btn.classList.add('active');
-            closeSidebar();
-        }
-
-        function showNotes() {
-            configureUI(false, true, 'notes');
-            document.getElementById('notesFrame').classList.add('active');
-            document.getElementById('btn-notes').classList.add('active');
-            closeSidebar();
-        }
-
-        function showExternal(frameId, navId) {
-            configureUI(false, true, navId);
-            document.getElementById(frameId).classList.add('active');
-            if(navId) document.getElementById('btn-' + navId).classList.add('active');
-            closeSidebar();
-        }
-
-        function showProfile() {
-            configureUI(true, false, 'profile');
-            document.getElementById('profileFrame').classList.add('active');
-            closeSidebar();
-        }
-
-        function showPDFTools() {
-            configureUI(true, false, 'pdf');
-            document.getElementById('pdfFrame').classList.add('active');
-            closeSidebar();
         }
     </script>
 </body>
