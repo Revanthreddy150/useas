@@ -35,16 +35,14 @@
             position: fixed;
             top: 0; 
             width: 100%;
-            /* High z-index ensures buttons are ALWAYS clickable over iframes */
             z-index: 9999; 
             transition: all 0.4s ease;
             background: var(--card-glass);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            pointer-events: none; /* Allows clicks to pass through header container... */
+            pointer-events: none;
         }
 
-        /* ...But we re-enable pointer-events for the actual buttons */
         .header-btn {
             pointer-events: auto;
             background: rgba(255, 255, 255, 0.9);
@@ -105,11 +103,16 @@
         /* --- Containers --- */
         .iframe-container { 
             width: 100%; border: none; display: none; position: absolute; left: 0; 
-            z-index: 100; /* Lower than header */
+            z-index: 100;
             overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
         .iframe-container.active { display: block; }
         
+        /* Adjusted top for frames that keep the header visible */
+        #notificationFrame.active { 
+            top: 70px; height: calc(100vh - 155px); /* Room for header AND bottom nav */
+        }
+
         #notesFrame.active, #labFrame.active, #shortNotesFrame.active { 
             top: 0; height: calc(100vh - 85px); 
         }
@@ -158,7 +161,7 @@
         <div class="menu-link" onclick="showProfile()"><i class="fa-solid fa-circle-user"></i> My Profile</div>
         <div class="menu-link" onclick="showPDFTools()"><i class="fa-solid fa-file-pdf"></i> PDF Tools</div>
         <div class="menu-link" onclick="showChatbot()"><i class="fa-solid fa-comment-dots"></i> Support Chat</div>
-        <div class="menu-link" onclick="showPage('notifications')"><i class="fa-solid fa-bell"></i> Notifications</div>
+        <div class="menu-link" onclick="showNotifications()"><i class="fa-solid fa-bell"></i> Notifications</div>
     </div>
 
     <header id="main-header">
@@ -177,6 +180,7 @@
     <iframe id="notesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhub/"></iframe>
     <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
     <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
+    <iframe id="notificationFrame" class="iframe-container" src="https://revanthreddy150.github.io/notifications/"></iframe>
 
     <div class="content-area">
         <div id="home" class="page active">
@@ -197,7 +201,7 @@
                     <div class="icon-circle" style="background: #f0fdf4; color: #16a34a;"><i class="fa-solid fa-terminal"></i></div>
                     <span style="font-weight: 700;">Lab Codes</span>
                 </div>
-                <div class="grid-item" onclick="showPage('notifications')">
+                <div class="grid-item" onclick="showNotifications()">
                     <div class="icon-circle" style="background: #fff1f2; color: #e11d48;"><i class="fa-solid fa-bell"></i></div>
                     <span style="font-weight: 700;">Alerts</span>
                 </div>
@@ -205,7 +209,6 @@
         </div>
 
         <div id="papers" class="page"><h2>Previous Papers</h2><p>Library loading...</p></div>
-        <div id="notifications" class="page"><h2>Notifications</h2><p>No new alerts at this time.</p></div>
     </div>
 
     <nav id="bottom-nav">
@@ -224,7 +227,7 @@
         <div class="nav-btn" id="btn-lab" onclick="showExternal('labFrame', 'lab')">
             <i class="fa-solid fa-code"></i><span>Lab</span>
         </div>
-        <div class="nav-btn" id="btn-notifications" onclick="showPage('notifications')">
+        <div class="nav-btn" id="btn-notifications" onclick="showNotifications()">
             <i class="fa-solid fa-bell"></i><span>Alerts</span>
         </div>
     </nav>
@@ -235,19 +238,25 @@
         const mainHeader = document.getElementById('main-header');
         let isHome = true;
 
+        // Auto-reload notifications every 40 seconds
+        setInterval(function() {
+            const notifFrame = document.getElementById('notificationFrame');
+            notifFrame.src = notifFrame.src;
+        }, 40000);
+
         window.addEventListener('popstate', function (event) {
             if (!isHome) {
                 showPage('home', false);
             }
         });
 
-        function resetViews(isHomeView) {
+        function resetViews(showFullHeader) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.iframe-container').forEach(f => f.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             bottomNav.style.display = 'flex';
             
-            if (isHomeView) {
+            if (showFullHeader) {
                 mainHeader.classList.remove('minimal');
             } else {
                 mainHeader.classList.add('minimal');
@@ -256,6 +265,7 @@
 
         function showPage(pageId, pushState = true) {
             const isH = (pageId === 'home');
+            // Full header only for home
             resetViews(isH);
             document.getElementById(pageId).classList.add('active');
             const btn = document.getElementById('btn-' + pageId);
@@ -267,7 +277,7 @@
         }
 
         function showNotes() {
-            resetViews(false);
+            resetViews(false); // Transparent header
             document.getElementById('notesFrame').classList.add('active');
             document.getElementById('btn-notes').classList.add('active');
             closeSidebar();
@@ -276,7 +286,7 @@
         }
 
         function showShortNotes() {
-            resetViews(false);
+            resetViews(false); // Transparent header
             document.getElementById('shortNotesFrame').classList.add('active');
             document.getElementById('btn-short-notes').classList.add('active');
             closeSidebar();
@@ -284,8 +294,17 @@
             history.pushState({page: 'short-notes'}, "");
         }
 
+        function showNotifications() {
+            resetViews(true); // FULL HEADER for notifications
+            document.getElementById('notificationFrame').classList.add('active');
+            document.getElementById('btn-notifications').classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: 'notifications'}, "");
+        }
+
         function showExternal(frameId, navId) {
-            resetViews(false);
+            resetViews(false); // Transparent header
             document.getElementById(frameId).classList.add('active');
             if(navId) document.getElementById('btn-' + navId).classList.add('active');
             closeSidebar();
