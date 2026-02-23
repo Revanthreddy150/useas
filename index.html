@@ -43,7 +43,6 @@
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
-            /* Default allows clicking header */
             pointer-events: auto; 
         }
 
@@ -51,12 +50,10 @@
             background: transparent !important;
             border-bottom: none !important;
             backdrop-filter: none !important;
-            /* CRITICAL FIX: Allows clicks to pass through the transparent bar to the iframe below */
             pointer-events: none; 
         }
 
         .header-btn {
-            /* Ensures buttons stay clickable even when header is transparent */
             pointer-events: auto; 
             background: white;
             color: var(--primary); 
@@ -233,6 +230,22 @@
         const mainHeader = document.getElementById('main-header');
         let isHome = true;
 
+        /* --- MOBILE BACK BUTTON LOGIC --- */
+        // Push an initial state so the back button has somewhere to go inside our app
+        window.history.pushState({page: 'home'}, "");
+
+        window.addEventListener('popstate', function (event) {
+            // Whenever the back button is pressed, go to Home
+            if (!isHome) {
+                showPage('home', false); // false prevents pushing a new state
+                // Re-push a state so the next back button click also works
+                window.history.pushState({page: 'home'}, "");
+            } else {
+                // If already at Home, let the default back button behavior occur (exit app)
+                // We don't need to do anything here
+            }
+        });
+
         function resetViews(showFullHeader) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.iframe-container').forEach(f => f.classList.remove('active'));
@@ -245,23 +258,30 @@
             }
         }
 
-        function showPage(pageId) {
+        function showPage(pageId, shouldPush = true) {
             resetViews(pageId === 'home');
             document.getElementById(pageId).classList.add('active');
             const btn = document.getElementById('btn-' + pageId);
             if(btn) btn.classList.add('active');
+            
             isHome = (pageId === 'home');
+            
+            // If we move away from Home, ensure we push a state for the back button to catch
+            if (!isHome && shouldPush) {
+                window.history.pushState({page: pageId}, "");
+            }
+            
             closeSidebar();
         }
 
-        function showNotes() { resetViews(false); document.getElementById('notesFrame').classList.add('active'); document.getElementById('btn-notes').classList.add('active'); isHome = false; closeSidebar(); }
-        function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); document.getElementById('btn-papers').classList.add('active'); isHome = false; closeSidebar(); }
-        function showShortNotes() { resetViews(false); document.getElementById('shortNotesFrame').classList.add('active'); document.getElementById('btn-short-notes').classList.add('active'); isHome = false; closeSidebar(); }
-        function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); document.getElementById('btn-notifications').classList.add('active'); isHome = false; closeSidebar(); }
-        function showExternal(fId, bId) { resetViews(false); document.getElementById(fId).classList.add('active'); if(bId) document.getElementById('btn-'+bId).classList.add('active'); isHome = false; closeSidebar(); }
-        function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
-        function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
-        function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
+        function showNotes() { resetViews(false); document.getElementById('notesFrame').classList.add('active'); document.getElementById('btn-notes').classList.add('active'); isHome = false; window.history.pushState({page: 'notes'}, ""); closeSidebar(); }
+        function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); document.getElementById('btn-papers').classList.add('active'); isHome = false; window.history.pushState({page: 'papers'}, ""); closeSidebar(); }
+        function showShortNotes() { resetViews(false); document.getElementById('shortNotesFrame').classList.add('active'); document.getElementById('btn-short-notes').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); closeSidebar(); }
+        function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); document.getElementById('btn-notifications').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); closeSidebar(); }
+        function showExternal(fId, bId) { resetViews(false); document.getElementById(fId).classList.add('active'); if(bId) document.getElementById('btn-'+bId).classList.add('active'); isHome = false; window.history.pushState({page: bId}, ""); closeSidebar(); }
+        function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
+        function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
+        function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'chat'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
 
         function toggleSidebar() { 
             sidebar.classList.toggle('active'); 
