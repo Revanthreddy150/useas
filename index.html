@@ -108,12 +108,12 @@
         }
         .iframe-container.active { display: block; }
         
-        /* Adjusted top for frames that keep the header visible */
+        /* Adjusted notificationFrame to top 0 for minimal header look */
         #notificationFrame.active { 
-            top: 70px; height: calc(100vh - 155px); /* Room for header AND bottom nav */
+            top: 0px; height: calc(100vh - 85px); 
         }
 
-        #notesFrame.active, #labFrame.active, #shortNotesFrame.active { 
+        #notesFrame.active, #labFrame.active, #shortNotesFrame.active, #papersFrame.active { 
             top: 0; height: calc(100vh - 85px); 
         }
 
@@ -181,6 +181,7 @@
     <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
     <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
     <iframe id="notificationFrame" class="iframe-container" src="https://revanthreddy150.github.io/notifications/"></iframe>
+    <iframe id="papersFrame" class="iframe-container" src="https://revanthreddy150.github.io/Paperhub/"></iframe>
 
     <div class="content-area">
         <div id="home" class="page active">
@@ -193,9 +194,9 @@
                     <div class="icon-circle" style="background: #eef2ff; color: #4f46e5;"><i class="fa-solid fa-book"></i></div>
                     <span style="font-weight: 700;">Notes</span>
                 </div>
-                <div class="grid-item" onclick="showShortNotes()">
-                    <div class="icon-circle" style="background: #fdf2f8; color: #db2777;"><i class="fa-solid fa-bolt"></i></div>
-                    <span style="font-weight: 700;">Smart Notes</span>
+                <div class="grid-item" onclick="showPapers()">
+                    <div class="icon-circle" style="background: #fdf2f8; color: #db2777;"><i class="fa-solid fa-file-lines"></i></div>
+                    <span style="font-weight: 700;">Papers</span>
                 </div>
                 <div class="grid-item" onclick="showExternal('labFrame', 'lab')">
                     <div class="icon-circle" style="background: #f0fdf4; color: #16a34a;"><i class="fa-solid fa-terminal"></i></div>
@@ -207,15 +208,13 @@
                 </div>
             </div>
         </div>
-
-        <div id="papers" class="page"><h2>Previous Papers</h2><p>Library loading...</p></div>
     </div>
 
     <nav id="bottom-nav">
         <div class="nav-btn active" id="btn-home" onclick="showPage('home')">
             <i class="fa-solid fa-house"></i><span>Home</span>
         </div>
-        <div class="nav-btn" id="btn-papers" onclick="showPage('papers')">
+        <div class="nav-btn" id="btn-papers" onclick="showPapers()">
             <i class="fa-solid fa-file-lines"></i><span>Papers</span>
         </div>
         <div class="nav-btn" id="btn-notes" onclick="showNotes()">
@@ -238,7 +237,6 @@
         const mainHeader = document.getElementById('main-header');
         let isHome = true;
 
-        // Auto-reload notifications every 40 seconds
         setInterval(function() {
             const notifFrame = document.getElementById('notificationFrame');
             notifFrame.src = notifFrame.src;
@@ -265,7 +263,6 @@
 
         function showPage(pageId, pushState = true) {
             const isH = (pageId === 'home');
-            // Full header only for home
             resetViews(isH);
             document.getElementById(pageId).classList.add('active');
             const btn = document.getElementById('btn-' + pageId);
@@ -276,8 +273,17 @@
             if (!isH && pushState) history.pushState({page: pageId}, "");
         }
 
+        function showPapers() {
+            resetViews(false); 
+            document.getElementById('papersFrame').classList.add('active');
+            document.getElementById('btn-papers').classList.add('active');
+            closeSidebar();
+            isHome = false;
+            history.pushState({page: 'papers'}, "");
+        }
+
         function showNotes() {
-            resetViews(false); // Transparent header
+            resetViews(false); 
             document.getElementById('notesFrame').classList.add('active');
             document.getElementById('btn-notes').classList.add('active');
             closeSidebar();
@@ -286,7 +292,7 @@
         }
 
         function showShortNotes() {
-            resetViews(false); // Transparent header
+            resetViews(false); 
             document.getElementById('shortNotesFrame').classList.add('active');
             document.getElementById('btn-short-notes').classList.add('active');
             closeSidebar();
@@ -295,7 +301,7 @@
         }
 
         function showNotifications() {
-            resetViews(true); // FULL HEADER for notifications
+            resetViews(false); // Minimal header applied
             document.getElementById('notificationFrame').classList.add('active');
             document.getElementById('btn-notifications').classList.add('active');
             closeSidebar();
@@ -304,7 +310,7 @@
         }
 
         function showExternal(frameId, navId) {
-            resetViews(false); // Transparent header
+            resetViews(false); 
             document.getElementById(frameId).classList.add('active');
             if(navId) document.getElementById('btn-' + navId).classList.add('active');
             closeSidebar();
