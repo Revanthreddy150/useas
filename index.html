@@ -29,6 +29,7 @@
             align-items: center;
         }
 
+        /* --- Header --- */
         header {
             padding: 15px 20px;
             display: flex;
@@ -42,7 +43,6 @@
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
-            pointer-events: auto; 
         }
 
         header.minimal {
@@ -67,7 +67,6 @@
         header.minimal .logo-container, header.minimal #help-btn { 
             opacity: 0; 
             visibility: hidden; 
-            pointer-events: none;
         }
 
         .logo-container {
@@ -78,6 +77,7 @@
         }
         @keyframes textShine { to { background-position: 200% center; } }
 
+        /* --- Sidebar --- */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
             background: white; z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -96,6 +96,7 @@
         }
         .menu-link:hover { background: #f1f5f9; color: var(--primary); }
 
+        /* --- Content Layout --- */
         .content-area {
             width: 100%;
             height: 100%;
@@ -130,11 +131,12 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .hero-card { background: var(--accent-gradient); border-radius: 24px; padding: 35px; color: white; margin-bottom: 25px; }
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 120px; }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 100px; }
         .grid-item { background: white; padding: 25px 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .grid-item:active { transform: scale(0.95); }
         .icon-circle { width: 55px; height: 55px; border-radius: 18px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
 
+        /* --- Navigation --- */
         #bottom-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 500px; background: #0f172a; padding: 12px 5px; 
@@ -180,8 +182,10 @@
         <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
         <iframe id="labFrame" class="iframe-container" src="https://tinyurl.com/abhyaslabkeys1"></iframe>
         <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
+        
         <iframe id="notesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhub"></iframe>
         <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
+        
         <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
         <iframe id="notificationFrame" class="iframe-container" src="https://revanthreddy150.github.io/notifications/"></iframe>
         <iframe id="papersFrame" class="iframe-container" src="https://revanthreddy150.github.io/Paperhub/"></iframe>
@@ -263,6 +267,7 @@
         function showShortNotes() { resetViews(false); document.getElementById('shortNotesFrame').classList.add('active'); document.getElementById('btn-shorts').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); closeSidebar(); }
         function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); document.getElementById('btn-alerts').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); closeSidebar(); }
         function showExternal(fId, bId) { resetViews(false); document.getElementById(fId).classList.add('active'); if(bId) document.getElementById('btn-'+bId).classList.add('active'); isHome = false; window.history.pushState({page: bId}, ""); closeSidebar(); }
+        
         function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
         function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
         function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'chat'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
