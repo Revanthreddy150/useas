@@ -29,7 +29,6 @@
             align-items: center;
         }
 
-        /* --- Header Logic --- */
         header {
             padding: 15px 20px;
             display: flex;
@@ -79,7 +78,6 @@
         }
         @keyframes textShine { to { background-position: 200% center; } }
 
-        /* --- Sidebar --- */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
             background: white; z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -98,7 +96,6 @@
         }
         .menu-link:hover { background: #f1f5f9; color: var(--primary); }
 
-        /* --- Content Layout --- */
         .content-area {
             width: 100%;
             height: 100%;
@@ -130,14 +127,14 @@
             overflow-y: auto;
         }
         .page.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .hero-card { background: var(--accent-gradient); border-radius: 24px; padding: 35px; color: white; margin-bottom: 25px; }
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 120px; }
         .grid-item { background: white; padding: 25px 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .grid-item:active { transform: scale(0.95); }
         .icon-circle { width: 55px; height: 55px; border-radius: 18px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
 
-        /* --- Bottom/Side Nav --- */
         #bottom-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 500px; background: #0f172a; padding: 12px 5px; 
@@ -183,9 +180,7 @@
         <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
         <iframe id="labFrame" class="iframe-container" src="https://tinyurl.com/abhyaslabkeys1"></iframe>
         <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
-        <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhub"
-                 allow="clipboard-read; clipboard-write; share">
-        </iframe>
+        <iframe id="notesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhub"></iframe>
         <iframe id="shortNotesFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
         <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
         <iframe id="notificationFrame" class="iframe-container" src="https://revanthreddy150.github.io/notifications/"></iframe>
@@ -221,9 +216,9 @@
         <div class="nav-btn active" id="btn-home" onclick="showPage('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
         <div class="nav-btn" id="btn-papers" onclick="showPapers()"><i class="fa-solid fa-file-lines"></i><span>Papers</span></div>
         <div class="nav-btn" id="btn-notes" onclick="showNotes()"><i class="fa-solid fa-book"></i><span>Notes</span></div>
-        <div class="nav-btn" id="btn-short-notes" onclick="showShortNotes()"><i class="fa-solid fa-clone"></i><span>Shorts</span></div>
+        <div class="nav-btn" id="btn-shorts" onclick="showShortNotes()"><i class="fa-solid fa-clone"></i><span>Shorts</span></div>
         <div class="nav-btn" id="btn-lab" onclick="showExternal('labFrame', 'lab')"><i class="fa-solid fa-code"></i><span>Lab</span></div>
-        <div class="nav-btn" id="btn-notifications" onclick="showNotifications()"><i class="fa-solid fa-bell"></i><span>Alerts</span></div>
+        <div class="nav-btn" id="btn-alerts" onclick="showNotifications()"><i class="fa-solid fa-bell"></i><span>Alerts</span></div>
     </nav>
 
     <script>
@@ -232,19 +227,12 @@
         const mainHeader = document.getElementById('main-header');
         let isHome = true;
 
-        /* --- MOBILE BACK BUTTON LOGIC --- */
-        // Push an initial state so the back button has somewhere to go inside our app
         window.history.pushState({page: 'home'}, "");
 
         window.addEventListener('popstate', function (event) {
-            // Whenever the back button is pressed, go to Home
             if (!isHome) {
-                showPage('home', false); // false prevents pushing a new state
-                // Re-push a state so the next back button click also works
+                showPage('home', false);
                 window.history.pushState({page: 'home'}, "");
-            } else {
-                // If already at Home, let the default back button behavior occur (exit app)
-                // We don't need to do anything here
             }
         });
 
@@ -265,21 +253,15 @@
             document.getElementById(pageId).classList.add('active');
             const btn = document.getElementById('btn-' + pageId);
             if(btn) btn.classList.add('active');
-            
             isHome = (pageId === 'home');
-            
-            // If we move away from Home, ensure we push a state for the back button to catch
-            if (!isHome && shouldPush) {
-                window.history.pushState({page: pageId}, "");
-            }
-            
+            if (!isHome && shouldPush) window.history.pushState({page: pageId}, "");
             closeSidebar();
         }
 
         function showNotes() { resetViews(false); document.getElementById('notesFrame').classList.add('active'); document.getElementById('btn-notes').classList.add('active'); isHome = false; window.history.pushState({page: 'notes'}, ""); closeSidebar(); }
         function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); document.getElementById('btn-papers').classList.add('active'); isHome = false; window.history.pushState({page: 'papers'}, ""); closeSidebar(); }
-        function showShortNotes() { resetViews(false); document.getElementById('shortNotesFrame').classList.add('active'); document.getElementById('btn-short-notes').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); closeSidebar(); }
-        function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); document.getElementById('btn-notifications').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); closeSidebar(); }
+        function showShortNotes() { resetViews(false); document.getElementById('shortNotesFrame').classList.add('active'); document.getElementById('btn-shorts').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); closeSidebar(); }
+        function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); document.getElementById('btn-alerts').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); closeSidebar(); }
         function showExternal(fId, bId) { resetViews(false); document.getElementById(fId).classList.add('active'); if(bId) document.getElementById('btn-'+bId).classList.add('active'); isHome = false; window.history.pushState({page: bId}, ""); closeSidebar(); }
         function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
         function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); if(window.innerWidth < 1024) bottomNav.style.display = 'none'; closeSidebar(); }
