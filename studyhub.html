@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Hub | Premium PDF Viewer</title>
+    <title>Study Hub | Premium PDF & Video Viewer</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -48,15 +47,18 @@
         .unit-item:hover { background: rgba(255,255,255,0.1); }
         .unit-actions { display: flex; gap: 15px; align-items: center; }
 
-        #pdf-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; overflow: hidden; }
+        /* Media Overlays (PDF & Video) */
+        #pdf-overlay, #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; flex-direction: column; overflow: hidden; }
         .viewer-controls { background: #111; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 3001; }
-        .pdf-wrapper { flex-grow: 1; width: 100%; height: 100%; -webkit-overflow-scrolling: touch; overflow-y: auto; }
-        #pdf-frame { width: 100%; height: 100%; border: none; background: #222; display: block; }
+        .media-wrapper { flex-grow: 1; width: 100%; height: 100%; position: relative; }
+        #pdf-frame, #video-frame { width: 100%; height: 100%; border: none; background: #000; display: block; }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1500; }
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 15px; border: 1px solid #00f2ff; z-index: 2000; text-align: center; width: 320px; }
 
         footer { padding: 40px; text-align: center; opacity: 0.4; font-size: 0.8rem; cursor: pointer; }
+        .tab-btn { background: #333; color: #fff; border: 1px solid #444; padding: 5px 10px; cursor: pointer; border-radius: 5px; font-size: 0.7rem;}
+        .tab-btn.active { background: #00f2ff; color: #000; }
     </style>
 </head>
 <body>
@@ -72,8 +74,18 @@
             <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeViewer()">Close</button>
         </div>
     </div>
-    <div class="pdf-wrapper">
+    <div class="media-wrapper">
         <iframe id="pdf-frame" src="" allow="autoplay"></iframe>
+    </div>
+</div>
+
+<div id="video-overlay">
+    <div class="viewer-controls">
+        <span id="video-title" style="color: #00f2ff; font-weight: 600;">Video Lesson</span>
+        <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeVideo()">Close</button>
+    </div>
+    <div class="media-wrapper">
+        <iframe id="video-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
 </div>
 
@@ -105,10 +117,18 @@
     <div id="unitList" style="margin-top:15px;"></div>
     
     <div id="admin-unit-tools" style="display:none; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-        <button class="owner-btn" onclick="addUnit()">+ Add Unit</button>
-        <div id="url-input-area" style="display:none; margin-top:10px;">
-            <input type="text" id="unitUrl" placeholder="Paste Google Drive Link" style="width:100%; padding:10px; border-radius:8px; border:1px solid #00f2ff; background:#000; color:#fff;">
-            <button class="owner-btn" onclick="saveUrl()" style="width:100%; margin-top:10px;">Save Link</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <button class="owner-btn" onclick="addUnit()">+ Add Unit</button>
+            <div id="edit-indicator" style="font-size: 0.7rem; color: #00f2ff; font-style: italic;">Select a unit to edit links</div>
+        </div>
+        
+        <div id="url-input-area" style="display:none; margin-top:10px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;">
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <button id="tabPdf" class="tab-btn active" onclick="switchLinkType('pdf')">PDF Link</button>
+                <button id="tabVid" class="tab-btn" onclick="switchLinkType('vid')">YouTube Link</button>
+            </div>
+            <input type="text" id="unitUrl" placeholder="Paste Link here..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #00f2ff; background:#000; color:#fff;">
+            <button class="owner-btn" onclick="saveUrl()" style="width:100%; margin-top:10px;">Update Link</button>
         </div>
     </div>
 </div>
@@ -143,9 +163,9 @@
     let isAdmin = false;
     let currentKey = '';
     let selectedIdx = null;
+    let activeLinkType = 'pdf'; // or 'vid'
     let fCount = 0;
 
-    // --- CUSTOM TOAST ---
     window.showToast = (msg) => {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -155,30 +175,12 @@
         setTimeout(() => toast.remove(), 3000);
     };
 
-    // --- FIXED SMART SHARE ---
     window.handleSmartShare = async (msg) => {
-        // Change the URL below to your actual direct hosting link if 'window.location' keeps failing
-        const shareUrl = window.location.href.includes('useas.online') ? 'https://useas.online' : window.location.href.split('?')[0];
+        const shareUrl = window.location.href.split('?')[0];
         const fullText = `${msg}\nLink: ${shareUrl}`;
-
-        // 1. Native Mobile Share
         if (navigator.share) {
-            try {
-                await navigator.share({ title: 'Study Hub', text: msg, url: shareUrl });
-                return;
-            } catch (err) { console.log("Native share cancelled"); }
+            try { await navigator.share({ title: 'Study Hub', text: msg, url: shareUrl }); return; } catch (err) {}
         }
-
-        // 2. Modern Clipboard API
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            try {
-                await navigator.clipboard.writeText(fullText);
-                showToast("Link Copied to Clipboard!");
-                return;
-            } catch (err) { console.log("Clipboard API failed"); }
-        }
-
-        // 3. Old School Fallback (Hidden Textarea)
         try {
             const textArea = document.createElement("textarea");
             textArea.value = fullText;
@@ -187,12 +189,9 @@
             document.execCommand('copy');
             document.body.removeChild(textArea);
             showToast("Link Copied!");
-        } catch (err) {
-            prompt("Copy this link:", shareUrl);
-        }
+        } catch (err) { prompt("Copy link:", shareUrl); }
     };
 
-    // --- ADMIN ACCESS ---
     document.getElementById('fTrig').onclick = () => { if(++fCount === 5) { hClick(); fCount = 0; } };
     window.hClick = () => {
         const pass = prompt("System Pass:");
@@ -243,12 +242,16 @@
         const list = document.getElementById('unitList');
         list.innerHTML = '';
         const units = subjectData[currentKey].units || [];
+        const vids = subjectData[currentKey].vids || [];
+        
         units.forEach((u, i) => {
+            const hasVid = vids[i] && vids[i] !== "#";
             list.innerHTML += `
-                <div class="unit-item" onclick="viewNote(${i})">
+                <div class="unit-item" onclick="handleUnitClick(${i})">
                     <span>${u}</span>
                     <div class="unit-actions">
                         <i class="fa-solid fa-share-nodes" style="color:#00f2ff; cursor:pointer;" onclick="event.stopPropagation(); handleSmartShare('Check out ${u} notes!')"></i>
+                        ${hasVid ? `<i class="fa-brands fa-youtube" style="color:#ff0000; font-size:1.3rem;" onclick="event.stopPropagation(); openVideo(${i})"></i>` : ''}
                         ${isAdmin ? `<i class="fa-solid fa-trash" style="color:#ff5252; cursor:pointer;" onclick="event.stopPropagation(); deleteUnit(${i})"></i>` : ''}
                         <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
                     </div>
@@ -256,10 +259,31 @@
         });
     };
 
-    window.viewNote = (i) => {
+    window.handleUnitClick = (i) => {
         selectedIdx = i;
+        if(isAdmin) {
+            document.getElementById('url-input-area').style.display = 'block';
+            document.getElementById('edit-indicator').innerText = `Editing: ${subjectData[currentKey].units[i]}`;
+            switchLinkType(activeLinkType); 
+        }
+        viewNote(i);
+    };
+
+    window.switchLinkType = (type) => {
+        activeLinkType = type;
+        document.getElementById('tabPdf').className = type === 'pdf' ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('tabVid').className = type === 'vid' ? 'tab-btn active' : 'tab-btn';
+        
+        if(selectedIdx !== null) {
+            const val = type === 'pdf' ? 
+                subjectData[currentKey].links[selectedIdx] : 
+                (subjectData[currentKey].vids ? subjectData[currentKey].vids[selectedIdx] : "#");
+            document.getElementById('unitUrl').value = (val === "#") ? "" : val;
+        }
+    };
+
+    window.viewNote = (i) => {
         let rawUrl = subjectData[currentKey].links[i];
-        if(isAdmin) document.getElementById('url-input-area').style.display = 'block';
         if(!rawUrl || rawUrl === "#") return;
 
         let finalViewerUrl = "";
@@ -277,20 +301,71 @@
         document.body.style.overflow = 'hidden'; 
     };
 
+    window.openVideo = (i) => {
+        let rawUrl = subjectData[currentKey].vids[i];
+        if(!rawUrl || rawUrl === "#") return;
+
+        let videoId = "";
+        if(rawUrl.includes('youtu.be/')) videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+        else if(rawUrl.includes('v=')) videoId = new URL(rawUrl).searchParams.get('v');
+        else if(rawUrl.includes('embed/')) videoId = rawUrl.split('embed/')[1];
+
+        document.getElementById('video-title').innerText = subjectData[currentKey].units[i];
+        document.getElementById('video-frame').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        document.getElementById('video-overlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
     window.closeViewer = () => {
         document.getElementById('pdf-overlay').style.display = 'none';
         document.getElementById('pdf-frame').src = "";
         document.body.style.overflow = 'auto';
     };
 
+    window.closeVideo = () => {
+        document.getElementById('video-overlay').style.display = 'none';
+        document.getElementById('video-frame').src = "";
+        document.body.style.overflow = 'auto';
+    };
+
     window.saveUrl = async () => {
-        const val = document.getElementById('unitUrl').value;
-        if(selectedIdx !== null && val) {
-            subjectData[currentKey].links[selectedIdx] = val;
+        const val = document.getElementById('unitUrl').value.trim() || "#";
+        if(selectedIdx !== null) {
+            if(activeLinkType === 'pdf') {
+                subjectData[currentKey].links[selectedIdx] = val;
+            } else {
+                if(!subjectData[currentKey].vids) subjectData[currentKey].vids = new Array(subjectData[currentKey].units.length).fill("#");
+                subjectData[currentKey].vids[selectedIdx] = val;
+            }
             await updateCloud();
-            document.getElementById('unitUrl').value = '';
-            showToast("Unit Updated!");
-            viewNote(selectedIdx);
+            showToast("Updated!");
+        }
+    };
+
+    window.addUnit = async () => {
+        let n = prompt("Unit Name:");
+        if(n) {
+            if(!subjectData[currentKey].units) { 
+                subjectData[currentKey].units = []; 
+                subjectData[currentKey].links = []; 
+                subjectData[currentKey].vids = []; 
+            }
+            subjectData[currentKey].units.push(n);
+            subjectData[currentKey].links.push("#");
+            if(!subjectData[currentKey].vids) subjectData[currentKey].vids = [];
+            subjectData[currentKey].vids.push("#");
+            await updateCloud();
+            showToast("Unit Added!");
+        }
+    };
+
+    window.deleteUnit = async (i) => {
+        if(confirm("Delete?")) {
+            subjectData[currentKey].units.splice(i, 1);
+            subjectData[currentKey].links.splice(i, 1);
+            if(subjectData[currentKey].vids) subjectData[currentKey].vids.splice(i, 1);
+            await updateCloud();
+            showToast("Removed!");
         }
     };
 
@@ -302,47 +377,4 @@
     window.addSubject = async () => {
         let n = prompt("Subject Name:");
         if(n) {
-            let k = "id_" + Date.now();
-            subjectData[k] = { title: n, units: [], links: [], pos: Object.keys(subjectData).length + 1 };
-            await updateCloud();
-            showToast("Added!");
-        }
-    };
-
-    window.deleteSubject = async (k) => { if(confirm("Delete Subject?")) { delete subjectData[k]; await updateCloud(); showToast("Deleted!"); } };
-
-    window.addUnit = async () => {
-        let n = prompt("Unit Name:");
-        if(n) {
-            if(!subjectData[currentKey].units) { subjectData[currentKey].units = []; subjectData[currentKey].links = []; }
-            subjectData[currentKey].units.push(n);
-            subjectData[currentKey].links.push("#");
-            await updateCloud();
-            showToast("Unit Added!");
-        }
-    };
-
-    window.deleteUnit = async (i) => {
-        if(confirm("Delete?")) {
-            subjectData[currentKey].units.splice(i, 1);
-            subjectData[currentKey].links.splice(i, 1);
-            await updateCloud();
-            showToast("Removed!");
-        }
-    };
-
-    window.setPosition = async (k) => {
-        let p = prompt("New Position:", subjectData[k].pos || 0);
-        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Moved!"); }
-    }
-
-    window.openAbout = () => { document.getElementById('overlay').style.display='block'; document.getElementById('aboutModal').style.display='block'; };
-    window.closeAll = () => { document.getElementById('overlay').style.display='none'; document.getElementById('aboutModal').style.display='none'; };
-    window.hideNotes = () => { currentKey = ''; document.getElementById('mainGrid').style.display = 'grid'; document.getElementById('notesArea').style.display = 'none'; };
-    window.doSearch = () => {
-        let q = document.getElementById('mSearch').value.toLowerCase();
-        document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none');
-    };
-</script>
-</body>
-</html>
+            l
