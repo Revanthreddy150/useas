@@ -377,4 +377,27 @@
     window.addSubject = async () => {
         let n = prompt("Subject Name:");
         if(n) {
-            l
+            let k = "id_" + Date.now();
+            subjectData[k] = { title: n, units: [], links: [], vids: [], pos: Object.keys(subjectData).length + 1 };
+            await updateCloud();
+            showToast("Added!");
+        }
+    };
+
+    window.deleteSubject = async (k) => { if(confirm("Delete Subject?")) { delete subjectData[k]; await updateCloud(); showToast("Deleted!"); } };
+
+    window.setPosition = async (k) => {
+        let p = prompt("New Position:", subjectData[k].pos || 0);
+        if(p) { subjectData[k].pos = parseInt(p); await updateCloud(); showToast("Moved!"); }
+    }
+
+    window.openAbout = () => { document.getElementById('overlay').style.display='block'; document.getElementById('aboutModal').style.display='block'; };
+    window.closeAll = () => { document.getElementById('overlay').style.display='none'; document.getElementById('aboutModal').style.display='none'; };
+    window.hideNotes = () => { currentKey = ''; document.getElementById('mainGrid').style.display = 'grid'; document.getElementById('notesArea').style.display = 'none'; };
+    window.doSearch = () => {
+        let q = document.getElementById('mSearch').value.toLowerCase();
+        document.querySelectorAll('.card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'block' : 'none');
+    };
+</script>
+</body>
+</html>
