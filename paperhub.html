@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #4A90E2; --bg: #F8F9FB; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; color: #333; }
+
+        /* Moving Color Heading */
+        @keyframes colorMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header { 
+            text-align: center; font-size: 32px; font-weight: 800; padding: 40px 10px 10px;
+            background: linear-gradient(270deg, #4A90E2, #9b59b6, #e74c3c, #f1c40f);
+            background-size: 600% 600%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorMove 10s ease infinite;
+        }
+
+        .search-container { display: flex; justify-content: center; padding: 10px 20px 30px; }
+        #mSearch {
+            width: 100%; max-width: 500px; padding: 14px 20px; border-radius: 12px;
+            border: 1px solid #ddd; background: #fff; font-size: 16px; outline: none;
+        }
+
+        /* Admin Tools Panel */
+        #admin-panel {
+            display: none; background: white; margin: 0 20px 30px; padding: 20px;
+            border-radius: 15px; border: 2px dashed var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .admin-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; }
+
+        /* Card Layout */
+        #papers-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px; padding: 0 20px;
+        }
+
+        .paper-card {
+            background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            border: 1px solid #f0f0f0; position: relative; transition: transform 0.2s;
+        }
+        .paper-card:hover { transform: translateY(-5px); }
+
+        /* Clickable Preview Area */
+        .card-preview { 
+            width: 100%; height: 320px; background: #f0f0f0; 
+            position: relative; cursor: pointer; overflow: hidden;
+        }
+        
+        /* Ensures the iframe/img doesn't block the click event of the parent div */
+        .card-preview iframe, .card-preview img { 
+            width: 100%; height: 100%; border: none; object-fit: cover; 
+            pointer-events: none; 
+        }
+
+        .card-title { padding: 20px; text-align: center; font-weight: 600; font-size: 16px; color: #555; border-top: 1px solid #f9f9f9; }
+
+        .admin-btns { display: flex; padding: 10px; gap: 5px; background: #fdfdfd; }
+        .btn { border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; color: white; font-size: 12px; font-weight: bold; }
+        
+        /* Secret Modals */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1500; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 25px; border-radius: 15px; z-index: 2000; text-align: center; width: 280px; }
+
+        footer { padding: 60px; text-align: center; opacity: 0.3; font-size: 0.8rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1 class="header">PAPER HUB</h1>
+
+    <div class="search-container">
+        <input type="text" id="mSearch" placeholder="Search resources...">
+    </div>
+
+    <div id="admin-panel">
+        <h3 style="margin-top:0; color:var(--primary)">🛡️ Admin Tools</h3>
+        <input type="text" id="paper-title" class="admin-input" placeholder="Document Title">
+        <input type="text" id="paper-link" class="admin-input" placeholder="PDF or Image Link">
+        <input type="hidden" id="edit-id">
+        <button id="save-btn" style="background:var(--primary); color:white; border:none; padding:12px; border-radius:8px; width:100%; cursor:pointer; font-weight:bold;">Save to Cloud</button>
+    </div>
+
+    <div id="papers-container"></div>
+
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    <div class="modal" id="secretModal">
+        <h2 id="modalHeading" style="cursor:pointer; color:var(--primary); margin:0;">PAPER HUB</h2>
+        <p style="font-size: 12px; color: #666; margin-top: 10px;">Security Verification</p>
+    </div>
+
+    <footer id="footerTrigger">© 2026 Paper Hub</footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+            authDomain: "studyhub-33164.firebaseapp.com",
+            projectId: "studyhub-33164",
+            storageBucket: "studyhub-33164.firebasestorage.app",
+            messagingSenderId: "918352715015",
+            appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const papersCol = collection(db, "papers");
+
+        let allPapers = [];
+        let isAdmin = false;
+        let fClicks = 0, mClicks = 0;
+
+        // --- SECRET ACCESS ---
+        document.getElementById('footerTrigger').onclick = () => {
+            if(++fClicks === 5) {
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('secretModal').style.display = 'block';
+                fClicks = 0;
+            }
+        };
+
+        document.getElementById('modalHeading').onclick = () => {
+            if(++mClicks === 5) {
+                if(prompt("System Password:") === "study11") {
+                    isAdmin = true;
+                    document.getElementById('admin-panel').style.display = 'block';
+                    closeModal();
+                    renderUI(allPapers);
+                }
+                mClicks = 0;
+            }
+        };
+
+        window.closeModal = () => {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('secretModal').style.display = 'none';
+        };
+
+        // --- SAVE DATA ---
+        document.getElementById('save-btn').onclick = async () => {
+            const title = document.getElementById('paper-title').value;
+            const link = document.getElementById('paper-link').value;
+            const editId = document.getElementById('edit-id').value;
+            if(!title || !link) return;
+
+            try {
+                if(editId) {
+                    await updateDoc(doc(db, "papers", editId), { title, link });
+                    document.getElementById('edit-id').value = "";
+                } else {
+                    await addDoc(papersCol, { title, link });
+                }
+                document.getElementById('paper-title').value = "";
+                document.getElementById('paper-link').value = "";
+                document.getElementById('save-btn').innerText = "Save to Cloud";
+                alert("Saved!");
+            } catch (e) { 
+                alert("Permission Error: Check Firebase Rules."); 
+            }
+        };
+
+        // --- LOAD DATA ---
+        onSnapshot(papersCol, (snapshot) => {
+            allPapers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderUI(allPapers);
+        });
+
+        function renderUI(data) {
+            const container = document.getElementById('papers-container');
+            container.innerHTML = '';
+            data.forEach(item => {
+                const isPdf = item.link.toLowerCase().includes('.pdf') || item.link.includes('drive.google.com');
+                let displayUrl = item.link;
+
+                if (item.link.includes('drive.google.com')) {
+                    let fileId = item.link.includes('/d/') ? item.link.split('/d/')[1].split('/')[0] : new URL(item.link).searchParams.get('id');
+                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${fileId}`)}&embedded=true`;
+                } else if (isPdf) {
+                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(item.link)}&embedded=true`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'paper-card';
+                card.innerHTML = `
+                    <div class="card-preview" onclick="window.open('${item.link}', '_blank')">
+                        ${isPdf ? `<iframe src="${displayUrl}"></iframe>` : `<img src="${item.link}">`}
+                    </div>
+                    <div class="card-title">${item.title}</div>
+                    ${isAdmin ? `
+                        <div class="admin-btns">
+                            <button class="btn" style="background:#f39c12" onclick="editMe('${item.id}','${item.title}','${item.link}')">Edit</button>
+                            <button class="btn" style="background:#e74c3c" onclick="deleteMe('${item.id}')">Del</button>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.editMe = (id, t, l) => {
+            document.getElementById('paper-title').value = t;
+            document.getElementById('paper-link').value = l;
+            document.getElementById('edit-id').value = id;
+            document.getElementById('save-btn').innerText = "Update Paper";
+            window.scrollTo(0,0);
+        };
+
+        window.deleteMe = async (id) => {
+            if(confirm("Delete Paper?")) await deleteDoc(doc(db, "papers", id));
+        };
+
+        document.getElementById('mSearch').oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            renderUI(allPapers.filter(p => p.title.toLowerCase().includes(val)));
+        };
+    </script>
+</body>
+</html>
+
