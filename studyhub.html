@@ -81,10 +81,13 @@
 
 <div id="video-overlay">
     <div class="viewer-controls">
-        <span id="video-title" style="color: #00f2ff; font-weight: 600;">Video Lesson</span>
-        <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeVideo()">Close</button>
+        <span id="video-title" style="color: #00f2ff; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 40%;">Video Lesson</span>
+        <div style="display:flex; gap: 8px;">
+            <button class="owner-btn" style="background:#3498db; color:#fff;" onclick="toggleVideoFullScreen()"><i class="fa-solid fa-expand"></i> Full Screen</button>
+            <button class="owner-btn" style="background:#ff5252; color:#fff;" onclick="closeVideo()">Close</button>
+        </div>
     </div>
-    <div class="media-wrapper">
+    <div class="media-wrapper" id="video-container">
         <iframe id="video-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
 </div>
@@ -163,7 +166,7 @@
     let isAdmin = false;
     let currentKey = '';
     let selectedIdx = null;
-    let activeLinkType = 'pdf'; // or 'vid'
+    let activeLinkType = 'pdf'; 
     let fCount = 0;
 
     window.showToast = (msg) => {
@@ -314,6 +317,18 @@
         document.getElementById('video-frame').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
         document.getElementById('video-overlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    };
+
+    // Full Screen Logic
+    window.toggleVideoFullScreen = () => {
+        const frame = document.getElementById('video-frame');
+        if (frame.requestFullscreen) {
+            frame.requestFullscreen();
+        } else if (frame.webkitRequestFullscreen) { /* Safari */
+            frame.webkitRequestFullscreen();
+        } else if (frame.msRequestFullscreen) { /* IE11 */
+            frame.msRequestFullscreen();
+        }
     };
 
     window.closeViewer = () => {
