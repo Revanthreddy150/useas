@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Useas App - Install</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background-color:#f4f7fe;
+color:#333;
+text-align:center;
+}
+
+.container{
+background:#ffffff;
+padding:50px 40px;
+border-radius:24px;
+width:380px;
+box-shadow:0 10px 40px rgba(0,0,0,0.04);
+border:1px solid rgba(0,0,0,0.03);
+}
+
+h1{
+font-size:32px;
+margin-bottom:8px;
+color:#6a59d1;
+font-weight:700;
+}
+
+.version{
+font-size:14px;
+color:#a0a0a0;
+margin-bottom:30px;
+font-weight:500;
+}
+
+.install-btn{
+background:linear-gradient(135deg,#6a59d1,#a389f4);
+color:#ffffff;
+padding:16px 40px;
+border:none;
+border-radius:14px;
+font-size:17px;
+cursor:pointer;
+font-weight:600;
+text-decoration:none;
+display:inline-block;
+transition:all 0.3s ease;
+box-shadow:0 8px 25px rgba(106,89,209,0.25);
+}
+
+.install-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 30px rgba(106,89,209,0.35);
+}
+
+.qr{
+margin-top:30px;
+}
+
+.qr img{
+width:160px;
+height:160px;
+}
+
+.qr-text{
+margin-top:10px;
+font-size:14px;
+color:#666;
+}
+
+.note{
+margin-top:25px;
+font-size:14px;
+color:#777;
+line-height:2;
+text-align:left;
+display:inline-block;
+}
+
+.check{
+color:#6a59d1;
+margin-right:8px;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>USEAS</h1>
+<div class="version">Version 1.0</div>
+
+<a href="https://mega.nz/file/EI12SDqR#yMLXGL2XDD1Hh3aKu7rm9Jk7ou-lGU045FmqmcFs8_U" class="install-btn">
+Download App
+</a>
+
+<div class="note">
+<span class="check">✓</span> Works on Android devices<br>
+<span class="check">✓</span> Secure & Fast Download<br>
+<span class="check">✓</span> All modern browsers supported
+</div>
+
+<!-- QR CODE BELOW -->
+<div class="qr">
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://mega.nz/file/EI12SDqR#yMLXGL2XDD1Hh3aKu7rm9Jk7ou-lGU045FmqmcFs8_U">
+<div class="qr-text">Scan QR to Download</div>
+</div>
+
+</div>
+
+</body>
+</html>
