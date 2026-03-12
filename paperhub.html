@@ -9,7 +9,6 @@
         :root { --primary: #4A90E2; --bg: #F8F9FB; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; color: #333; }
 
-        /* Moving Color Heading */
         @keyframes colorMove {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -29,9 +28,9 @@
         #mSearch {
             width: 100%; max-width: 500px; padding: 14px 20px; border-radius: 12px;
             border: 1px solid #ddd; background: #fff; font-size: 16px; outline: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
 
-        /* Admin Tools Panel */
         #admin-panel {
             display: none; background: white; margin: 0 20px 30px; padding: 20px;
             border-radius: 15px; border: 2px dashed var(--primary);
@@ -39,40 +38,47 @@
         }
         .admin-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; }
 
-        /* Card Layout */
+        /* Content Viewport */
         #papers-container {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 25px; padding: 0 20px;
         }
 
+        #chrome-container {
+            display: none; padding: 0 20px; flex-direction: column; align-items: center;
+        }
+
+        .chrome-header {
+            width: 100%; max-width: 1200px; display: flex; justify-content: space-between;
+            align-items: center; padding: 12px; background: #333; border-radius: 15px 15px 0 0;
+            color: white;
+        }
+
+        #chrome-frame {
+            width: 100%; max-width: 1200px; height: 85vh; border: 2px solid #333; 
+            border-radius: 0 0 15px 15px; background: #fff;
+        }
+
+        .close-chrome {
+            padding: 5px 15px; background: #ff4757; color: white; 
+            border: none; border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+
+        /* Paper Cards */
         .paper-card {
             background: white; border-radius: 20px; overflow: hidden;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column;
-            border: 1px solid #f0f0f0; position: relative; transition: transform 0.2s;
+            border: 1px solid #f0f0f0; transition: transform 0.2s;
         }
         .paper-card:hover { transform: translateY(-5px); }
+        .card-preview { width: 100%; height: 300px; background: #f0f0f0; cursor: pointer; }
+        .card-preview iframe, .card-preview img { width: 100%; height: 100%; border: none; object-fit: cover; pointer-events: none; }
+        .card-title { padding: 15px; text-align: center; font-weight: 600; font-size: 15px; color: #444; }
 
-        /* Clickable Preview Area */
-        .card-preview { 
-            width: 100%; height: 320px; background: #f0f0f0; 
-            position: relative; cursor: pointer; overflow: hidden;
-        }
-        
-        /* Ensures the iframe/img doesn't block the click event of the parent div */
-        .card-preview iframe, .card-preview img { 
-            width: 100%; height: 100%; border: none; object-fit: cover; 
-            pointer-events: none; 
-        }
-
-        .card-title { padding: 20px; text-align: center; font-weight: 600; font-size: 16px; color: #555; border-top: 1px solid #f9f9f9; }
-
-        .admin-btns { display: flex; padding: 10px; gap: 5px; background: #fdfdfd; }
-        .btn { border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; color: white; font-size: 12px; font-weight: bold; }
-        
-        /* Secret Modals */
+        .admin-btns { display: flex; padding: 10px; gap: 5px; background: #f9f9f9; }
+        .btn { border: none; padding: 8px; border-radius: 6px; cursor: pointer; flex: 1; color: white; font-size: 11px; font-weight: bold; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1500; }
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 25px; border-radius: 15px; z-index: 2000; text-align: center; width: 280px; }
-
         footer { padding: 60px; text-align: center; opacity: 0.3; font-size: 0.8rem; cursor: pointer; }
     </style>
 </head>
@@ -93,6 +99,14 @@
     </div>
 
     <div id="papers-container"></div>
+
+    <div id="chrome-container">
+        <div class="chrome-header">
+            <span><i class="fab fa-chrome"></i> Paper Hub Browser</span>
+            <button class="close-chrome" id="closeChrome">Exit</button>
+        </div>
+        <iframe id="chrome-frame" src=""></iframe>
+    </div>
 
     <div class="overlay" id="overlay" onclick="closeModal()"></div>
     <div class="modal" id="secretModal">
@@ -121,58 +135,54 @@
 
         let allPapers = [];
         let isAdmin = false;
-        let fClicks = 0, mClicks = 0;
 
         // --- SECRET ACCESS ---
-        document.getElementById('footerTrigger').onclick = () => {
-            if(++fClicks === 5) {
-                document.getElementById('overlay').style.display = 'block';
-                document.getElementById('secretModal').style.display = 'block';
-                fClicks = 0;
-            }
-        };
+        let fClicks = 0, mClicks = 0;
+        document.getElementById('footerTrigger').onclick = () => { if(++fClicks === 5) { document.getElementById('overlay').style.display = 'block'; document.getElementById('secretModal').style.display = 'block'; fClicks = 0; } };
+        document.getElementById('modalHeading').onclick = () => { if(++mClicks === 5) { if(prompt("System Password:") === "study11") { isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; closeModal(); renderUI(allPapers); } mClicks = 0; } };
+        window.closeModal = () => { document.getElementById('overlay').style.display = 'none'; document.getElementById('secretModal').style.display = 'none'; };
 
-        document.getElementById('modalHeading').onclick = () => {
-            if(++mClicks === 5) {
-                if(prompt("System Password:") === "study11") {
-                    isAdmin = true;
-                    document.getElementById('admin-panel').style.display = 'block';
-                    closeModal();
-                    renderUI(allPapers);
+        // --- THE "OPENCHROME" FEATURE ---
+        const searchInput = document.getElementById('mSearch');
+        const papersContainer = document.getElementById('papers-container');
+        const chromeContainer = document.getElementById('chrome-container');
+        const chromeFrame = document.getElementById('chrome-frame');
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = searchInput.value.trim().toLowerCase();
+                if (val === "openchrome") {
+                    papersContainer.style.display = 'none';
+                    chromeContainer.style.display = 'flex';
+                    
+                    // This is a special URL that allows loading Google-like search inside an iframe
+                    chromeFrame.src = "https://www.google.com/search?igu=1"; 
+                    
+                    searchInput.value = "";
                 }
-                mClicks = 0;
             }
+        });
+
+        document.getElementById('closeChrome').onclick = () => {
+            chromeContainer.style.display = 'none';
+            papersContainer.style.display = 'grid';
+            chromeFrame.src = ""; 
         };
 
-        window.closeModal = () => {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('secretModal').style.display = 'none';
-        };
-
-        // --- SAVE DATA ---
+        // --- FIREBASE LOGIC ---
         document.getElementById('save-btn').onclick = async () => {
             const title = document.getElementById('paper-title').value;
             const link = document.getElementById('paper-link').value;
             const editId = document.getElementById('edit-id').value;
             if(!title || !link) return;
-
             try {
-                if(editId) {
-                    await updateDoc(doc(db, "papers", editId), { title, link });
-                    document.getElementById('edit-id').value = "";
-                } else {
-                    await addDoc(papersCol, { title, link });
-                }
-                document.getElementById('paper-title').value = "";
-                document.getElementById('paper-link').value = "";
-                document.getElementById('save-btn').innerText = "Save to Cloud";
-                alert("Saved!");
-            } catch (e) { 
-                alert("Permission Error: Check Firebase Rules."); 
-            }
+                if(editId) { await updateDoc(doc(db, "papers", editId), { title, link }); document.getElementById('edit-id').value = ""; }
+                else { await addDoc(papersCol, { title, link }); }
+                document.getElementById('paper-title').value = ""; document.getElementById('paper-link').value = "";
+                document.getElementById('save-btn').innerText = "Save to Cloud"; alert("Saved!");
+            } catch (e) { alert("Error saving data."); }
         };
 
-        // --- LOAD DATA ---
         onSnapshot(papersCol, (snapshot) => {
             allPapers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
             renderUI(allPapers);
@@ -184,7 +194,6 @@
             data.forEach(item => {
                 const isPdf = item.link.toLowerCase().includes('.pdf') || item.link.includes('drive.google.com');
                 let displayUrl = item.link;
-
                 if (item.link.includes('drive.google.com')) {
                     let fileId = item.link.includes('/d/') ? item.link.split('/d/')[1].split('/')[0] : new URL(item.link).searchParams.get('id');
                     displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${fileId}`)}&embedded=true`;
@@ -199,12 +208,10 @@
                         ${isPdf ? `<iframe src="${displayUrl}"></iframe>` : `<img src="${item.link}">`}
                     </div>
                     <div class="card-title">${item.title}</div>
-                    ${isAdmin ? `
-                        <div class="admin-btns">
-                            <button class="btn" style="background:#f39c12" onclick="editMe('${item.id}','${item.title}','${item.link}')">Edit</button>
-                            <button class="btn" style="background:#e74c3c" onclick="deleteMe('${item.id}')">Del</button>
-                        </div>
-                    ` : ''}
+                    ${isAdmin ? `<div class="admin-btns">
+                        <button class="btn" style="background:#f39c12" onclick="editMe('${item.id}','${item.title}','${item.link}')">Edit</button>
+                        <button class="btn" style="background:#e74c3c" onclick="deleteMe('${item.id}')">Del</button>
+                    </div>` : ''}
                 `;
                 container.appendChild(card);
             });
@@ -218,15 +225,14 @@
             window.scrollTo(0,0);
         };
 
-        window.deleteMe = async (id) => {
-            if(confirm("Delete Paper?")) await deleteDoc(doc(db, "papers", id));
-        };
+        window.deleteMe = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "papers", id)); };
 
-        document.getElementById('mSearch').oninput = (e) => {
+        searchInput.oninput = (e) => {
             const val = e.target.value.toLowerCase();
-            renderUI(allPapers.filter(p => p.title.toLowerCase().includes(val)));
+            if (val !== "openchrome") {
+                renderUI(allPapers.filter(p => p.title.toLowerCase().includes(val)));
+            }
         };
     </script>
 </body>
 </html>
-
