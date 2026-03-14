@@ -24,7 +24,6 @@
         }
 
         .container { max-width: 480px; margin: 0 auto; }
-
         header { text-align: center; margin-bottom: 35px; padding-top: 10px; }
 
         #page-title { 
@@ -40,7 +39,6 @@
 
         .subtitle { color: #b2bec3; font-size: 0.9rem; margin-top: 5px; font-weight: 500; }
 
-        /* Notification Card */
         .notification-card {
             background: white; border-radius: 24px; margin-bottom: 20px;
             box-shadow: var(--card-shadow); overflow: hidden; cursor: pointer;
@@ -72,7 +70,6 @@
         .title-text { font-weight: 700; display: block; font-size: 1rem; color: #2d3436; margin-bottom: 2px; }
         .date-text { font-size: 0.8rem; color: #b2bec3; }
 
-        /* Share Button */
         .share-btn {
             background: #f8f9fa; border: none; width: 38px; height: 38px;
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
@@ -80,7 +77,6 @@
         }
         .share-btn:hover { background: var(--primary); color: white; }
 
-        /* Full-Screen View */
         #fs-view {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: #ffffff;
@@ -95,7 +91,6 @@
 
         .fs-body { flex-grow: 1; overflow-y: auto; padding: 30px 20px; max-width: 550px; margin: 0 auto; width: 100%; box-sizing: border-box; }
 
-        /* Modals */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(45, 52, 54, 0.4); backdrop-filter: blur(6px);
@@ -187,8 +182,12 @@
     const db = getDatabase(app);
     const dbRef = ref(db, 'notifications');
 
-    let editModeId = null;
     let currentData = {};
+    let editModeId = null;
+
+    // Detect if the URL has an ID to auto-open
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoOpenId = urlParams.get('msgId');
 
     let taps = 0;
     document.getElementById('page-title').onclick = () => { 
@@ -227,6 +226,72 @@
         }
     };
 
+    onValue(dbRef, (snap) => {
+        const list = document.getElementById('msg-list');
+        const history = document.getElementById('history-list');
+        list.innerHTML = ""; history.innerHTML = "";
+        const data = snap.val();
+        currentData = data || {};
+        if(!data) return;
+
+        Object.entries(data).reverse().forEach(([id, val]) => {
+            const card = document.createElement('div');
+            card.className = 'notification-card';
+            card.onclick = () => openContent(id, val);
+            let prev = val.type === 'image' ? `<img src="${val.data}" class="preview-img">` : `<div class="msg-placeholder">${val.type === 'pdf' ? '📄 Document' : '"'+val.data.substring(0,40)+'..."'}</div>`;
+            
+            card.innerHTML = `
+                <div class="card-top"><span class="type-badge">${val.type}</span>${prev}</div>
+                <div class="card-bottom">
+                    <div class="brand-avatar">US</div>
+                    <div class="info-col">
+                        <span class="title-text">${val.title}</span>
+                        <span class="date-text">${val.date}</span>
+                    </div>
+                    <button class="share-btn" onclick="shareMsg(event, '${id}', '${val.title}')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    </button>
+                </div>`;
+            list.appendChild(card);
+
+            history.innerHTML += `
+                <div class="admin-item">
+                    <span style="font-weight:600; font-size:13px;">${val.title}</span>
+                    <div class="admin-item-btns">
+                        <span class="edit-tag" onclick="editMsg('${id}')">Edit</span>
+                        <span class="del-tag" onclick="deleteMsg('${id}')">Delete</span>
+                    </div>
+                </div>`;
+        });
+
+        // Check if we need to auto-open a message from the link
+        if(autoOpenId && currentData[autoOpenId]) {
+            openContent(autoOpenId, currentData[autoOpenId]);
+        }
+    });
+
+    window.shareMsg = (event, id, title) => {
+        event.stopPropagation();
+        // New URL format: uses ?msgId=... so it doesn't cause a 404
+        const shareUrl = `${window.location.origin}${window.location.pathname}?msgId=${id}`;
+
+        if (navigator.share) {
+            navigator.share({
+                title: `USEAS | ${title}`,
+                text: `Check this notification: ${title}`,
+                url: shareUrl
+            }).catch(err => console.log('Share failed', err));
+        } else {
+            const dummy = document.createElement("input");
+            document.body.appendChild(dummy);
+            dummy.value = shareUrl;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            alert("Share link copied to clipboard!");
+        }
+    };
+
     window.editMsg = (id) => {
         const item = currentData[id];
         editModeId = id;
@@ -251,69 +316,6 @@
         document.getElementById('btn-cancel-edit').style.display = "none";
     };
 
-    onValue(dbRef, (snap) => {
-        const list = document.getElementById('msg-list');
-        const history = document.getElementById('history-list');
-        list.innerHTML = ""; history.innerHTML = "";
-        const data = snap.val();
-        currentData = data || {};
-        if(!data) return;
-
-        Object.entries(data).reverse().forEach(([id, val]) => {
-            const card = document.createElement('div');
-            card.className = 'notification-card';
-            card.onclick = () => openContent(id, val);
-            let prev = val.type === 'image' ? `<img src="${val.data}" class="preview-img">` : `<div class="msg-placeholder">${val.type === 'pdf' ? '📄 Document' : '"'+val.data.substring(0,40)+'..."'}</div>`;
-            
-            card.innerHTML = `
-                <div class="card-top"><span class="type-badge">${val.type}</span>${prev}</div>
-                <div class="card-bottom">
-                    <div class="brand-avatar">US</div>
-                    <div class="info-col">
-                        <span class="title-text">${val.title}</span>
-                        <span class="date-text">${val.date}</span>
-                    </div>
-                    <button class="share-btn" onclick="shareMsg(event, '${val.title}', '${val.date}')">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                    </button>
-                </div>`;
-            list.appendChild(card);
-
-            history.innerHTML += `
-                <div class="admin-item">
-                    <span style="font-weight:600; font-size:13px;">${val.title}</span>
-                    <div class="admin-item-btns">
-                        <span class="edit-tag" onclick="editMsg('${id}')">Edit</span>
-                        <span class="del-tag" onclick="deleteMsg('${id}')">Delete</span>
-                    </div>
-                </div>`;
-        });
-    });
-
-    // Share Logic
-    window.shareMsg = (event, title, date) => {
-        event.stopPropagation();
-        const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-        const cleanDate = date.replace(/\s/g, '-').replace(/\//g, '-');
-        const shareUrl = `${window.location.origin}/useas/${cleanTitle}/${cleanDate}`;
-
-        if (navigator.share) {
-            navigator.share({
-                title: `USEAS | ${title}`,
-                text: `Check this out: ${title}`,
-                url: shareUrl
-            }).catch(err => console.log('Share failed', err));
-        } else {
-            const dummy = document.createElement("input");
-            document.body.appendChild(dummy);
-            dummy.value = shareUrl;
-            dummy.select();
-            document.execCommand("copy");
-            document.body.removeChild(dummy);
-            alert("Share link copied to clipboard!");
-        }
-    };
-
     window.deleteMsg = (id) => { if(confirm("Delete this?")) remove(ref(db, 'notifications/' + id)); };
 
     async function renderPDF(url) {
@@ -326,7 +328,10 @@
                 const page = await pdf.getPage(i);
                 const viewport = page.getViewport({ scale: 1.5 });
                 const canvas = document.createElement('canvas');
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                await page.render({ canvasContext: context, viewport }).promise;
                 target.appendChild(canvas);
             }
         } catch (e) { target.innerHTML = "Error loading document."; }
@@ -343,8 +348,12 @@
         if(item.type === 'image') { const img = document.getElementById('view-img'); img.src = item.data; img.style.display = "block"; }
     };
 
-    window.closeView = () => document.getElementById('fs-view').style.display = 'none';
+    window.closeView = () => {
+        document.getElementById('fs-view').style.display = 'none';
+        // Clean URL after closing
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+    };
 </script>
 </body>
 </html>
-
