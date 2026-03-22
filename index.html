@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>USEAS | Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            --primary-accent: #6366f1;
+            --secondary-accent: #a855f7;
+            --glass: rgba(255, 255, 255, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --max-width: 1100px; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+            width: 100%;
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- Global Header --- */
+        header {
+            padding: 12px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; width: 100%;
+            z-index: 9999; 
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: 0.3s ease;
+        }
+
+        @media (min-width: 1024px) {
+            header { padding: 12px calc((100% - var(--max-width)) / 2 + 20px); }
+        }
+
+        header.minimal {
+            background: transparent !important;
+            border-bottom: none !important;
+            backdrop-filter: none !important;
+            pointer-events: none;
+        }
+
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            pointer-events: auto;
+        }
+
+        .header-btn {
+            background: white;
+            color: var(--primary-accent);
+            border: none;
+            width: 42px; height: 42px;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            z-index: 10001;
+            transition: 0.2s;
+        }
+        .header-btn:hover { background: #f1f5f9; }
+        .header-btn:active { transform: scale(0.9); }
+
+        #back-btn { display: none; background: #0f172a; color: white; }
+
+        header.minimal #back-btn { display: flex; }
+        header.minimal .logo-container, header.minimal #help-btn { opacity: 0; visibility: hidden; }
+
+        .logo-container {
+            font-weight: 800; font-size: 1.5rem; letter-spacing: -1px;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            pointer-events: none;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed; top: 0; left: -300px; width: 300px; height: 100%;
+            background: white; z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 15px 0 40px rgba(0,0,0,0.1); padding: 40px 25px;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4); z-index: 9998; display: none; backdrop-filter: blur(4px);
+        }
+
+        .menu-link { 
+            padding: 15px; border-radius: 14px; display: flex; align-items: center; 
+            gap: 15px; cursor: pointer; color: var(--text-main); font-weight: 600; 
+            text-decoration: none; margin-bottom: 8px; transition: 0.3s;
+        }
+        .menu-link:hover { background: #f1f5f9; color: var(--primary-accent); transform: translateX(5px); }
+
+        /* --- Content Layout --- */
+        .content-area { width: 100%; flex: 1; position: relative; }
+
+        .iframe-container { 
+            width: 100%; height: 100vh; border: none; 
+            display: none; position: absolute; top: 0; left: 0; 
+            z-index: 100; background: white; 
+        }
+        .iframe-container.active { display: block; }
+
+        .page { 
+            display: none; padding: 100px 20px 60px; 
+            width: 100%; max-width: var(--max-width); margin: 0 auto;
+            animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .page.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Lab Banner --- */
+        .lab-scroll { padding: 5px 0 25px; }
+        .lab-banner {
+            width: 100%; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 28px; padding: 40px; color: white; display: flex; justify-content: space-between; align-items: center;
+            position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
+        }
+
+        /* --- Grid Responsiveness --- */
+        .section-header { margin: 35px 0 20px; }
+        .section-header h3 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+
+        .main-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+        }
+
+        @media (min-width: 640px) {
+            .main-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .main-grid { grid-template-columns: repeat(4, 1fr); }
+            .page { padding-top: 120px; }
+            .lab-banner { padding: 50px 60px; }
+            .lab-banner h2 { font-size: 2.2rem; }
+        }
+
+        .feature-card {
+            background: white; padding: 30px 20px; border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            gap: 15px; cursor: pointer; transition: all 0.3s ease;
+        }
+        .feature-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-color: var(--primary-accent);
+        }
+
+        .card-icon { 
+            width: 56px; height: 56px; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; transition: 0.3s;
+        }
+        .feature-card:hover .card-icon { transform: scale(1.1); }
+
+        .pulse-box { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 100px; font-size: 0.8rem; font-weight: 700; }
+        .dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } 100% { transform: scale(1); } }
+        .lab-btn { background: white; color: #4f46e5; border: none; padding: 12px 28px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .lab-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <h2 style="margin-bottom: 30px; letter-spacing: -1px; color: var(--primary-accent);">USEAS HUB</h2>
+        <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
+        <div class="menu-link" onclick="showProfile()"><i class="fa-solid fa-circle-user"></i> My Profile</div>
+        <div class="menu-link" onclick="showPDFTools()"><i class="fa-solid fa-file-pdf"></i> PDF Tools</div>
+        <div class="menu-link" onclick="showChatbot()"><i class="fa-solid fa-robot"></i> AI Chatbot</div>
+        <div class="menu-link" onclick="showNotifications()"><i class="fa-solid fa-bell"></i> Notifications</div>
+        <div class="menu-link" onclick="showFeedback()"><i class="fa-solid fa-comment-dots"></i> Feedback</div>
+        <div class="menu-link" onclick="showAboutUs()"><i class="fa-solid fa-circle-info"></i> About Us</div>
+        <div class="menu-link" onclick="showTerms()"><i class="fa-solid fa-shield-halved"></i> Terms & Conditions</div>
+    </div>
+
+    <header id="main-header">
+        <div class="header-left-group">
+            <button class="header-btn" id="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars-staggered"></i></button>
+            <button class="header-btn" id="back-btn" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i></button>
+        </div>
+        
+        <div class="logo-container">USEAS</div>
+        
+        <div style="display: flex; gap: 10px; pointer-events: auto;">
+            <button class="header-btn" id="help-btn" onclick="showChatbot()"><i class="fa-solid fa-bolt"></i></button>
+        </div>
+    </header>
+
+    <div class="content-area">
+        <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
+        <iframe id="labFrame" class="iframe-container" src="https://revanthreddy150.github.io/abhyaslabkeys1/" allow="clipboard-write"></iframe>
+        <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
+        <iframe id="notesFrame" class="iframe-container" src="https://revanthreddy150.github.io/test/study"></iframe>
+        <iframe id="shortsFrame" class="iframe-container" src="https://revanthreddy150.github.io/studyhublite/"></iframe>
+        <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
+        <iframe id="notificationFrame" class="iframe-container" src="https://www.useas.online/notifications"></iframe>
+        <iframe id="papersFrame" class="iframe-container" src="https://www.useas.online/paperhub"></iframe>
+        <iframe id="aboutFrame" class="iframe-container" src="https://revanthreddy150.github.io/aboutus/"></iframe>
+        <iframe id="termsFrame" class="iframe-container" src="https://revanthreddy150.github.io/termsandconditions/"></iframe>
+        <iframe id="feedbackFrame" class="iframe-container" src="https://www.useas.online/feedback"></iframe>
+
+        <div id="home" class="page active">
+            <div class="section-header">
+                <h3>Lab Zone</h3>
+            </div>
+            <div class="lab-scroll">
+                <div class="lab-banner">
+                    <div style="z-index: 1;">
+                        <div class="pulse-box"><div class="dot"></div> LIVE NOW</div>
+                        <h2 style="margin: 15px 0 8px;">Abhyas Lab Keys</h2>
+                        <p style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px;">Get instant solutions for your lab codes with one click.</p>
+                        <button class="lab-btn" onclick="showExternal('labFrame', 'lab')">Launch Lab</button>
+                    </div>
+                    <i class="fa-solid fa-code" style="font-size: 8rem; opacity: 0.1; position: absolute; right: 20px;"></i>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h3>Study Essentials</h3>
+            </div>
+            <div class="main-grid">
+                <div class="feature-card" onclick="showNotes()">
+                    <div class="card-icon" style="background: #eef2ff; color: #6366f1;"><i class="fa-solid fa-book-open"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">Notes</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Detailed PDF files</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="showShorts()">
+                    <div class="card-icon" style="background: #fff7ed; color: #f59e0b;"><i class="fa-solid fa-bolt-lightning"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">Short Notes</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Quick Revision</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="showPapers()">
+                    <div class="card-icon" style="background: #fdf2f8; color: #ec4899;"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">Prev Papers</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Exam Prep</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="showNotifications()">
+                    <div class="card-icon" style="background: #f0fdf4; color: #22c55e;"><i class="fa-solid fa-bullhorn"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">Alerts</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Latest Updates ( <b>Crt keys </b>)</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="showPDFTools()">
+                    <div class="card-icon" style="background: #fff1f2; color: #e11d48;"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">PDF Tools</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Merge & Convert</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="showFeedback()">
+                    <div class="card-icon" style="background: #fdfce8; color: #ca8a04;"><i class="fa-solid fa-star"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">Feedback</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Rate your experience</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="showChatbot()">
+                    <div class="card-icon" style="background: #f0f9ff; color: #0ea5e9;"><i class="fa-solid fa-robot"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">AI Chat</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Smart Assistant</span>
+                    </div>
+                </div>
+                <div class="feature-card" onclick="showProfile()">
+                    <div class="card-icon" style="background: #f5f3ff; color: #8b5cf6;"><i class="fa-solid fa-id-card"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 1rem;">My Profile</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Student Info</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainHeader = document.getElementById('main-header');
+        let isHome = true;
+
+        window.history.pushState({page: 'home'}, "");
+        window.addEventListener('popstate', () => { if (!isHome) showPage('home', false); });
+
+        function resetViews(isHomeView) {
+            document.querySelectorAll('.page, .iframe-container').forEach(el => el.classList.remove('active'));
+            if (isHomeView) {
+                mainHeader.classList.remove('minimal');
+            } else {
+                mainHeader.classList.add('minimal');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function showPage(pageId, shouldPush = true) {
+            resetViews(pageId === 'home');
+            document.getElementById(pageId).classList.add('active');
+            isHome = (pageId === 'home');
+            if (!isHome && shouldPush) window.history.pushState({page: pageId}, "");
+            closeSidebar();
+        }
+
+        function showNotes() { resetViews(false); document.getElementById('notesFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'notes'}, ""); }
+        function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'papers'}, ""); }
+        function showShorts() { resetViews(false); document.getElementById('shortsFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); }
+        function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); }
+        function showExternal(fId, pName) { resetViews(false); document.getElementById(fId).classList.add('active'); isHome = false; window.history.pushState({page: pName}, ""); }
+        
+        function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); closeSidebar(); }
+        function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); closeSidebar(); }
+        function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'chat'}, ""); closeSidebar(); }
+        function showAboutUs() { resetViews(false); document.getElementById('aboutFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'about'}, ""); closeSidebar(); }
+        function showTerms() { resetViews(false); document.getElementById('termsFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'terms'}, ""); closeSidebar(); }
+        
+        // Function to show Feedback
+        function showFeedback() { resetViews(false); document.getElementById('feedbackFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'feedback'}, ""); closeSidebar(); }
+
+        function toggleSidebar() { 
+            sidebar.classList.toggle('active'); 
+            document.getElementById('overlay').style.display = sidebar.classList.contains('active') ? 'block' : 'none'; 
+        }
+        function closeSidebar() { 
+            sidebar.classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none'; 
+        }
+    </script>
+</body>
+</html>
