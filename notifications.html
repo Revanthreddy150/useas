@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS | Notifications</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary: #6a5af9;
+            --secondary: #f62d8f;
+            --useas-gradient: linear-gradient(135deg, #6a5af9 0%, #f62d8f 100%);
+            --bg-color: #f4f7fa;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background: var(--bg-color); 
+            margin: 0; 
+            padding: 20px; 
+            color: #2d3436;
+        }
+
+        .container { max-width: 480px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 35px; padding-top: 10px; }
+
+        #page-title { 
+            font-size: 2.5rem; 
+            font-weight: 900; 
+            background: var(--useas-gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin: 0; 
+            letter-spacing: -1.5px;
+        }
+
+        .subtitle { color: #b2bec3; font-size: 0.9rem; margin-top: 5px; font-weight: 500; }
+
+        .notification-card {
+            background: white; border-radius: 24px; margin-bottom: 20px;
+            box-shadow: var(--card-shadow); overflow: hidden; cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.02); transition: var(--transition);
+        }
+
+        .notification-card:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(106, 90, 249, 0.12); }
+
+        .card-top { height: 150px; background: #fdfdfd; display: flex; justify-content: center; align-items: center; position: relative; }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .type-badge {
+            position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.95);
+            padding: 5px 12px; border-radius: 50px; font-size: 0.65rem; font-weight: 800;
+            text-transform: uppercase; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .msg-placeholder { padding: 20px; color: #636e72; font-weight: 500; text-align: center; }
+
+        .card-bottom { padding: 18px 20px; display: flex; align-items: center; background: white; border-top: 1px solid #f9f9f9; }
+
+        .brand-avatar {
+            width: 42px; height: 42px; background: var(--useas-gradient); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-weight: 800; font-size: 0.8rem; margin-right: 15px;
+        }
+
+        .info-col { flex-grow: 1; }
+        .title-text { font-weight: 700; display: block; font-size: 1rem; color: #2d3436; margin-bottom: 2px; }
+        .date-text { font-size: 0.8rem; color: #b2bec3; }
+
+        .share-btn {
+            background: #f8f9fa; border: none; width: 38px; height: 38px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: var(--transition); color: var(--primary);
+        }
+        .share-btn:hover { background: var(--primary); color: white; }
+
+        #fs-view {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: #ffffff;
+            z-index: 2000; flex-direction: column; animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .fs-header { padding: 15px 20px; border-bottom: 1px solid #f1f2f6; display: flex; align-items: center; justify-content: space-between; }
+        .fs-brand { font-weight: 900; font-size: 1.3rem; background: var(--useas-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .close-btn { background: #f1f2f6; border: none; padding: 10px 18px; border-radius: 14px; font-weight: 700; cursor: pointer; }
+
+        .fs-body { flex-grow: 1; overflow-y: auto; padding: 30px 20px; max-width: 550px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        #pdf-render canvas { width: 100% !important; height: auto !important; border-radius: 12px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 id="page-title">USEAS</h1>
+        <p class="subtitle">Digital Notification Hub</p>
+    </header>
+    <div id="msg-list"></div>
+</div>
+
+<div id="fs-view">
+    <div class="fs-header">
+        <div class="fs-brand">USEAS</div>
+        <button class="close-btn" onclick="closeView()">Close ✕</button>
+    </div>
+    <div class="fs-body">
+        <h2 id="view-title" style="margin: 0 0 5px 0;"></h2>
+        <p id="view-date" style="color: #b2bec3; font-weight: 600; margin-bottom: 25px; font-size: 0.9rem;"></p>
+        <div id="view-text" style="color: #2d3436; line-height: 1.7; font-size: 1.05rem; white-space: pre-wrap;"></div>
+        <div id="pdf-render"></div>
+        <img id="view-img" style="max-width: 100%; border-radius: 18px; display: none; box-shadow: var(--card-shadow);">
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDAheWdYiiEBUHgbokK7kDPjMEEk7fngYQ",
+        authDomain: "abhyaslabkeys.firebaseapp.com",
+        databaseURL: "https://abhyaslabkeys-default-rtdb.firebaseio.com",
+        projectId: "abhyaslabkeys",
+        storageBucket: "abhyaslabkeys.firebasestorage.app",
+        messagingSenderId: "782150849318",
+        appId: "1:782150849318:web:5eaea4cec185abdbc567e7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'notifications');
+
+    let currentData = {};
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoOpenId = urlParams.get('msgId');
+
+    onValue(dbRef, (snap) => {
+        const list = document.getElementById('msg-list');
+        list.innerHTML = "";
+        const data = snap.val();
+        currentData = data || {};
+        if(!data) return;
+
+        Object.entries(data).reverse().forEach(([id, val]) => {
+            const card = document.createElement('div');
+            card.className = 'notification-card';
+            card.onclick = () => openContent(id, val);
+            let prev = val.type === 'image' ? `<img src="${val.data}" class="preview-img">` : `<div class="msg-placeholder">${val.type === 'pdf' ? '📄 Document' : '"'+val.data.substring(0,40)+'..."'}</div>`;
+            
+            card.innerHTML = `
+                <div class="card-top"><span class="type-badge">${val.type}</span>${prev}</div>
+                <div class="card-bottom">
+                    <div class="brand-avatar">US</div>
+                    <div class="info-col">
+                        <span class="title-text">${val.title}</span>
+                        <span class="date-text">${val.date}</span>
+                    </div>
+                    <button class="share-btn" onclick="shareMsg(event, '${id}', '${val.title}')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    </button>
+                </div>`;
+            list.appendChild(card);
+        });
+
+        if(autoOpenId && currentData[autoOpenId]) {
+            openContent(autoOpenId, currentData[autoOpenId]);
+        }
+    });
+
+    window.shareMsg = (event, id, title) => {
+        event.stopPropagation();
+        const shareUrl = `${window.location.origin}${window.location.pathname}?msgId=${id}`;
+        if (navigator.share) {
+            navigator.share({ title: `USEAS | ${title}`, text: `Check this: ${title}`, url: shareUrl });
+        } else {
+            navigator.clipboard.writeText(shareUrl);
+            alert("Link copied!");
+        }
+    };
+
+    async function renderPDF(url) {
+        const target = document.getElementById('pdf-render');
+        target.innerHTML = "Fetching PDF...";
+        try {
+            const pdf = await pdfjsLib.getDocument(url).promise;
+            target.innerHTML = "";
+            for(let i=1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height; canvas.width = viewport.width;
+                await page.render({ canvasContext: context, viewport }).promise;
+                target.appendChild(canvas);
+            }
+        } catch (e) { target.innerHTML = "Error loading document."; }
+    }
+
+    window.openContent = (id, item) => {
+        document.getElementById('fs-view').style.display = 'flex';
+        document.getElementById('view-title').innerText = item.title;
+        document.getElementById('view-date').innerText = item.date;
+        document.getElementById('pdf-render').innerHTML = "";
+        document.getElementById('view-img').style.display = "none";
+        document.getElementById('view-text').innerText = item.type === 'text' ? item.data : "";
+        if(item.type === 'pdf') renderPDF(item.data);
+        if(item.type === 'image') { const img = document.getElementById('view-img'); img.src = item.data; img.style.display = "block"; }
+    };
+
+    window.closeView = () => {
+        document.getElementById('fs-view').style.display = 'none';
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+    };
+</script>
+</body>
+</html>
