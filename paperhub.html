@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #4A90E2; --bg: #F8F9FB; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; color: #333; }
+
+        @keyframes colorMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header { 
+            text-align: center; font-size: 32px; font-weight: 800; padding: 40px 10px 10px;
+            background: linear-gradient(270deg, #4A90E2, #9b59b6, #e74c3c, #f1c40f);
+            background-size: 600% 600%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorMove 10s ease infinite;
+        }
+
+        .search-container { display: flex; justify-content: center; padding: 10px 20px 30px; }
+        #mSearch {
+            width: 100%; max-width: 500px; padding: 14px 20px; border-radius: 12px;
+            border: 1px solid #ddd; background: #fff; font-size: 16px; outline: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        #papers-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px; padding: 0 20px;
+        }
+
+        #chrome-container {
+            display: none; padding: 0 20px; flex-direction: column; align-items: center;
+        }
+
+        .chrome-header {
+            width: 100%; max-width: 1200px; display: flex; justify-content: space-between;
+            align-items: center; padding: 12px; background: #333; border-radius: 15px 15px 0 0;
+            color: white;
+        }
+
+        #chrome-frame {
+            width: 100%; max-width: 1200px; height: 85vh; border: 2px solid #333; 
+            border-radius: 0 0 15px 15px; background: #fff;
+        }
+
+        .close-chrome {
+            padding: 5px 15px; background: #ff4757; color: white; 
+            border: none; border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+
+        .paper-card {
+            background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            border: 1px solid #f0f0f0; transition: transform 0.2s;
+        }
+        .paper-card:hover { transform: translateY(-5px); }
+        .card-preview { width: 100%; height: 300px; background: #f0f0f0; cursor: pointer; }
+        .card-preview iframe, .card-preview img { width: 100%; height: 100%; border: none; object-fit: cover; pointer-events: none; }
+        .card-title { padding: 15px; text-align: center; font-weight: 600; font-size: 15px; color: #444; }
+
+        footer { padding: 60px; text-align: center; opacity: 0.3; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1 class="header">PAPER HUB</h1>
+
+    <div class="search-container">
+        <input type="text" id="mSearch" placeholder="Search resources...">
+    </div>
+
+    <div id="papers-container"></div>
+
+    <div id="chrome-container">
+        <div class="chrome-header">
+            <span><i class="fab fa-chrome"></i> Paper Hub Browser</span>
+            <button class="close-chrome" id="closeChrome">Exit</button>
+        </div>
+        <iframe id="chrome-frame" src=""></iframe>
+    </div>
+
+    <footer>© 2026 Paper Hub</footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+            authDomain: "studyhub-33164.firebaseapp.com",
+            projectId: "studyhub-33164",
+            storageBucket: "studyhub-33164.firebasestorage.app",
+            messagingSenderId: "918352715015",
+            appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const papersCol = collection(db, "papers");
+
+        let allPapers = [];
+
+        // Search and Chrome Feature
+        const searchInput = document.getElementById('mSearch');
+        const papersContainer = document.getElementById('papers-container');
+        const chromeContainer = document.getElementById('chrome-container');
+        const chromeFrame = document.getElementById('chrome-frame');
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = searchInput.value.trim().toLowerCase();
+                if (val === "openchrome") {
+                    papersContainer.style.display = 'none';
+                    chromeContainer.style.display = 'flex';
+                    chromeFrame.src = "https://www.google.com/search?igu=1"; 
+                    searchInput.value = "";
+                }
+            }
+        });
+
+        document.getElementById('closeChrome').onclick = () => {
+            chromeContainer.style.display = 'none';
+            papersContainer.style.display = 'grid';
+            chromeFrame.src = ""; 
+        };
+
+        // Render logic
+        onSnapshot(papersCol, (snapshot) => {
+            allPapers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderUI(allPapers);
+        });
+
+        function renderUI(data) {
+            const container = document.getElementById('papers-container');
+            container.innerHTML = '';
+            data.forEach(item => {
+                const isPdf = item.link.toLowerCase().includes('.pdf') || item.link.includes('drive.google.com');
+                let displayUrl = item.link;
+                if (item.link.includes('drive.google.com')) {
+                    let fileId = item.link.includes('/d/') ? item.link.split('/d/')[1].split('/')[0] : new URL(item.link).searchParams.get('id');
+                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${fileId}`)}&embedded=true`;
+                } else if (isPdf) {
+                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(item.link)}&embedded=true`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'paper-card';
+                card.innerHTML = `
+                    <div class="card-preview" onclick="window.open('${item.link}', '_blank')">
+                        ${isPdf ? `<iframe src="${displayUrl}"></iframe>` : `<img src="${item.link}">`}
+                    </div>
+                    <div class="card-title">${item.title}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        searchInput.oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            if (val !== "openchrome") {
+                renderUI(allPapers.filter(p => p.title.toLowerCase().includes(val)));
+            }
+        };
+    </script>
+</body>
+</html>
