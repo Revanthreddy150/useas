@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS | Admin Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #00f2fe;
+            --accent: #4facfe;
+            --text: #e0e0e0;
+            --danger: #ff4b5c;
+            --success: #00e676;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1a1f2c, var(--bg));
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Header Styling */
+        #admin-header {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-top: 60px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #admin-header:hover { transform: scale(1.05); text-shadow: 0 0 20px rgba(79, 172, 254, 0.5); }
+
+        .tagline { color: #666; margin-bottom: 40px; font-weight: 300; }
+
+        /* Hidden Admin Panel */
+        #admin-panel {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: slideDown 0.6s ease forwards;
+        }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { margin-top: 0; color: var(--primary); font-weight: 600; }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        input:focus { border-color: var(--primary); outline: none; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        #submitBtn { background: linear-gradient(45deg, var(--accent), var(--primary)); color: #000; }
+        #cancelEdit { background: #333; color: white; display: none; }
+
+        /* Projects Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: 0.4s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            transform: translateY(-10px);
+        }
+
+        .card strong { display: block; font-size: 1.3rem; color: #fff; margin-bottom: 8px; }
+        .card span { font-size: 0.8rem; color: var(--accent); letter-spacing: 2px; }
+
+        /* Admin Action Buttons (Hidden until login) */
+        .admin-actions {
+            display: none; 
+            margin-top: 20px;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .edit-btn { background: var(--success); color: #000; padding: 6px 15px; border-radius: 6px; font-size: 0.75rem; }
+        .del-btn { background: var(--danger); color: #fff; padding: 6px 15px; border-radius: 6px; font-size: 0.75rem; }
+
+    </style>
+</head>
+<body>
+
+    <h1 id="admin-header">USEAS</h1>
+    <p class="tagline">mee prayanam maa bhadyatha</p>
+
+    <div id="admin-panel">
+        <h2 id="panel-title">Add New Web Tool</h2>
+        <input type="hidden" id="editKey">
+        <input type="text" id="webName" placeholder="Application Name (e.g. Note Finder)">
+        <textarea id="htmlCode" rows="6" placeholder="Paste your HTML Code here..."></textarea>
+        
+        <div class="btn-group">
+            <button id="submitBtn">Deploy Tool</button>
+            <button id="cancelEdit">Cancel Edit</button>
+        </div>
+    </div>
+
+    <div class="grid" id="projectList">
+        </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+            authDomain: "useasnotes.firebaseapp.com",
+            databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
+            projectId: "useasnotes",
+            storageBucket: "useasnotes.firebasestorage.app",
+            messagingSenderId: "1066601715098",
+            appId: "1:1066601715098:web:880548e333297079d09623"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let isAdmin = false;
+
+        // 1. Secret Admin Access
+        let clicks = 0;
+        document.getElementById('admin-header').addEventListener('click', () => {
+            clicks++;
+            if (clicks === 5) {
+                const pass = prompt("Enter Admin Password:");
+                if (pass === "admin@123") {
+                    isAdmin = true;
+                    document.getElementById('admin-panel').style.display = "block";
+                    renderData(); // Refresh UI to show edit/delete buttons
+                    alert("Welcome back, Revanth.");
+                } else {
+                    alert("Access Denied.");
+                    clicks = 0;
+                }
+            }
+        });
+
+        // 2. Submit or Update Data
+        const submitBtn = document.getElementById('submitBtn');
+        const webName = document.getElementById('webName');
+        const htmlCode = document.getElementById('htmlCode');
+        const editKey = document.getElementById('editKey');
+
+        submitBtn.onclick = () => {
+            const name = webName.value;
+            const code = htmlCode.value;
+            const key = editKey.value;
+
+            if (!name || !code) return alert("Fill all fields");
+
+            if (key) {
+                // Update existing
+                update(ref(db, `adminTools/${key}`), { name, code });
+                resetForm();
+            } else {
+                // Add new
+                push(ref(db, 'adminTools'), { name, code });
+                resetForm();
+            }
+        };
+
+        function resetForm() {
+            webName.value = "";
+            htmlCode.value = "";
+            editKey.value = "";
+            submitBtn.innerText = "Deploy Tool";
+            document.getElementById('cancelEdit').style.display = "none";
+            document.getElementById('panel-title').innerText = "Add New Web Tool";
+        }
+
+        document.getElementById('cancelEdit').onclick = resetForm;
+
+        // 3. Render and View
+        function renderData() {
+            onValue(ref(db, 'adminTools'), (snapshot) => {
+                const projectList = document.getElementById('projectList');
+                projectList.innerHTML = "";
+                const data = snapshot.val();
+                
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const item = data[key];
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        
+                        card.innerHTML = `
+                            <span>SECURE TOOL</span>
+                            <strong>${item.name}</strong>
+                            <div class="admin-actions" style="display: ${isAdmin ? 'flex' : 'none'}">
+                                <button class="edit-btn" onclick="triggerEdit('${key}', '${item.name.replace(/'/g, "\\'")}')">Edit</button>
+                                <button class="del-btn" onclick="triggerDelete('${key}')">Delete</button>
+                            </div>
+                        `;
+
+                        // Open code on card click (not buttons)
+                        card.onclick = (e) => {
+                            if (e.target.tagName !== 'BUTTON') {
+                                const win = window.open("", "_blank");
+                                win.document.write(item.code);
+                                win.document.close();
+                            }
+                        };
+                        projectList.appendChild(card);
+                    });
+                }
+            });
+        }
+
+        // 4. Global Admin Functions
+        window.triggerDelete = (key) => {
+            if (confirm("Delete this tool permanently?")) {
+                remove(ref(db, `adminTools/${key}`));
+            }
+        };
+
+        window.triggerEdit = (key, name) => {
+            // Fetch latest code from Firebase for editing
+            onValue(ref(db, `adminTools/${key}`), (snap) => {
+                const item = snap.val();
+                webName.value = item.name;
+                htmlCode.value = item.code;
+                editKey.value = key;
+                submitBtn.innerText = "Update Tool";
+                document.getElementById('cancelEdit').style.display = "block";
+                document.getElementById('panel-title').innerText = "Editing Tool";
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }, { onlyOnce: true });
+        };
+
+        // Initial Load
+        renderData();
+
+    </script>
+</body>
+</html>
