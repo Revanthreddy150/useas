@@ -37,7 +37,7 @@
                     document.getElementById('adminPanel').style.display = 'block';
                     document.body.classList.add('admin-mode-active');
                     alert("Admin Access Granted - Delete options enabled on Wall.");
-                    renderData(); // Refresh to show delete buttons
+                    renderData(); 
                 } else {
                     clickCount = 0;
                 }
@@ -58,8 +58,19 @@
             const msg = document.getElementById('userMsg').value;
             if(currentRating === 0) return alert("Please select a star rating!");
 
+            // FIXED: Manual date formatting for consistency (DD/MM/YYYY)
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const formattedDate = `${day}/${month}/${year}`;
+
             push(ref(db, 'feedbacks'), {
-                name, message: msg, rating: currentRating, status: 'pending', date: new Date().toLocaleDateString()
+                name, 
+                message: msg, 
+                rating: currentRating, 
+                status: 'pending', 
+                date: formattedDate 
             }).then(() => {
                 alert("Sent! Waiting for admin approval.");
                 e.target.reset();
@@ -81,7 +92,6 @@
             for (let id in globalData) {
                 const item = globalData[id];
                 
-                // PENDING LIST (Admin only)
                 if (item.status === 'pending') {
                     adminList.innerHTML += `
                         <div class="admin-card">
@@ -93,7 +103,6 @@
                         </div>`;
                 }
 
-                // APPROVED WALL
                 if (item.status === 'approved') {
                     const deleteBtn = isAdmin ? `<button class="btn-rej-small" onclick="deleteFeedback('${id}')"><i class="fa-solid fa-trash"></i></button>` : '';
                     
@@ -101,7 +110,7 @@
                         <div class="post shine-anim">
                             <div class="post-info">
                                 <strong>${item.name}</strong>
-                                <span>${item.date} ${deleteBtn}</span>
+                                <span class="date-container">${item.date} ${deleteBtn}</span>
                             </div>
                             <div class="stars">${"★".repeat(item.rating)}</div>
                             <p>${item.message}</p>
@@ -146,7 +155,6 @@
             padding: 0 20px;
         }
 
-        /* Form Card */
         .form-card {
             background: var(--white); padding: 35px; border-radius: 24px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.04); height: fit-content;
@@ -166,13 +174,11 @@
             font-weight: 700; cursor: pointer; transition: 0.3s;
         }
 
-        /* Wall Section */
         .wall-card {
             background: var(--white); padding: 35px; border-radius: 24px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.04); max-height: 750px; overflow-y: auto;
         }
 
-        /* SHINE ANIMATION EFFECT */
         .shine-anim {
             position: relative;
             overflow: hidden;
@@ -201,17 +207,16 @@
         }
 
         .post-info { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; align-items: center; }
+        .date-container { display: flex; align-items: center; gap: 5px; }
         .stars { color: #FFD700; margin: 8px 0; }
         .post p { margin: 0; line-height: 1.5; color: #334155; }
 
-        /* Admin controls */
         #adminPanel { display: none; margin-top: 20px; border-top: 2px dashed #eee; padding-top: 20px; }
         .admin-card { background: #fff5f5; padding: 15px; border-radius: 12px; margin-bottom: 10px; font-size: 14px; }
         .btn-acc { background: #22c55e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
         .btn-rej { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-        .btn-rej-small { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-left: 10px;}
+        .btn-rej-small { background: #fee2e2; color: #ef4444; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;}
 
-        /* Scrollbar */
         .wall-card::-webkit-scrollbar { width: 6px; }
         .wall-card::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
 
@@ -230,7 +235,6 @@
     </div>
 
     <div class="content-container">
-        
         <div class="form-section">
             <div class="form-card">
                 <form id="feedbackForm">
@@ -265,11 +269,9 @@
         <div class="wall-section">
             <div class="wall-card">
                 <h2>User Feedbacks</h2>
-                <div id="publicWall">
-                    </div>
+                <div id="publicWall"></div>
             </div>
         </div>
-
     </div>
 
 </body>
