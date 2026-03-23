@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Hub | USEAS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #8b8df8; 
+            --bg: #f8faff; 
+            --text: #1e293b; 
+            --white: #ffffff; 
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; 
+            color: var(--text); 
+        }
+
+        .hero { 
+            text-align: center; 
+            padding: 60px 20px; 
+            background: var(--white); 
+            border-bottom: 1px solid #eef2f6; 
+        }
+        
+        .hero h1 { font-size: 3rem; color: var(--primary); margin: 0; }
+        .hero p { color: #64748b; font-weight: 500; }
+
+        .content-container { 
+            display: grid; 
+            grid-template-columns: 450px 1fr; 
+            gap: 40px; 
+            max-width: 1300px; 
+            margin: -40px auto 40px; 
+            padding: 0 20px; 
+        }
+
+        .form-card, .wall-card { 
+            background: var(--white); 
+            padding: 35px; 
+            border-radius: 24px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04); 
+        }
+
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        input, textarea { 
+            width: 100%; padding: 12px; border: 2px solid #f1f5f9; 
+            border-radius: 12px; box-sizing: border-box; font-family: inherit;
+        }
+
+        .rating-box { display: flex; gap: 10px; margin-bottom: 25px; justify-content: center; }
+        .rating-box i { font-size: 28px; color: #cbd5e0; cursor: pointer; transition: 0.2s; }
+
+        .btn-submit { 
+            background: var(--primary); color: white; border: none; 
+            width: 100%; padding: 15px; border-radius: 50px; 
+            font-weight: 700; cursor: pointer; transition: 0.3s; 
+        }
+        .btn-submit:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* --- Shining Animation CSS --- */
+        .post { 
+            background: #f8fafc; 
+            border: 1px solid #edf2f7; 
+            padding: 20px; 
+            border-radius: 16px; 
+            margin-bottom: 15px; 
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .shine-anim::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 4s infinite;
+        }
+
+        @keyframes shine {
+            from { left: -150%; }
+            to { left: 150%; }
+        }
+
+        .post-info { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; align-items: center; }
+        .stars { color: #FFD700; margin: 8px 0; }
+        .post p { margin: 0; line-height: 1.5; color: #334155; }
+
+        @media (max-width: 950px) { 
+            .content-container { grid-template-columns: 1fr; margin-top: 0; } 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <p>USEAS COMMUNITY</p>
+        <h1>Feedback</h1>
+        <p>Tell us how we are doing!</p>
+    </div>
+
+    <div class="content-container">
+        <div class="form-section">
+            <div class="form-card">
+                <form id="feedbackForm">
+                    <div class="input-group">
+                        <label>Your Name</label>
+                        <input type="text" id="userName" placeholder="Enter your name" required>
+                    </div>
+
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star" onclick="rate(1)"></i>
+                        <i class="fa-solid fa-star" onclick="rate(2)"></i>
+                        <i class="fa-solid fa-star" onclick="rate(3)"></i>
+                        <i class="fa-solid fa-star" onclick="rate(4)"></i>
+                        <i class="fa-solid fa-star" onclick="rate(5)"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Review Message</label>
+                        <textarea id="userMsg" rows="5" placeholder="Share your experience with USEAS..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="wall-section">
+            <div class="wall-card">
+                <h2>User Feedbacks</h2>
+                <div id="publicWall"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+            authDomain: "useasnotes.firebaseapp.com",
+            databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
+            projectId: "useasnotes",
+            storageBucket: "useasnotes.firebasestorage.app",
+            messagingSenderId: "1066601715098",
+            appId: "1:1066601715098:web:880548e333297079d09623"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let currentRating = 0;
+
+        // Star Rating Selection
+        window.rate = function(n) {
+            currentRating = n;
+            const stars = document.querySelectorAll('.rating-box i');
+            stars.forEach((star, index) => {
+                star.style.color = (index < n) ? "#FFD700" : "#cbd5e0";
+            });
+        };
+
+        // Submit Feedback
+        document.getElementById('feedbackForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if(currentRating === 0) return alert("Please select a star rating!");
+
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString();
+
+            push(ref(db, 'feedbacks'), {
+                name: document.getElementById('userName').value,
+                message: document.getElementById('userMsg').value,
+                rating: currentRating,
+                status: 'pending',
+                date: formattedDate
+            }).then(() => {
+                alert("Thank you! Your feedback has been sent for approval.");
+                e.target.reset();
+                rate(0);
+            });
+        });
+
+        // Load Approved Feedbacks
+        onValue(ref(db, 'feedbacks'), (snapshot) => {
+            const data = snapshot.val();
+            const publicWall = document.getElementById('publicWall');
+            publicWall.innerHTML = '';
+
+            for (let id in data) {
+                const item = data[id];
+                if (item.status === 'approved') {
+                    publicWall.innerHTML += `
+                        <div class="post shine-anim">
+                            <div class="post-info">
+                                <strong>${item.name}</strong>
+                                <span>${item.date}</span>
+                            </div>
+                            <div class="stars">${"★".repeat(item.rating)}</div>
+                            <p>${item.message}</p>
+                        </div>`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
