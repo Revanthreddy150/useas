@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CR Attendance - Manual Tick</title>
+    <style>
+        :root { --primary: #2563eb; --danger: #ef4444; --success: #22c55e; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 10px; margin: 0; padding-bottom: 140px; }
+        
+        .main-container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        .header { text-align: center; margin-bottom: 15px; }
+        .search-box { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; margin-bottom: 15px; font-size: 16px; outline: none; }
+        
+        .stats-bar { display: flex; justify-content: space-between; background: #1e293b; color: white; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 14px; }
+        
+        .student-list { border-top: 1px solid #eee; max-height: 400px; overflow-y: auto; margin-bottom: 20px; }
+        .student-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #f1f5f9; }
+        .student-row.hidden { display: none; }
+        .roll { font-weight: bold; color: var(--primary); min-width: 30px; }
+        .name { font-size: 14px; flex: 1; margin-left: 10px; color: #334155; }
+        
+        input[type="checkbox"] { width: 26px; height: 26px; cursor: pointer; accent-color: var(--success); }
+
+        /* Preview Card */
+        .preview-card {
+            background: #fdfdfd;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .preview-title { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        #live-preview { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 13px; color: #1e293b; line-height: 1.5; }
+
+        /* Floating Button Bar */
+        .floating-actions { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 460px; display: flex; gap: 10px; z-index: 1000; }
+        .btn { flex: 1; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 16px; }
+        .btn-copy { background: var(--success); }
+        .btn-reset { background: var(--danger); }
+        
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 25px; border-radius: 30px; display: none; z-index: 2000; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div id="toast">Report Copied! ✅</div>
+
+<div class="main-container">
+    <div class="header">
+        <h2 style="margin:0; color: #1e293b;">Class Attendance</h2>
+        <div id="dateStr" style="color: #64748b; font-size: 0.85em; margin-top: 4px;"></div>
+    </div>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search Roll or Name..." onkeyup="filterStudents()">
+
+    <div class="stats-bar">
+        <span id="p-count">Present: 0</span>
+        <span id="a-count">Absent: 42</span>
+    </div>
+
+    <div id="listContainer" class="student-list"></div>
+
+    <div class="preview-card">
+        <div class="preview-title">Live Report Preview</div>
+        <div id="live-preview"></div>
+    </div>
+</div>
+
+<div class="floating-actions">
+    <button class="btn btn-reset" onclick="resetForm()">Reset</button>
+    <button class="btn btn-copy" onclick="copyWhatsAppReport()">Copy Report</button>
+</div>
+
+<script>
+    const studentNames = [
+        "L. Sai ganesh", "S. Dandi Shiva ganesh", "M. Revanth sai kumar reddy", "P. Chandrahasa venkat", 
+        "A. Rishitha", "K. Alekhya", "M. Santhosh", "R. Naga surya lakshman Sai ram", "T. Rakshitha", 
+        "A. Yaswanth sundhar", "K. Mounika", "L. Divya sri", "K. Jayaram durga pradeep", "J. Tarun reddy", 
+        "M. Bhagat raj swaroop", "M. Venkata sai santhosh", "P. Lakshmi sai pranusha", "M. Siva meghana", 
+        "T. Bindhu sai sree", "M. samuel raju", 
+        "K. Latheef (Permanent Absent)", 
+        "G. Satya vara prasad", "K. Phanendra bhaskar kumar", "M. Simhadri", "C. Chandu siva ram", 
+        "G. Ganga bhavani", "A. D V S D Bala rama krishna", "A. Deevan kumar", "P. Dhana sai deepak", 
+        "P. Rishitha navya", "Y. Mokshagna", "S. Farida", "B. Tarun reddy", "S. Shajahan", "K. Meghana", 
+        "K. Manikanta", "R. Sai ganesh", "K. Chittu usha devi", "R. Sai sandeep", "M. Harshith vivek", 
+        "M. V V Siva satya ashok", "M. Arun sai"
+    ];
+
+    const studentData = studentNames.map((name, index) => ({
+        roll: index + 1,
+        name: name
+    }));
+
+    const listDiv = document.getElementById('listContainer');
+    document.getElementById('dateStr').innerText = new Date().toDateString();
+
+    function renderList() {
+        listDiv.innerHTML = '';
+        studentData.forEach(student => {
+            const row = document.createElement('div');
+            row.className = 'student-row';
+            row.setAttribute('data-roll', student.roll);
+            row.setAttribute('data-name', student.name.toLowerCase());
+            
+            // All students unticked by default
+            row.innerHTML = `
+                <span class="name"><span class="roll">${student.roll}.</span> ${student.name}</span>
+                <input type="checkbox" class="st-check" 
+                       data-roll="${student.roll}" 
+                       data-name="${student.name}" 
+                       onchange="updateUI()">
+            `;
+            listDiv.appendChild(row);
+        });
+        updateUI();
+    }
+
+    function filterStudents() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.student-row');
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const roll = row.getAttribute('data-roll');
+            row.classList.toggle('hidden', !(name.includes(query) || roll == query));
+        });
+    }
+
+    function generateReportText() {
+        const checks = document.querySelectorAll('.st-check');
+        let absentees = [];
+        let presentCount = 0;
+
+        checks.forEach(c => {
+            if (!c.checked) {
+                absentees.push(`${c.getAttribute('data-roll')}. ${c.getAttribute('data-name')}`);
+            } else {
+                presentCount++;
+            }
+        });
+
+        const date = new Date();
+        const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+
+        return `📅 *Attendance: ${formattedDate}*\n` +
+               `━━━━━━━━━━━━━━━━━━\n` +
+               `✅ Present: ${presentCount}\n` +
+               `❌ Absent: ${absentees.length}\n` +
+               `━━━━━━━━━━━━━━━━━━\n` +
+               `📝 *ABSENT LIST:*\n` +
+               (absentees.length > 0 ? absentees.join('\n') : "All Present") +
+               `\n━━━━━━━━━━━━━━━━━━\n` +
+               `_Generated by CR Portal_`;
+    }
+
+    function updateUI() {
+        const checks = document.querySelectorAll('.st-check');
+        const present = Array.from(checks).filter(c => c.checked).length;
+        document.getElementById('p-count').innerText = `✅ Present: ${present}`;
+        document.getElementById('a-count').innerText = `❌ Absent: ${checks.length - present}`;
+        document.getElementById('live-preview').innerText = generateReportText();
+    }
+
+    function copyWhatsAppReport() {
+        const report = generateReportText();
+        navigator.clipboard.writeText(report).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        });
+    }
+
+    function resetForm() {
+        if(confirm("Are you sure you want to clear the list?")) {
+            document.getElementById('searchInput').value = '';
+            renderList();
+        }
+    }
+
+    renderList();
+</script>
+
+</body>
+</html>
