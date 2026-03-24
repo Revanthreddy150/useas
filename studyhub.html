@@ -14,93 +14,119 @@
         }
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; transition: 0.3s; }
         body { background: var(--bg); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+        
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2d3436; color: var(--neon-green); padding: 12px 25px; border-radius: 50px; font-weight: 600; display: none; z-index: 11000; border: 1px solid var(--neon-green); }
+        
         #help-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 1000; animation: sonarWave 2s infinite; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); }
         @keyframes sonarWave { 0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0); } 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); } }
+        
         #visitor-counter { position: fixed; background: var(--primary); color: white; padding: 8px 15px; border-radius: 50px; font-size: 0.75rem; z-index: 1000; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 8px; }
+        
         .header { text-align: center; padding: 40px 20px 10px; }
         .logo { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--primary); letter-spacing: 5px; font-weight: 700; text-transform: uppercase; }
+        
         .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; position: relative; }
-        .search-bar { width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; border: 1px solid var(--border); background: var(--card-bg); outline: none; }
+        .search-bar { width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; border: 1px solid var(--border); background: var(--card-bg); outline: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .search-icon { position: absolute; left: 35px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
         .bc-box { padding: 12px 25px; background: var(--card-bg); border-radius: 12px; font-size: 0.85rem; border: 1px solid var(--border); margin-bottom: 20px; }
         .bc-link { color: var(--primary); cursor: pointer; font-weight: 600; }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; padding-bottom: 40px; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 50px 20px; border-radius: 24px; text-align: center; cursor: pointer; position: relative;}
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 50px 20px; border-radius: 24px; text-align: center; cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(108, 92, 231, 0.1); }
+        
         .unit-item { background: var(--card-bg); border: 1px solid var(--border); margin: 10px 0; padding: 18px 22px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .unit-item:hover { border-color: var(--primary); background: #fcfbff; }
+
         #v2-loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10001; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
         #viewer, #video-viewer, #help-panel { display: none; position: fixed; inset: 0; z-index: 9999; background: var(--bg); flex-direction: column; }
         .v-header { background: var(--card-bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
         iframe { width: 100%; height: 100%; border: none; }
+
         #help-panel { background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
         .help-card { width: 90%; max-width: 450px; background: #fff; border-radius: 30px; overflow: hidden; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .help-top { background: var(--primary); padding: 30px; text-align: center; color: white; position: relative; }
-        .msg-input { width: 100%; height: 120px; padding: 15px; border: 2px solid #eee; border-radius: 15px; margin-bottom: 20px; resize: none; outline: none; }
+        .msg-input { width: 100%; height: 120px; padding: 15px; border: 2px solid #eee; border-radius: 15px; margin-bottom: 20px; resize: none; outline: none; font-size: 0.9rem; }
         .submit-help-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; }
-        footer { padding: 60px; text-align: center; color: var(--text-muted); opacity: 0.5; font-size: 0.8rem; }
-        .back-btn { background: var(--blue-accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+
+        footer { padding: 60px; text-align: center; color: var(--text-muted); opacity: 0.7; font-size: 0.8rem; }
+        .back-btn { background: var(--blue-accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
 
 <div id="toast">Copied!</div>
-<div id="v2-loader"><div class="spinner"></div><p style="margin-top:10px;">Accessing Resource...</p></div>
+<div id="v2-loader"><div class="spinner"></div><p style="margin-top:10px; font-weight: 600;">Accessing Resource...</p></div>
 <div id="visitor-counter"><i class="fa-solid fa-eye"></i> <span id="view-count">...</span></div>
 <div id="help-btn" onclick="openHelp()"><i class="fa-solid fa-headset"></i></div>
 
-<div class="header"><h1 class="logo">STUDY HUB</h1></div>
+<div class="header">
+    <h1 class="logo">STUDY HUB</h1>
+</div>
 
 <div class="search-container">
     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-    <input type="text" id="searchInput" class="search-bar" placeholder="Search subjects..." onkeyup="filterItems()">
+    <input type="text" id="searchInput" class="search-bar" placeholder="Search subjects or topics..." onkeyup="filterItems()">
 </div>
 
 <div class="container">
     <div class="bc-box" id="bc">Home</div>
+    
     <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 id="viewTitle" style="font-size: 1.2rem; color: var(--primary); font-family: 'Orbitron';"></h2>
-        <button onclick="goBack()" class="back-btn"><i class="fa-solid fa-chevron-left"></i> Back</button>
+        <h2 id="viewTitle" style="font-size: 1.1rem; color: var(--primary); font-family: 'Orbitron'; text-transform: uppercase;"></h2>
+        <button onclick="goBack()" class="back-btn"><i class="fa-solid fa-chevron-left"></i> BACK</button>
     </div>
+
     <div class="grid" id="mainGrid"></div>
-    <div id="notesArea" style="display:none;"><div id="unitList"></div></div>
+
+    <div id="notesArea" style="display:none;">
+        <div id="unitList"></div>
+    </div>
 </div>
 
 <div id="help-panel">
     <div class="help-card">
         <div class="help-top">
-            <i class="fa-solid fa-circle-question" style="font-size:3rem;"></i>
+            <i class="fa-solid fa-circle-question" style="font-size:3rem; margin-bottom: 10px; display: block;"></i>
             <h2>SUPPORT CENTER</h2>
             <div style="position:absolute; top:15px; right:20px; cursor:pointer;" onclick="closeHelp()"><i class="fa-solid fa-xmark"></i></div>
         </div>
         <div class="help-body" style="padding:30px;">
-            <textarea id="helpMsg" class="msg-input" placeholder="Broken link? Missing notes? Mention details here..."></textarea>
+            <textarea id="helpMsg" class="msg-input" placeholder="Is a link broken? Notes missing? Describe the issue here..."></textarea>
             <button class="submit-help-btn" onclick="sendMessage()">SEND REPORT</button>
         </div>
     </div>
 </div>
 
 <div id="viewer">
-    <div class="v-header"><span id="v-name"></span><button onclick="closeViewer()" style="background:red; color:white; border:none; padding:5px 15px; border-radius:5px;">Close</button></div>
+    <div class="v-header">
+        <span id="v-name" style="font-weight: 600; color: var(--primary);"></span>
+        <button onclick="closeViewer()" style="background:#e74c3c; color:white; border:none; padding:8px 20px; border-radius:5px; cursor: pointer; font-weight: 600;">CLOSE</button>
+    </div>
     <iframe id="v-frame"></iframe>
 </div>
 
 <div id="video-viewer">
-    <div class="v-header"><span id="v-video-name"></span><button onclick="closeVideo()" style="background:red; color:white; border:none; padding:5px 15px; border-radius:5px;">Close</button></div>
+    <div class="v-header">
+        <span id="v-video-name" style="font-weight: 600; color: var(--primary);"></span>
+        <button onclick="closeVideo()" style="background:#e74c3c; color:white; border:none; padding:8px 20px; border-radius:5px; cursor: pointer; font-weight: 600;">CLOSE</button>
+    </div>
     <div style="flex:1; background:#000; display:flex; align-items:center; justify-content:center;">
-        <iframe id="video-frame" allowfullscreen style="max-width:900px; aspect-ratio:16/9; width:100%;"></iframe>
+        <iframe id="video-frame" allowfullscreen style="max-width:1000px; aspect-ratio:16/9; width:95%;"></iframe>
     </div>
 </div>
 
-<footer>&copy; 2026 STUDY HUB PORTAL • POWERED BY USEAS</footer>
+<footer>&copy; 2026 STUDY HUB PORTAL • ACADEMIC RESOURCE NETWORK</footer>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
@@ -112,96 +138,179 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    
+    // References
     const docRef = doc(db, "portal", "final_v4_data");
     const countRef = doc(db, "portal", "visitor_stats");
     const settingsRef = doc(db, "portal", "app_settings");
     const msgRef = doc(db, "portal", "messages");
 
-    let core = {}; let path = []; let v2Enabled = false;
+    let core = {}; 
+    let path = []; 
+    let v2Enabled = false;
 
-    window.showToast = (m) => { const t=document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2000); };
-    
+    // Internal UI Helpers
+    window.showToast = (m) => { 
+        const t = document.getElementById('toast'); 
+        t.innerText = m; 
+        t.style.display = 'block'; 
+        setTimeout(() => t.style.display = 'none', 2500); 
+    };
+
+    // Real-time Listeners
     onSnapshot(docRef, (s) => { if(s.exists()){ core = s.data(); render(); } });
     onSnapshot(settingsRef, (s) => { if(s.exists()){ v2Enabled = s.data().v2Enabled; } });
 
+    // Main Rendering Engine
     function render() {
         const grid = document.getElementById('mainGrid');
         const notes = document.getElementById('notesArea');
-        grid.innerHTML = ''; notes.style.display = 'none'; grid.style.display = 'grid';
-
-        document.getElementById('bc').innerHTML = `<span class="bc-link" onclick="resetPath()">Home</span>` + path.map((p, i) => ` > <span class="bc-link" onclick="jumpTo(${i})">${p}</span>`).join('');
-        document.getElementById('navHeader').style.display = path.length > 0 ? 'flex' : 'none';
+        const navHeader = document.getElementById('navHeader');
+        const viewTitle = document.getElementById('viewTitle');
         
-        let target = core; path.forEach(p => target = target[p]);
+        grid.innerHTML = ''; 
+        notes.style.display = 'none'; 
+        grid.style.display = 'grid';
+
+        // Update Breadcrumbs
+        document.getElementById('bc').innerHTML = `<span class="bc-link" onclick="resetPath()">Home</span>` + 
+            path.map((p, i) => ` <i class="fa-solid fa-chevron-right" style="font-size:0.7rem; margin:0 5px; opacity:0.5;"></i> <span class="bc-link" onclick="jumpTo(${i})">${p}</span>`).join('');
+        
+        navHeader.style.display = path.length > 0 ? 'flex' : 'none';
+        if(path.length > 0) viewTitle.innerText = path[path.length - 1];
+
+        // Navigate to target data
+        let target = core; 
+        path.forEach(p => target = target[p]);
+        
         if(!target) return resetPath();
 
         if(target._type === 'subject') {
-            grid.style.display = 'none'; notes.style.display = 'block';
-            const list = document.getElementById('unitList'); list.innerHTML = '';
+            grid.style.display = 'none'; 
+            notes.style.display = 'block';
+            const list = document.getElementById('unitList'); 
+            list.innerHTML = '';
+            
             (target.units || []).forEach((u, i) => {
-                list.innerHTML += `<div class="unit-item" onclick="handleUnitClick(${i})">
-                    <div style="display:flex; align-items:center;"><i class="fa-solid fa-file-pdf" style="color:#e74c3c; margin-right:15px;"></i><span>${u}</span></div>
-                    <div style="display:flex; gap:18px;">
-                        ${target.vids && target.vids[i] ? `<i class="fa-brands fa-youtube" style="color:var(--yt-red); font-size:1.5rem;" onclick="event.stopPropagation(); playVid('${target.vids[i]}')"></i>` : ''}
-                        <i class="fa-solid fa-up-right-from-square" style="color:var(--primary);"></i>
-                    </div>
-                </div>`;
+                const hasVid = target.vids && target.vids[i];
+                list.innerHTML += `
+                    <div class="unit-item" onclick="handleUnitClick(${i})">
+                        <div style="display:flex; align-items:center;">
+                            <i class="fa-solid fa-file-pdf" style="color:#e74c3c; margin-right:15px; font-size:1.2rem;"></i>
+                            <span style="font-weight:500;">${u}</span>
+                        </div>
+                        <div style="display:flex; gap:20px; align-items:center;">
+                            ${hasVid ? `<i class="fa-brands fa-youtube" style="color:var(--yt-red); font-size:1.6rem;" onclick="event.stopPropagation(); playVid('${target.vids[i]}', '${u}')"></i>` : ''}
+                            <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--primary); opacity:0.7;"></i>
+                        </div>
+                    </div>`;
             });
         } else {
-            const keys = Object.keys(target).filter(k => !k.startsWith('_')).sort((a,b) => (target[a]._rank || 999) - (target[b]._rank || 999));
+            // Render Folders/Categories
+            const keys = Object.keys(target)
+                .filter(k => !k.startsWith('_'))
+                .sort((a,b) => (target[a]._rank || 999) - (target[b]._rank || 999));
+            
             keys.forEach(k => {
                 let icon = path.length === 0 ? "fa-graduation-cap" : "fa-book-bookmark";
-                grid.innerHTML += `<div class="card" onclick="moveIn('${k}')"><i class="fa-solid ${icon}" style="font-size:2.8rem; color:var(--primary); margin-bottom:15px; display:block;"></i><h3>${k}</h3></div>`;
+                grid.innerHTML += `
+                    <div class="card" onclick="moveIn('${k}')">
+                        <i class="fa-solid ${icon}" style="font-size:2.8rem; color:var(--primary); margin-bottom:20px; display:block;"></i>
+                        <h3 style="font-size:1.1rem;">${k}</h3>
+                    </div>`;
             });
         }
     }
 
+    // Resource Handling
     window.handleUnitClick = (idx) => {
         let t = core; path.forEach(p => t = t[p]);
         let link = t.links[idx];
+        let name = t.units[idx];
+
         if(v2Enabled) {
             document.getElementById('v2-loader').style.display='flex';
-            setTimeout(()=> { document.getElementById('v2-loader').style.display='none'; window.open(link, '_blank'); }, 1200);
+            setTimeout(()=> { 
+                document.getElementById('v2-loader').style.display='none'; 
+                window.open(link, '_blank'); 
+            }, 1000);
         } else {
+            document.getElementById('v-name').innerText = name;
             document.getElementById('v-frame').src = link.includes('drive.google.com') ? link.replace('/view', '/preview') : link;
             document.getElementById('viewer').style.display='flex';
+            document.body.style.overflow = 'hidden';
         }
     };
 
+    // Support Messaging
     window.sendMessage = async () => {
         const text = document.getElementById('helpMsg').value;
         if(!text.trim()) return;
         try {
+            const msgData = { 
+                text, 
+                time: new Date().toLocaleString(), 
+                location: path.join(' > ') || 'Home' 
+            };
             const snap = await getDoc(msgRef);
-            const msgData = { text, time: new Date().toLocaleString() };
             if (!snap.exists()) await setDoc(msgRef, { inbox: [msgData] });
             else await updateDoc(msgRef, { inbox: arrayUnion(msgData) });
-            document.getElementById('helpMsg').value = ''; showToast("Report Sent!"); closeHelp();
-        } catch(e) { console.error(e); }
+            
+            document.getElementById('helpMsg').value = ''; 
+            showToast("Report Sent Successfully!"); 
+            closeHelp();
+        } catch(e) { 
+            console.error(e);
+            showToast("Error sending report.");
+        }
     };
 
-    window.moveIn = (k) => { path.push(k); render(); };
+    // Navigation Controls
+    window.moveIn = (k) => { path.push(k); render(); window.scrollTo(0,0); };
     window.goBack = () => { path.pop(); render(); };
     window.resetPath = () => { path = []; render(); };
     window.jumpTo = (i) => { path = path.slice(0, i+1); render(); };
-    window.closeViewer = () => { document.getElementById('viewer').style.display='none'; document.getElementById('v-frame').src=''; };
+    
+    window.closeViewer = () => { 
+        document.getElementById('viewer').style.display='none'; 
+        document.getElementById('v-frame').src=''; 
+        document.body.style.overflow = 'auto';
+    };
+
     window.openHelp = () => document.getElementById('help-panel').style.display='flex';
     window.closeHelp = () => document.getElementById('help-panel').style.display='none';
-    window.playVid = (url) => { 
+
+    window.playVid = (url, title) => { 
         let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
+        document.getElementById('v-video-name').innerText = title;
         document.getElementById('video-frame').src = `https://www.youtube.com/embed/${id}?autoplay=1`;
         document.getElementById('video-viewer').style.display='flex';
     };
-    window.closeVideo = () => { document.getElementById('video-viewer').style.display='none'; document.getElementById('video-frame').src=''; };
+
+    window.closeVideo = () => { 
+        document.getElementById('video-viewer').style.display='none'; 
+        document.getElementById('video-frame').src=''; 
+    };
+
+    // Search Filter
     window.filterItems = () => {
         let q = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('.card, .unit-item').forEach(el => el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none');
+        document.querySelectorAll('.card, .unit-item').forEach(el => {
+            el.style.display = el.innerText.toLowerCase().includes(q) ? '' : 'none';
+        });
     };
+
+    // Visitor Counter
     async function updateCounter() {
-        const snap = await getDoc(countRef);
-        let count = snap.exists() ? snap.data().count : 0;
-        await setDoc(countRef, { count: ++count });
-        document.getElementById('view-count').innerText = count.toLocaleString();
+        try {
+            await updateDoc(countRef, { count: increment(1) });
+            const snap = await getDoc(countRef);
+            document.getElementById('view-count').innerText = snap.data().count.toLocaleString();
+        } catch(e) {
+            // Fallback if doc doesn't exist
+            await setDoc(countRef, { count: 1 }, { merge: true });
+            document.getElementById('view-count').innerText = "1";
+        }
     }
     updateCounter();
 </script>
