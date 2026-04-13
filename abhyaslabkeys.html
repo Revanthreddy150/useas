@@ -33,8 +33,6 @@
         .qa-code { font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 13px; color: #374151; background: #f1f5f9; padding: 15px; border-radius: 12px; overflow-x: auto; margin-top: 10px; border: 1px solid #cbd5e1; position: relative; }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        
-        /* --- PDF ACTION STYLING --- */
         .pdf-actions { display: flex; gap: 12px; margin-bottom: 25px; background: #f8fafc; padding: 12px; border-radius: 20px; border: 1px solid #edf2f7; }
         
         .pdf-btn-base { 
@@ -43,7 +41,6 @@
             align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;
         }
 
-        /* Preview Button Style */
         .preview-trigger { background: #1f2937; color: white; }
         .preview-trigger:hover { background: #111827; transform: translateY(-1px); }
         .eye-icon { display: inline-block; animation: eyeBlink 4s infinite; }
@@ -52,7 +49,6 @@
             95% { transform: scaleY(0.1); }
         }
 
-        /* Improved Download Button Style */
         .download-trigger { 
             background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); 
             color: white; 
@@ -71,7 +67,8 @@
         }
 
         .copy-btn { background: #10b981; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; flex: 2; font-weight: 700; transition: 0.3s; position: relative; }
-        .share-btn { background: #6366f1; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; flex: 1; font-weight: 700; }
+        .share-btn { background: #6366f1; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; flex: 1; font-weight: 700; transition: 0.3s; }
+        .share-btn.copied { background: #4f46e5; transform: scale(0.95); }
 
         .flyer-snippet { position: fixed; z-index: 9999; background: #f1f5f9; border: 1px solid var(--secondary); color: #374151; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 10px; pointer-events: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: all 0.7s cubic-bezier(0.5, 0, 0.1, 1); overflow: hidden; white-space: pre; }
         .btn-active-state { background: #059669 !important; transform: scale(1.05); }
@@ -145,10 +142,9 @@
     let currentData = {};
     let activeKey = null;
 
-    // --- PDF GENERATION LOGIC ---
+    // --- PDF GENERATION ---
     window.generatePDF = (mode) => {
         if (!activeKey || !currentData[activeKey]) return;
-        
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const item = currentData[activeKey];
@@ -168,7 +164,6 @@
         doc.setFontSize(22);
         doc.setTextColor(59, 130, 246);
         doc.text(item.name, 20, 20);
-        
         doc.setFontSize(10);
         doc.setTextColor(100, 116, 139);
         doc.text(`Generated on: ${date} | Repository: ABHYAS LAB KEYS`, 20, 28);
@@ -176,10 +171,8 @@
         doc.line(20, 32, 190, 32);
 
         let yPos = 45;
-        const pageHeight = 270;
-
         (item.questions || []).forEach((pair, index) => {
-            if (yPos > pageHeight) { doc.addPage(); addWatermark(doc); yPos = 20; }
+            if (yPos > 270) { doc.addPage(); addWatermark(doc); yPos = 20; }
             doc.setFontSize(12);
             doc.setFont("helvetica", 'bold');
             doc.setTextColor(31, 41, 55);
@@ -188,7 +181,7 @@
             yPos += (qLines.length * 7) + 2;
 
             const aLines = doc.splitTextToSize(pair.a, 165);
-            if (yPos + (aLines.length * 5) > pageHeight) { doc.addPage(); addWatermark(doc); yPos = 20; }
+            if (yPos + (aLines.length * 5) > 270) { doc.addPage(); addWatermark(doc); yPos = 20; }
             doc.setFontSize(10);
             doc.setFont('courier', 'normal');
             doc.setTextColor(55, 65, 81);
@@ -196,15 +189,11 @@
             yPos += (aLines.length * 5) + 12;
         });
 
-        if (mode === 'preview') {
-            window.open(doc.output('bloburl'), '_blank');
-        } else {
-            const fileName = `${item.name.replace(/\s+/g, '_')}_${date.replace(/\//g, '-')}.pdf`;
-            doc.save(fileName);
-        }
+        if (mode === 'preview') window.open(doc.output('bloburl'), '_blank');
+        else doc.save(`${item.name.replace(/\s+/g, '_')}_${date}.pdf`);
     };
 
-    // --- UI LOGIC ---
+    // --- UI ANIMATIONS & LOGIC ---
     function performFlyAnimation(sourceId, buttonId) {
         const sourceEl = document.getElementById(sourceId);
         const btnEl = document.getElementById(buttonId);
@@ -213,20 +202,20 @@
         const bRect = btnEl.getBoundingClientRect();
         const flyer = document.createElement('div');
         flyer.className = 'flyer-snippet';
-        flyer.textContent = sourceEl.textContent;
+        flyer.textContent = sourceEl.textContent.substring(0, 100) + "...";
         flyer.style.top = sRect.top + 'px';
         flyer.style.left = sRect.left + 'px';
         flyer.style.width = sRect.width + 'px';
-        flyer.style.height = (sRect.height > 200 ? 200 : sRect.height) + 'px';
+        flyer.style.height = '100px';
         document.body.appendChild(flyer);
+        
         btnEl.classList.add('btn-active-state');
         setTimeout(() => {
             flyer.style.top = (bRect.top + bRect.height / 2) + 'px';
             flyer.style.left = (bRect.left + bRect.width / 2) + 'px';
-            flyer.style.width = '40px';
-            flyer.style.height = '20px';
+            flyer.style.width = '20px';
+            flyer.style.height = '10px';
             flyer.style.opacity = '0';
-            flyer.style.transform = 'scale(0.1) rotate(15deg)';
         }, 50);
         setTimeout(() => { flyer.remove(); btnEl.classList.remove('btn-active-state'); }, 750);
     }
@@ -239,13 +228,42 @@
     }
 
     window.shareCode = (idx) => {
+        const btn = document.getElementById(`share-btn-${idx}`);
         const q = document.getElementById(`q-text-${idx}`).textContent;
         const a = document.getElementById(`text-${idx}`).textContent;
         const payload = btoa(unescape(encodeURIComponent(JSON.stringify({ q, a }))));
         const shareUrl = `${window.location.origin}${window.location.pathname}?data=${payload}`;
-        navigator.clipboard.writeText(shareUrl).then(() => showMsg("Link Copied!"));
+        
+        // Visual Feedback
+        performFlyAnimation(`text-${idx}`, `share-btn-${idx}`);
+        
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showMsg("Share Link Copied!");
+            btn.textContent = "COPIED!";
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = "SHARE";
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy share link: ', err);
+            showMsg("Error copying link");
+        });
     };
 
+    window.copyMainCode = (idx) => {
+        const code = document.getElementById(`text-${idx}`).textContent;
+        performFlyAnimation(`text-${idx}`, `copy-btn-${idx}`);
+        navigator.clipboard.writeText(code).then(() => showMsg("Code Copied!"));
+    };
+
+    window.copySharedCode = () => {
+        const code = document.getElementById('shared-a').innerText;
+        performFlyAnimation('shared-a', 'shared-copy-btn');
+        navigator.clipboard.writeText(code).then(() => showMsg("Code Copied!"));
+    };
+
+    // --- CORE APP LOGIC ---
     function checkShareLink() {
         const urlParams = new URLSearchParams(window.location.search);
         const data = urlParams.get('data');
@@ -306,7 +324,7 @@
                     <div class="qa-code" id="text-${index}"></div>
                     <div class="btn-group">
                         <button class="copy-btn" id="copy-btn-${index}" onclick="window.copyMainCode(${index})">COPY CODE</button>
-                        <button class="share-btn" onclick="window.shareCode(${index})">SHARE</button>
+                        <button class="share-btn" id="share-btn-${index}" onclick="window.shareCode(${index})">SHARE</button>
                     </div>
                 </div>
             `;
@@ -320,18 +338,6 @@
     window.toggleAns = (idx) => {
         const box = document.getElementById(`ans-${idx}`);
         box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-    };
-
-    window.copyMainCode = (idx) => {
-        const code = document.getElementById(`text-${idx}`).textContent;
-        performFlyAnimation(`text-${idx}`, `copy-btn-${idx}`);
-        navigator.clipboard.writeText(code).then(() => showMsg("Code Copied!"));
-    };
-
-    window.copySharedCode = () => {
-        const code = document.getElementById('shared-a').innerText;
-        performFlyAnimation('shared-a', 'shared-copy-btn');
-        navigator.clipboard.writeText(code).then(() => showMsg("Code Copied!"));
     };
 
     window.closeQA = () => {
