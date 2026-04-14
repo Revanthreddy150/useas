@@ -24,7 +24,7 @@
             animation: colorMove 10s ease infinite;
         }
 
-        .search-container { display: flex; justify-content: center; padding: 10px 20px 30px; }
+        .search-container { display: flex; justify-content: center; padding: 10px 20px 30px; gap: 10px; }
         #mSearch {
             width: 100%; max-width: 500px; padding: 14px 20px; border-radius: 12px;
             border: 1px solid #ddd; background: #fff; font-size: 16px; outline: none;
@@ -59,17 +59,34 @@
         .paper-card {
             background: white; border-radius: 20px; overflow: hidden;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column;
-            border: 1px solid #f0f0f0; transition: transform 0.2s;
+            border: 1px solid #f0f0f0; transition: transform 0.2s; position: relative;
         }
         .paper-card:hover { transform: translateY(-5px); }
+        
         .card-preview { width: 100%; height: 300px; background: #f0f0f0; cursor: pointer; }
         .card-preview iframe, .card-preview img { width: 100%; height: 100%; border: none; object-fit: cover; pointer-events: none; }
-        .card-title { padding: 15px; text-align: center; font-weight: 600; font-size: 15px; color: #444; }
+        
+        .card-info { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-weight: 600; font-size: 15px; color: #444; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .share-btn { 
+            background: #f1f2f6; border: none; padding: 8px 12px; border-radius: 8px; 
+            cursor: pointer; color: var(--primary); transition: 0.3s;
+        }
+        .share-btn:hover { background: var(--primary); color: white; }
 
         footer { padding: 60px; text-align: center; opacity: 0.3; font-size: 0.8rem; }
+
+        /* Toast notification for copy */
+        #toast {
+            visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 8px; padding: 12px; position: fixed;
+            z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%);
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1847020814272884"
-     crossorigin="anonymous"></script>
 </head>
 <body>
     <h1 class="header">PAPER HUB</h1>
@@ -87,6 +104,8 @@
         </div>
         <iframe id="chrome-frame" src=""></iframe>
     </div>
+
+    <div id="toast">Link Copied!</div>
 
     <footer>© 2026 Paper Hub</footer>
 
@@ -109,11 +128,78 @@
 
         let allPapers = [];
 
-        // Search and Chrome Feature
+        // UI Elements
         const searchInput = document.getElementById('mSearch');
         const papersContainer = document.getElementById('papers-container');
         const chromeContainer = document.getElementById('chrome-container');
         const chromeFrame = document.getElementById('chrome-frame');
+
+        // Handle URL Parameters for Sharing
+        const getPaperFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('paper');
+        };
+
+        // Render logic
+        onSnapshot(papersCol, (snapshot) => {
+            allPapers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            const sharedId = getPaperFromUrl();
+            if (sharedId) {
+                const sharedPaper = allPapers.filter(p => p.id === sharedId);
+                renderUI(sharedPaper.length > 0 ? sharedPaper : allPapers);
+            } else {
+                renderUI(allPapers);
+            }
+        });
+
+        window.copyShareLink = (id) => {
+            const baseUrl = window.location.href.split('?')[0];
+            const shareUrl = `${baseUrl}?paper=${id}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                const toast = document.getElementById("toast");
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            });
+        };
+
+        function renderUI(data) {
+            papersContainer.innerHTML = '';
+            data.forEach(item => {
+                const isPdf = item.link.toLowerCase().includes('.pdf') || item.link.includes('drive.google.com');
+                let displayUrl = item.link;
+                
+                if (item.link.includes('drive.google.com')) {
+                    let fileId = item.link.includes('/d/') ? item.link.split('/d/')[1].split('/')[0] : new URL(item.link).searchParams.get('id');
+                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${fileId}`)}&embedded=true`;
+                } else if (isPdf) {
+                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(item.link)}&embedded=true`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'paper-card';
+                card.innerHTML = `
+                    <div class="card-preview" onclick="window.open('${item.link}', '_blank')">
+                        ${isPdf ? `<iframe src="${displayUrl}"></iframe>` : `<img src="${item.link}">`}
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">${item.title}</div>
+                        <button class="share-btn" onclick="copyShareLink('${item.id}')">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    </div>
+                `;
+                papersContainer.appendChild(card);
+            });
+        }
+
+        // Search logic
+        searchInput.oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            if (val !== "openchrome") {
+                renderUI(allPapers.filter(p => p.title.toLowerCase().includes(val)));
+            }
+        };
 
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -131,44 +217,6 @@
             chromeContainer.style.display = 'none';
             papersContainer.style.display = 'grid';
             chromeFrame.src = ""; 
-        };
-
-        // Render logic
-        onSnapshot(papersCol, (snapshot) => {
-            allPapers = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            renderUI(allPapers);
-        });
-
-        function renderUI(data) {
-            const container = document.getElementById('papers-container');
-            container.innerHTML = '';
-            data.forEach(item => {
-                const isPdf = item.link.toLowerCase().includes('.pdf') || item.link.includes('drive.google.com');
-                let displayUrl = item.link;
-                if (item.link.includes('drive.google.com')) {
-                    let fileId = item.link.includes('/d/') ? item.link.split('/d/')[1].split('/')[0] : new URL(item.link).searchParams.get('id');
-                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${fileId}`)}&embedded=true`;
-                } else if (isPdf) {
-                    displayUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(item.link)}&embedded=true`;
-                }
-
-                const card = document.createElement('div');
-                card.className = 'paper-card';
-                card.innerHTML = `
-                    <div class="card-preview" onclick="window.open('${item.link}', '_blank')">
-                        ${isPdf ? `<iframe src="${displayUrl}"></iframe>` : `<img src="${item.link}">`}
-                    </div>
-                    <div class="card-title">${item.title}</div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        searchInput.oninput = (e) => {
-            const val = e.target.value.toLowerCase();
-            if (val !== "openchrome") {
-                renderUI(allPapers.filter(p => p.title.toLowerCase().includes(val)));
-            }
         };
     </script>
 </body>
