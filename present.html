@@ -3,57 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CR Admin - Final Portal</title>
+    <title>CR Admin - Firebase Pro</title>
     <style>
         :root { --primary: #2563eb; --danger: #ef4444; --success: #22c55e; --bg: #f1f5f9; --dark: #0f172a; --gold: #f59e0b; --purple: #8b5cf6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 160px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 180px; }
         
+        /* History Modal */
+        #analysisModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        .history-item { background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .history-meta { font-size: 12px; color: #64748b; margin-bottom: 5px; }
+        .history-actions { display: flex; gap: 10px; margin-top: 10px; }
+
         .main-container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 15px; position: relative; }
+        .analysis-trigger { position: absolute; right: 0; top: 0; background: var(--primary); color: white; border: none; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
         
-        .header { text-align: center; margin-bottom: 15px; }
         .mode-selector { display: flex; background: #e2e8f0; border-radius: 12px; padding: 4px; margin-bottom: 15px; }
         .mode-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: #64748b; background: transparent; transition: 0.3s; }
         .mode-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         .search-box { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 16px; outline: none; box-sizing: border-box; }
-        
         .student-list { border-top: 1px solid #f1f5f9; max-height: 400px; overflow-y: auto; }
         .student-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #f1f5f9; }
         .student-row.hidden { display: none; }
-        
-        .info { flex: 1; }
         .roll { font-weight: bold; color: var(--primary); font-size: 14px; }
         .name { font-size: 13px; color: #334155; margin-left: 5px; }
         
-        .controls { display: flex; gap: 8px; align-items: center; }
-        
-        .cycle-btn { border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; min-width: 85px; text-align: center; color: white; }
+        .cycle-btn { border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; min-width: 85px; color: white; }
         .state-absent { background: #94a3b8; }
         .state-full { background: var(--success); }
         .state-morning { background: var(--purple); }
         .state-afternoon { background: var(--gold); }
 
-        .paid-toggle { width: 22px; height: 22px; cursor: pointer; accent-color: var(--gold); }
-
         .preview-card { margin-top: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; }
         #live-preview { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4; color: #1e293b; }
 
-        .floating-actions { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 460px; display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; font-size: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .btn-copy { background: var(--dark); }
+        .floating-actions { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 460px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn { padding: 14px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; font-size: 14px; }
+        .btn-copy { background: var(--dark); grid-column: span 2; }
         .btn-reset { background: var(--danger); }
+        .btn-save { background: var(--success); }
         
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 12px 25px; border-radius: 30px; display: none; z-index: 2000; }
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 12px 25px; border-radius: 30px; display: none; z-index: 4000; }
     </style>
 </head>
 <body>
 
-<div id="toast">Report Copied! ✅</div>
+<div id="toast">Copied! ✅</div>
+
+<div id="analysisModal">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin:0;">Attendance History</h2>
+        <button onclick="closeAnalysis()" style="background:var(--danger); color:white; border:none; padding:8px 15px; border-radius:8px;">Close</button>
+    </div>
+    <div id="historyList">Loading history...</div>
+</div>
 
 <div class="main-container">
     <div class="header">
-        <h2 style="margin:0; color: var(--dark);">CR Attendance Portal</h2>
+        <h2 style="margin:0; color: var(--dark);">CR Admin Portal</h2>
         <div id="dateStr" style="color: #64748b; font-size: 0.85em;"></div>
+        <button class="analysis-trigger" onclick="openAnalysis()">Analysis</button>
     </div>
 
     <div class="mode-selector">
@@ -72,88 +82,95 @@
 </div>
 
 <div class="floating-actions">
-    <button class="btn btn-reset" onclick="resetAll()">Reset Attendance</button>
-    <button class="btn btn-copy" onclick="copyReport()">Copy Report</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="btn btn-save" onclick="saveToFirebase()">Save to Cloud</button>
+    <button class="btn btn-copy" onclick="copyReport()">Copy Report to Clipboard</button>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDAheWdYiiEBUHgbokK7kDPjMEEk7fngYQ",
+      authDomain: "abhyaslabkeys.firebaseapp.com",
+      databaseURL: "https://abhyaslabkeys-default-rtdb.firebaseio.com",
+      projectId: "abhyaslabkeys",
+      storageBucket: "abhyaslabkeys.firebasestorage.app",
+      messagingSenderId: "782150849318",
+      appId: "1:782150849318:web:cf33844130d28f82c567e7",
+      measurementId: "G-QT02834DT7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
     // STUDENT DATA
     const studentNames = [
         "L. Sai ganesh", "S. Dandi Shiva ganesh", "M. Revanth sai kumar reddy", "P. Chandrahasa venkat", 
         "A. Rishitha", "K. Alekhya", "M. Santhosh", "R. Naga surya lakshman Sai ram", "T. Rakshitha", 
         "A. Yaswanth sundhar", "K. Mounika", "L. Divya sri", "K. Jayaram durga pradeep", 
-        "J. Tarun kumar", // Fixed name (Roll 14)
-        "M. Bhagat raj swaroop", "M. Venkata sai santhosh", "P. Lakshmi sai pranusha", "M. Siva meghana", 
-        "T. Bindhu sai sree", "M. samuel raju", 
-        // 21 is skipped
-        "G. Satya vara prasad", "K. Phanendra bhaskar kumar", "M. Simhadri", "C. Chandu siva ram", 
-        "G. Ganga bhavani", "A. D V S D Bala rama krishna", "A. Deevan kumar", "P. Dhana sai deepak", 
-        "P. Rishitha navya", "Y. Mokshagna", "S. Farida", "B. Tarun reddy", "S. Shajahan", "K. Meghana", 
-        "K. Manikanta", "R. Sai ganesh", "K. Chittu usha devi", "R. Sai sandeep", "M. Harshith vivek", 
-        "M. V V Siva satya ashok", "M. Arun sai"
+        "J. Tarun kumar", "M. Bhagat raj swaroop", "M. Venkata sai santhosh", "P. Lakshmi sai pranusha", "M. Siva meghana", 
+        "T. Bindhu sai sree", "M. samuel raju", "G. Satya vara prasad", "K. Phanendra bhaskar kumar", 
+        "M. Simhadri", "C. Chandu siva ram", "G. Ganga bhavani", "A. D V S D Bala rama krishna", 
+        "A. Deevan kumar", "P. Dhana sai deepak", "P. Rishitha navya", "Y. Mokshagna", "S. Farida", 
+        "B. Tarun reddy", "S. Shajahan", "K. Meghana", "K. Manikanta", "R. Sai ganesh", "K. Chittu usha devi", 
+        "R. Sai sandeep", "M. Harshith vivek", "M. V V Siva satya ashok", "M. Arun sai"
     ];
 
-    let currentMode = 'class';
-    let paidData = JSON.parse(localStorage.getItem('cr_paid_v4')) || {};
-    let attData = {}; 
+    window.currentMode = 'class';
+    window.paidData = JSON.parse(localStorage.getItem('cr_paid_v4')) || {};
+    window.attData = {}; 
+    window.students = [];
 
-    const students = [];
     let r = 1;
     studentNames.forEach(name => {
-        if(r === 21) r++; // Skip Roll 21 logic
-        students.push({ roll: r, name: name });
-        attData[r] = 0; 
+        if(r === 21) r++;
+        window.students.push({ roll: r, name: name });
+        window.attData[r] = 0; 
         r++;
     });
 
-    function setMode(mode) {
-        currentMode = mode;
+    window.setMode = (mode) => {
+        window.currentMode = mode;
         document.getElementById('m-class').classList.toggle('active', mode==='class');
         document.getElementById('m-cert').classList.toggle('active', mode==='cert');
         render();
-    }
+    };
 
-    function cycleStatus(roll) {
-        attData[roll] = (attData[roll] + 1) % 4;
+    window.cycleStatus = (roll) => {
+        window.attData[roll] = (window.attData[roll] + 1) % 4;
         render();
-    }
+    };
 
-    function togglePaid(roll, val) {
-        paidData[roll] = val;
-        localStorage.setItem('cr_paid_v4', JSON.stringify(paidData));
+    window.togglePaid = (roll, val) => {
+        window.paidData[roll] = val;
+        localStorage.setItem('cr_paid_v4', JSON.stringify(window.paidData));
         render();
-    }
+    };
 
     function render() {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
-
-        students.forEach(s => {
+        window.students.forEach(s => {
             const row = document.createElement('div');
             row.className = 'student-row';
             row.setAttribute('data-name', s.name.toLowerCase());
             row.setAttribute('data-roll', s.roll);
-
-            const status = attData[s.roll];
+            const status = window.attData[s.roll] || 0;
             const statusConfig = [
                 { label: 'ABSENT', class: 'state-absent' },
                 { label: 'PRESENT', class: 'state-full' },
                 { label: 'MORNING', class: 'state-morning' },
                 { label: 'AFTERNOON', class: 'state-afternoon' }
             ];
-
             let controls = `<button class="cycle-btn ${statusConfig[status].class}" onclick="cycleStatus(${s.roll})">${statusConfig[status].label}</button>`;
-            
-            if(currentMode === 'cert') {
-                const isPaid = paidData[s.roll] ? 'checked' : '';
+            if(window.currentMode === 'cert') {
+                const isPaid = window.paidData[s.roll] ? 'checked' : '';
                 controls += `<span style="font-size:9px; color:#94a3b8; margin-left:5px;">PAID</span>
                              <input type="checkbox" class="paid-toggle" ${isPaid} onchange="togglePaid(${s.roll}, this.checked)">`;
             }
-
-            row.innerHTML = `
-                <div class="info"><span class="roll">${s.roll}.</span><span class="name">${s.name}</span></div>
-                <div class="controls">${controls}</div>
-            `;
+            row.innerHTML = `<div class="info"><span class="roll">${s.roll}.</span><span class="name">${s.name}</span></div><div class="controls">${controls}</div>`;
             container.appendChild(row);
         });
         updatePreview();
@@ -161,64 +178,141 @@
 
     function updatePreview() {
         const date = new Date().toLocaleDateString();
-        const p_list = students.filter(s => attData[s.roll] === 1);
-        const a_list = students.filter(s => attData[s.roll] === 0);
-        const m_list = students.filter(s => attData[s.roll] === 2);
-        const an_list = students.filter(s => attData[s.roll] === 3);
-
-        let text = "";
-        const modeTitle = currentMode === 'class' ? "CLASS ATTENDANCE" : "CERTIFICATE REPORT";
-        text += `📅 *${modeTitle} - ${date}*\n━━━━━━━━━━━━━━━━━━\n\n`;
-
-        const getPaidLabel = (roll) => {
-            if (currentMode === 'class') return "";
-            return paidData[roll] ? " [PAID ✅]" : " [NOT PAID ❌]";
-        };
-
-        if (p_list.length > 0) {
-            text += `✅ *PRESENT LIST:* (${p_list.length})\n`;
-            text += p_list.map(s => `• ${s.roll}. ${s.name}${getPaidLabel(s.roll)}`).join('\n') + `\n\n`;
-        }
-
+        const p_list = window.students.filter(s => window.attData[s.roll] === 1);
+        const a_list = window.students.filter(s => window.attData[s.roll] === 0);
+        const m_list = window.students.filter(s => window.attData[s.roll] === 2);
+        const an_list = window.students.filter(s => window.attData[s.roll] === 3);
+        let text = `📅 *${window.currentMode === 'class' ? 'CLASS ATTENDANCE' : 'CERTIFICATE REPORT'} - ${date}*\n━━━━━━━━━━━━━━━━━━\n\n`;
+        const getPaidLabel = (roll) => (window.currentMode === 'cert' && window.paidData[roll]) ? " [PAID ✅]" : (window.currentMode === 'cert' ? " [NOT PAID ❌]" : "");
+        
+        if (p_list.length > 0) text += `✅ *PRESENT LIST:* (${p_list.length})\n` + p_list.map(s => `• ${s.roll}. ${s.name}${getPaidLabel(s.roll)}`).join('\n') + `\n\n`;
         if (m_list.length > 0 || an_list.length > 0) {
             text += `⏳ *HALF DAY LIST:*\n`;
             if(m_list.length > 0) text += m_list.map(s => `• ${s.roll}. ${s.name} (Morning)${getPaidLabel(s.roll)}`).join('\n') + `\n`;
             if(an_list.length > 0) text += an_list.map(s => `• ${s.roll}. ${s.name} (Afternoon)${getPaidLabel(s.roll)}`).join('\n') + `\n`;
             text += `\n`;
         }
-
-        if (a_list.length > 0) {
-            text += `❌ *ABSENT LIST:* (${a_list.length})\n`;
-            text += a_list.map(s => `• ${s.roll}. ${s.name}${getPaidLabel(s.roll)}`).join('\n') + `\n\n`;
-        }
-
+        if (a_list.length > 0) text += `❌ *ABSENT LIST:* (${a_list.length})\n` + a_list.map(s => `• ${s.roll}. ${s.name}${getPaidLabel(s.roll)}`).join('\n') + `\n\n`;
+        
         text += `━━━━━━━━━━━━━━━━━━\n_Generated by CR Revanth_`;
         document.getElementById('live-preview').innerText = text;
     }
 
-    function filterStudents() {
+    // --- Firebase Logic ---
+    window.saveToFirebase = async () => {
+        const timestamp = new Date().toLocaleString();
+        const reportId = Date.now();
+        const folder = window.currentMode === 'class' ? 'class_reports' : 'cert_reports';
+        try {
+            await set(ref(db, folder + '/' + reportId), {
+                id: reportId,
+                mode: window.currentMode,
+                timestamp: timestamp,
+                attendance: window.attData,
+                paid: window.paidData
+            });
+            showToast("Saved to Firebase! ☁️");
+        } catch (e) { alert("Error: " + e.message); }
+    };
+
+    window.openAnalysis = () => {
+        document.getElementById('analysisModal').style.display = 'block';
+        const histDiv = document.getElementById('historyList');
+        histDiv.innerHTML = "Fetching...";
+        onValue(ref(db), (snapshot) => {
+            const data = snapshot.val();
+            histDiv.innerHTML = "";
+            if(!data) { histDiv.innerHTML = "No data found."; return; }
+            ['class_reports', 'cert_reports'].forEach(f => {
+                if(data[f]) {
+                    Object.values(data[f]).reverse().forEach(record => {
+                        const div = document.createElement('div');
+                        div.className = 'history-item';
+                        div.innerHTML = `<div class="history-meta"><b>${record.mode.toUpperCase()}</b> | ${record.timestamp}</div>
+                            <div class="history-actions">
+                                <button onclick="editRec('${f}','${record.id}')" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:6px;">Edit</button>
+                                <button onclick="delRec('${f}','${record.id}')" style="background:var(--danger); color:white; border:none; padding:6px 12px; border-radius:6px;">Delete</button>
+                            </div>`;
+                        histDiv.appendChild(div);
+                    });
+                }
+            });
+        });
+    };
+
+    window.closeAnalysis = () => document.getElementById('analysisModal').style.display = 'none';
+
+    window.editRec = (f, id) => {
+        onValue(ref(db, f + '/' + id), (s) => {
+            const d = s.val();
+            if(d) {
+                window.attData = d.attendance;
+                window.paidData = d.paid || {};
+                window.setMode(d.mode);
+                closeAnalysis();
+                showToast("Record Loaded");
+            }
+        }, { onlyOnce: true });
+    };
+
+    window.delRec = (f, id) => {
+        if(confirm("Delete this?")) {
+            remove(ref(db, f + '/' + id));
+            showToast("Deleted");
+        }
+    };
+
+    window.showToast = (msg) => {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 2000);
+    };
+
+    window.copyReport = () => {
+        const text = document.getElementById('live-preview').innerText;
+        
+        // Strategy 1: Modern API
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => showToast("Copied! ✅"))
+            .catch(() => fallbackCopy(text));
+        } else {
+            // Strategy 2: Fallback for non-https/older browsers
+            fallbackCopy(text);
+        }
+    };
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed"; // prevent scrolling to bottom
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast("Copied! ✅");
+        } catch (err) {
+            alert('Fallback: Unable to copy', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    window.filterStudents = () => {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.student-row').forEach(row => {
             const n = row.getAttribute('data-name');
             const r = row.getAttribute('data-roll');
             row.classList.toggle('hidden', !(n.includes(q) || r == q));
         });
-    }
+    };
 
-    function resetAll() {
-        if(confirm("Reset all attendance values? (Payment data will stay saved)")) {
-            students.forEach(s => attData[s.roll] = 0);
+    window.resetAll = () => {
+        if(confirm("Clear current list?")) {
+            window.students.forEach(s => window.attData[s.roll] = 0);
             render();
         }
-    }
-
-    function copyReport() {
-        navigator.clipboard.writeText(document.getElementById('live-preview').innerText).then(() => {
-            const t = document.getElementById('toast');
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-        });
-    }
+    };
 
     document.getElementById('dateStr').innerText = new Date().toDateString();
     render();
