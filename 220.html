@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1847020814272884" crossorigin="anonymous"></script>
+    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>USEAS | Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            --primary-accent: #6366f1;
+            --secondary-accent: #a855f7;
+            --glass: rgba(255, 255, 255, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --max-width: 1100px; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body { background: #f8fafc; min-height: 100vh; width: 100%; color: var(--text-main); overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
+
+        /* --- Global Header --- */
+        header {
+            padding: 12px 5%; display: flex; justify-content: space-between; align-items: center;
+            position: fixed; top: 0; width: 100%; z-index: 9999; 
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05); transition: 0.3s ease;
+        }
+
+        @media (min-width: 1024px) { header { padding: 12px calc((100% - var(--max-width)) / 2 + 20px); } }
+
+        .header-left-group { display: flex; align-items: center; gap: 15px; }
+
+        .header-btn {
+            background: white; color: var(--primary-accent); border: none;
+            width: 42px; height: 42px; border-radius: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: 0.2s;
+        }
+
+        #ad-status-btn { background: #fee2e2; color: #ef4444; position: relative; }
+        #ad-status-btn.active { background: #dcfce7; color: #22c55e; }
+        .timer-badge { 
+            position: absolute; top: -5px; right: -5px; background: #0f172a; 
+            color: white; font-size: 10px; padding: 2px 6px; border-radius: 20px; display: none;
+        }
+
+        /* --- Sidebar & Layout --- */
+        .sidebar {
+            position: fixed; top: 0; left: -300px; width: 300px; height: 100%;
+            background: white; z-index: 10000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 15px 0 40px rgba(0,0,0,0.1); padding: 40px 25px;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4); z-index: 9998; display: none; backdrop-filter: blur(4px);
+        }
+
+        .content-area { width: 100%; flex: 1; position: relative; }
+        .iframe-container { width: 100%; height: 100vh; border: none; display: none; position: absolute; top: 0; left: 0; z-index: 100; background: white; }
+        .iframe-container.active { display: block; }
+
+        .page { display: none; padding: 100px 20px 60px; width: 100%; max-width: var(--max-width); margin: 0 auto; animation: slideUp 0.5s ease; }
+        .page.active { display: block; }
+
+        /* --- Main UI Elements --- */
+        .lab-banner {
+            width: 100%; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 28px; padding: 40px; color: white; display: flex; justify-content: space-between; align-items: center;
+            position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
+        }
+
+        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        @media (min-width: 640px) { .main-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1024px) { .main-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .feature-card {
+            background: white; padding: 30px 20px; border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; cursor: pointer;
+        }
+
+        /* --- Ad Reward Modal --- */
+        #ad-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 20000; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 24px; max-width: 400px; width: 100%; text-align: center;
+        }
+        .ad-placeholder {
+            width: 100%; height: 250px; background: #f1f5f9; margin: 20px 0;
+            display: flex; align-items: center; justify-content: center; border-radius: 12px;
+            border: 2px dashed #cbd5e1; position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ad-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Unlock Ad-Free Mode</h3>
+            <p style="font-size: 0.9rem; color: #64748b; margin-top: 10px;">Click the ad below 3 times to enjoy 3 hours without ads!</p>
+            
+            <div class="ad-placeholder" id="ad-click-area">
+                <p style="color: #94a3b8;">[ AD UNIT HERE ]<br>Click Count: <span id="click-count">0</span>/3</p>
+                <div onclick="handleAdClick()" style="position:absolute; top:0; left:0; width:100%; height:100%; cursor:pointer;"></div>
+            </div>
+
+            <button class="lab-btn" style="background: #f1f5f9; color: #64748b;" onclick="closeAdModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <h2 style="margin-bottom: 30px; color: var(--primary-accent);">USEAS HUB</h2>
+        <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
+        <div class="menu-link" onclick="showProfile()"><i class="fa-solid fa-circle-user"></i> My Profile</div>
+        <div class="menu-link" onclick="showPDFTools()"><i class="fa-solid fa-file-pdf"></i> PDF Tools</div>
+        <div class="menu-link" onclick="showChatbot()"><i class="fa-solid fa-robot"></i> AI Chatbot</div>
+    </div>
+
+    <header id="main-header">
+        <div class="header-left-group">
+            <button class="header-btn" id="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars-staggered"></i></button>
+            <button class="header-btn" id="back-btn" onclick="showPage('home')" style="display:none;"><i class="fa-solid fa-arrow-left"></i></button>
+        </div>
+        
+        <div class="logo-container" style="font-weight: 800; font-size: 1.5rem; background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">USEAS</div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button class="header-btn" id="ad-status-btn" onclick="openAdModal()">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span class="timer-badge" id="ad-timer">3h</span>
+            </button>
+            <button class="header-btn" id="help-btn" onclick="showChatbot()"><i class="fa-solid fa-bolt"></i></button>
+        </div>
+    </header>
+
+    <div class="content-area">
+        <iframe id="profileFrame" class="iframe-container" src="https://revanthreddy150.github.io/anikingloginuseas/"></iframe>
+        <iframe id="labFrame" class="iframe-container" src="https://www.useas.online/abhyaslabkeys"></iframe>
+        <iframe id="pdfFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaspdftools/"></iframe>
+        <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
+
+        <div id="home" class="page active">
+            <div class="lab-banner">
+                <div>
+                    <h2 style="margin-bottom: 8px;">Abhyas Lab Keys</h2>
+                    <p style="margin-bottom: 20px; opacity: 0.9;">Instant lab solutions with one click.</p>
+                    <button class="lab-btn" style="background:white; color:#4f46e5; border:none; padding:10px 20px; border-radius:12px; font-weight:700;" onclick="showExternal('labFrame', 'lab')">Launch Lab</button>
+                </div>
+                <i class="fa-solid fa-code" style="font-size: 6rem; opacity: 0.1;"></i>
+            </div>
+
+            <div class="main-grid" style="margin-top: 30px;">
+                <div class="feature-card" onclick="showPDFTools()">
+                    <div class="card-icon" style="color: #e11d48;"><i class="fa-solid fa-file-pdf"></i></div>
+                    <b>PDF Tools</b>
+                </div>
+                <div class="feature-card" onclick="showChatbot()">
+                    <div class="card-icon" style="color: #0ea5e9;"><i class="fa-solid fa-robot"></i></div>
+                    <b>AI Chat</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let adClicks = 0;
+        const AD_FREE_DURATION = 3 * 60 * 60 * 1000; // 3 Hours in ms
+
+        // Check Ad-Free status on Load
+        window.onload = checkAdStatus;
+
+        function openAdModal() {
+            const expiry = localStorage.getItem('adFreeExpiry');
+            if (expiry && Date.now() < expiry) {
+                alert("You are already in Ad-Free mode!");
+                return;
+            }
+            document.getElementById('ad-modal').style.display = 'flex';
+        }
+
+        function closeAdModal() {
+            document.getElementById('ad-modal').style.display = 'none';
+            adClicks = 0;
+            document.getElementById('click-count').innerText = adClicks;
+        }
+
+        function handleAdClick() {
+            adClicks++;
+            document.getElementById('click-count').innerText = adClicks;
+
+            if (adClicks >= 3) {
+                const expiryTime = Date.now() + AD_FREE_DURATION;
+                localStorage.setItem('adFreeExpiry', expiryTime);
+                alert("Success! Ads hidden for 3 hours.");
+                closeAdModal();
+                checkAdStatus();
+            }
+        }
+
+        function checkAdStatus() {
+            const expiry = localStorage.getItem('adFreeExpiry');
+            const btn = document.getElementById('ad-status-btn');
+            const timerBadge = document.getElementById('ad-timer');
+            const allAds = document.querySelectorAll('ins.adsbygoogle, amp-auto-ads, #container-b18faffa536f7227efc89409ea4acda5');
+
+            if (expiry && Date.now() < expiry) {
+                // AD FREE ACTIVE
+                btn.classList.add('active');
+                timerBadge.style.display = 'block';
+                allAds.forEach(ad => ad.style.display = 'none'); // Hide Ads
+                
+                // Update countdown
+                let remaining = Math.round((expiry - Date.now()) / (1000 * 60 * 60));
+                timerBadge.innerText = remaining + "h";
+            } else {
+                // ADS ACTIVE
+                btn.classList.remove('active');
+                timerBadge.style.display = 'none';
+                allAds.forEach(ad => ad.style.display = 'block'); // Show Ads
+                localStorage.removeItem('adFreeExpiry');
+            }
+        }
+
+        // --- Navigation Logic ---
+        function showPage(pageId) {
+            document.querySelectorAll('.page, .iframe-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('back-btn').style.display = (pageId === 'home') ? 'none' : 'flex';
+            closeSidebar();
+        }
+
+        function showExternal(fId) {
+            document.querySelectorAll('.page, .iframe-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(fId).classList.add('active');
+            document.getElementById('back-btn').style.display = 'flex';
+        }
+
+        function showProfile() { showExternal('profileFrame'); }
+        function showPDFTools() { showExternal('pdfFrame'); }
+        function showChatbot() { showExternal('chatFrame'); }
+
+        function toggleSidebar() { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = 'block';
+        }
+        function closeSidebar() { 
+            document.getElementById('sidebar').classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
