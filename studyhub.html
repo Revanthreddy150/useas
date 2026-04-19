@@ -1,221 +1,167 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Hub | Student Portal</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Hub | Student Portal</title>
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root { 
+  --primary: #6c5ce7; --bg: #f4f7f6; 
+  --card-bg: #ffffff; --text-main: #2d3436; 
+  --border: rgba(0,0,0,0.08);
+}
 
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --blue-accent: #2980b9;
-            --bg: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-main: #2d3436;
-            --text-muted: #636e72;
-            --border: rgba(0, 0, 0, 0.08);
-            --neon-green: #2ecc71;
-            --yt-red: #FF0000;
-        }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins'; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-            transition: 0.3s;
-        }
+body { background: var(--bg); }
 
-        body {
-            background: var(--bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+.header { text-align:center; padding:30px; }
+.logo { font-family:'Orbitron'; font-size:2rem; color:var(--primary); }
 
-        /* Toast */
-        #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2d3436;
-            color: var(--neon-green);
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-weight: 600;
-            display: none;
-            z-index: 11000;
-            border: 1px solid var(--neon-green);
-        }
+.search-container { max-width:500px; margin:auto; padding:10px; }
+.search-bar { width:100%; padding:12px; border-radius:30px; border:1px solid var(--border); }
 
-        /* Help Button */
-        #help-btn {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 60px;
-            height: 60px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 1000;
-            animation: sonarWave 2s infinite;
-        }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  padding:20px;
+}
 
-        @keyframes sonarWave {
-            0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); }
-        }
+.card {
+  background:white;
+  padding:40px;
+  border-radius:20px;
+  text-align:center;
+  cursor:pointer;
+  border:1px solid var(--border);
+}
 
-        /* Visitor Counter */
-        #visitor-counter {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--primary);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            display: flex;
-            gap: 8px;
-        }
+.card:hover {
+  transform:translateY(-5px);
+  border-color:var(--primary);
+}
 
-        .header {
-            text-align: center;
-            padding: 40px 20px 10px;
-        }
+/* Viewer */
+#viewer {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:white;
+  flex-direction:column;
+}
 
-        .logo {
-            font-family: 'Orbitron';
-            font-size: 2.2rem;
-            color: var(--primary);
-            letter-spacing: 5px;
-        }
+.v-header {
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  background:#eee;
+}
 
-        .search-container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 0 20px;
-            position: relative;
-        }
-
-        .search-bar {
-            width: 100%;
-            padding: 12px 20px 12px 45px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 35px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: auto;
-            padding: 0 20px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 50px 20px;
-            border-radius: 24px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-    </style>
+iframe {
+  flex:1;
+  width:100%;
+  border:none;
+}
+</style>
 </head>
 
 <body>
 
-<!-- Toast -->
-<div id="toast">Copied!</div>
-
-<!-- Visitor Counter -->
-<div id="visitor-counter">
-    <i class="fa-solid fa-eye"></i>
-    <span id="view-count">...</span>
-</div>
-
-<!-- Help Button -->
-<div id="help-btn">
-    <i class="fa-solid fa-headset"></i>
-</div>
-
-<!-- Header -->
 <div class="header">
-    <h1 class="logo">STUDY HUB</h1>
+  <h1 class="logo">STUDY HUB</h1>
 </div>
 
-<!-- Search -->
 <div class="search-container">
-    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-    <input type="text" class="search-bar" placeholder="Search subjects or topics...">
+  <input type="text" id="searchInput" class="search-bar" placeholder="Search subjects...">
 </div>
 
-<!-- Main Content -->
-<div class="container">
-    <div class="grid" id="mainGrid"></div>
-</div>
+<div class="grid" id="mainGrid"></div>
 
 <!-- Viewer -->
 <div id="viewer">
-    <div class="v-header">
-        <span id="v-name"></span>
-        <button id="closeViewerBtn">Close</button>
-    </div>
-    <iframe id="v-frame"></iframe>
+  <div class="v-header">
+    <span id="v-name"></span>
+    <button onclick="closeViewer()">Close</button>
+  </div>
+  <iframe id="v-frame"></iframe>
 </div>
 
-<!-- Video Viewer -->
-<div id="video-viewer">
-    <div class="v-header">
-        <span id="v-video-name"></span>
-        <button id="closeVideoBtn">Close</button>
-    </div>
-    <iframe id="video-frame"></iframe>
-</div>
+<script>
 
-<footer>
-    © 2026 STUDY HUB PORTAL
-</footer>
+// Data
+const subjects = [
+  {
+    name: "Physics",
+    link: "https://www.youtube.com/embed/1VfZlK6X7fQ"
+  },
+  {
+    name: "Chemistry",
+    link: "https://www.youtube.com/embed/FSyAehMdpyI"
+  },
+  {
+    name: "Mathematics",
+    link: "https://www.youtube.com/embed/2ePf9rue1Ao"
+  },
+  {
+    name: "Biology",
+    link: "https://www.youtube.com/embed/Gxv2h7kS2Tg"
+  }
+];
 
-<script type="module" src="studyapp.js"></script>
+// Load cards
+function loadSubjects() {
+  const grid = document.getElementById("mainGrid");
+  grid.innerHTML = "";
+
+  subjects.forEach(sub => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `<h3>${sub.name}</h3>`;
+
+    card.onclick = () => {
+      openViewer(sub.name, sub.link);
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+// Open viewer
+function openViewer(name, link) {
+  document.getElementById("viewer").style.display = "flex";
+  document.getElementById("v-name").innerText = name;
+  document.getElementById("v-frame").src = link;
+}
+
+// Close viewer
+function closeViewer() {
+  document.getElementById("viewer").style.display = "none";
+  document.getElementById("v-frame").src = "";
+}
+
+// Search
+document.getElementById("searchInput").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.style.display = text.includes(value) ? "block" : "none";
+  });
+});
+
+// Start
+loadSubjects();
+
+</script>
 
 </body>
 </html>
+```
