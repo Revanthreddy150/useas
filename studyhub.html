@@ -4,155 +4,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Hub | Student Portal</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root { 
-            --primary: #6c5ce7; --blue-accent: #2980b9; --bg: #f4f7f6; 
-            --card-bg: #ffffff; --text-main: #2d3436; --text-muted: #636e72; 
-            --border: rgba(0, 0, 0, 0.08); --neon-green: #2ecc71; --yt-red: #FF0000;
+            --primary: #6c5ce7; 
+            --primary-hover: #5b4cc4;
+            --blue-accent: #2980b9; 
+            --bg: #f4f7f6; 
+            --card-bg: #ffffff; 
+            --text-main: #2d3436; 
+            --text-muted: #636e72; 
+            --border: rgba(0, 0, 0, 0.08); 
+            --neon-green: #2ecc71; 
+            --error: #e74c3c;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; transition: 0.3s; }
+
+        /* Base Reset */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+        html { scroll-behavior: smooth; }
         body { background: var(--bg); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+        /* Toast Notification */
+        #toast { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            background: #2d3436; color: var(--neon-green); padding: 12px 25px; 
+            border-radius: 50px; font-weight: 600; display: none; z-index: 11000; 
+            border: 1px solid var(--neon-green); box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Floating Elements */
+        #help-btn { 
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; 
+            background: var(--primary); color: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; cursor: pointer; z-index: 1000; 
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #help-btn:hover { transform: scale(1.1) rotate(5deg); background: var(--primary-hover); }
         
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2d3436; color: var(--neon-green); padding: 12px 25px; border-radius: 50px; font-weight: 600; display: none; z-index: 11000; border: 1px solid var(--neon-green); }
-        #help-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 1000; animation: sonarWave 2s infinite; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); }
+        #visitor-counter { 
+            position: fixed; bottom: 20px; left: 20px; background: var(--primary); 
+            color: white; padding: 8px 18px; border-radius: 50px; font-size: 0.8rem; 
+            z-index: 1000; display: flex; align-items: center; gap: 8px; font-weight: 600;
+        }
+
+        /* Header & Search */
+        .header { text-align: center; padding: 50px 20px 20px; }
+        .logo { 
+            font-family: 'Orbitron', sans-serif; font-size: 2.5rem; 
+            color: var(--primary); letter-spacing: 6px; font-weight: 700; 
+            text-transform: uppercase; text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+        }
+
+        .search-container { max-width: 650px; margin: 20px auto; padding: 0 20px; position: relative; }
+        .search-bar { 
+            width: 100%; padding: 15px 20px 15px 55px; border-radius: 50px; 
+            border: 2px solid transparent; background: var(--card-bg); outline: none; 
+            box-shadow: var(--shadow); font-size: 1rem; transition: 0.3s;
+        }
+        .search-bar:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); }
+        .search-icon { position: absolute; left: 40px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
+
+        /* Main Layout */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .bc-box { 
+            padding: 12px 25px; background: var(--card-bg); border-radius: 15px; 
+            font-size: 0.9rem; border: 1px solid var(--border); margin-bottom: 25px;
+            display: flex; gap: 10px; color: var(--text-muted);
+        }
+        .bc-link { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: none; }
+
+        /* Grid & Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; padding-bottom: 60px; }
+        .card { 
+            background: var(--card-bg); border: 1px solid var(--border); 
+            padding: 60px 25px; border-radius: 28px; text-align: center; 
+            cursor: pointer; position: relative; transition: 0.4s;
+        }
+        .card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(108, 92, 231, 0.15); }
+        .card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 15px; display: block; }
         
-        /* Visitor Counter Styling */
-        #visitor-counter { position: fixed; background: var(--primary); color: white; padding: 8px 15px; border-radius: 50px; font-size: 0.75rem; z-index: 1000; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
-        
-        @keyframes sonarWave { 0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0); } 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); } }
-        
-        .header { text-align: center; padding: 40px 20px 10px; }
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--primary); letter-spacing: 5px; font-weight: 700; text-transform: uppercase; }
-        .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; position: relative; }
-        .search-bar { width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; border: 1px solid var(--border); background: var(--card-bg); outline: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .search-icon { position: absolute; left: 35px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-        .bc-box { padding: 12px 25px; background: var(--card-bg); border-radius: 12px; font-size: 0.85rem; border: 1px solid var(--border); margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; padding-bottom: 40px; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 50px 20px; border-radius: 24px; text-align: center; cursor: pointer; position: relative; }
-        
-        /* Analysis Modal Styling */
-        #analysis-panel { display: none; position: fixed; inset: 0; z-index: 10002; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); justify-content: center; align-items: center; }
-        .analysis-card { width: 90%; max-width: 500px; background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .analysis-header { background: #2d3436; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .analysis-body { padding: 20px; max-height: 400px; overflow-y: auto; }
-        .stats-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-        
-        #v2-loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10001; flex-direction: column; align-items: center; justify-content: center; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
+        .unit-item { 
+            background: var(--card-bg); border: 1px solid var(--border); margin: 12px 0; 
+            padding: 20px 25px; border-radius: 18px; display: flex; 
+            justify-content: space-between; align-items: center; cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.02); transition: 0.2s;
+        }
+        .unit-item:hover { border-color: var(--primary); background: #fcfbff; transform: scale(1.01); }
+
+        /* Loader */
+        #v2-loader { 
+            display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.9); 
+            z-index: 10001; flex-direction: column; align-items: center; justify-content: center; 
+            backdrop-filter: blur(5px);
+        }
+        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+
+        /* Viewers */
         #viewer, #video-viewer, #help-panel { display: none; position: fixed; inset: 0; z-index: 9999; background: var(--bg); flex-direction: column; }
-        .v-header { background: var(--card-bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .v-header { background: var(--card-bg); padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
         iframe { width: 100%; height: 100%; border: none; }
-        footer { padding: 60px; text-align: center; color: var(--text-muted); opacity: 0.7; font-size: 0.8rem; }
+
+        /* Help Panel */
+        #help-panel { background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); justify-content: center; align-items: center; }
+        .help-card { width: 90%; max-width: 480px; background: #fff; border-radius: 35px; overflow: hidden; animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .help-top { background: var(--primary); padding: 40px; text-align: center; color: white; position: relative; }
+        .msg-input { width: 100%; height: 140px; padding: 18px; border: 2px solid #eee; border-radius: 20px; margin-bottom: 20px; resize: none; outline: none; transition: 0.3s; }
+        .msg-input:focus { border-color: var(--primary); }
+        .submit-help-btn { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .submit-help-btn:hover { background: var(--primary-hover); }
+
+        /* Utility */
+        .back-btn { background: var(--blue-accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        footer { padding: 80px 20px; text-align: center; color: var(--text-muted); opacity: 0.8; font-size: 0.85rem; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-<div id="toast">Copied!</div>
-<div id="v2-loader"><div class="spinner"></div><p style="margin-top:10px; font-weight: 600;">Accessing Resource...</p></div>
+    <div id="toast" role="alert">Copied to Clipboard!</div>
+    
+    <div id="v2-loader">
+        <div class="spinner"></div>
+        <p style="margin-top:15px; font-weight: 600; color: var(--primary);">Fetching Resources...</p>
+    </div>
 
-<div id="visitor-counter" title="Click 5 times for analytics">
-    <i class="fa-solid fa-eye"></i> 
-    <span id="view-count">0</span>
-</div>
+    <div id="visitor-counter" title="Total Portal Visits">
+        <i class="fa-solid fa-users-viewfinder"></i> 
+        <span id="view-count">0</span>
+    </div>
 
-<div id="analysis-panel">
-    <div class="analysis-card">
-        <div class="analysis-header">
-            <h3><i class="fa-solid fa-chart-line"></i> Traffic Analysis</h3>
-            <i class="fa-solid fa-xmark" id="closeAnalysis" style="cursor:pointer;"></i>
+    <div id="help-btn" aria-label="Support Center">
+        <i class="fa-solid fa-headset"></i>
+    </div>
+
+    <header class="header">
+        <h1 class="logo">STUDY HUB</h1>
+    </header>
+
+    <section class="search-container">
+        <label for="searchInput" class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></label>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search subjects, units, or topics...">
+    </section>
+
+    <main class="container">
+        <nav class="bc-box" id="bc" aria-label="breadcrumb">Home</nav>
+        
+        <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 id="viewTitle" style="font-size: 1.2rem; color: var(--primary); font-family: 'Orbitron'; text-transform: uppercase;"></h2>
+            <button id="globalBackBtn" class="back-btn"><i class="fa-solid fa-arrow-left"></i> BACK</button>
         </div>
-        <div class="analysis-body" id="analysisData">
+
+        <div class="grid" id="mainGrid">
             </div>
+
+        <div id="notesArea" style="display:none;">
+            <div id="unitList"></div>
+        </div>
+    </main>
+
+    <div id="help-panel">
+        <div class="help-card">
+            <div class="help-top">
+                <i class="fa-solid fa-circle-question" style="font-size:3.5rem; margin-bottom: 15px; display: block;"></i>
+                <h2 style="font-family: 'Orbitron';">SUPPORT</h2>
+                <div id="closeHelpX" style="position:absolute; top:20px; right:25px; cursor:pointer; font-size: 1.5rem;"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div class="help-body" style="padding:40px;">
+                <textarea id="helpMsg" class="msg-input" placeholder="Broken link? Missing notes? Report here..."></textarea>
+                <button class="submit-help-btn" id="sendReportBtn">SUBMIT REPORT</button>
+            </div>
+        </div>
     </div>
-</div>
 
-<div id="help-btn"><i class="fa-solid fa-headset"></i></div>
-
-<div class="header">
-    <h1 class="logo">STUDY HUB</h1>
-</div>
-
-<div class="search-container">
-    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-    <input type="text" id="searchInput" class="search-bar" placeholder="Search subjects or topics...">
-</div>
-
-<div class="container">
-    <div class="bc-box" id="bc">Home</div>
-    <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 id="viewTitle" style="font-size: 1.1rem; color: var(--primary); font-family: 'Orbitron'; text-transform: uppercase;"></h2>
-        <button id="globalBackBtn" class="back-btn"><i class="fa-solid fa-chevron-left"></i> BACK</button>
+    <div id="viewer">
+        <div class="v-header">
+            <span id="v-name" style="font-weight: 600; color: var(--primary);"></span>
+            <button id="closeViewerBtn" style="background: var(--error); color:white; border:none; padding:10px 25px; border-radius:8px; cursor: pointer; font-weight: 600;">EXIT VIEW</button>
+        </div>
+        <iframe id="v-frame" title="Document Viewer" loading="lazy"></iframe>
     </div>
-    <div class="grid" id="mainGrid"></div>
-</div>
 
-<footer>&copy; 2026 STUDY HUB PORTAL • ACADEMIC RESOURCE NETWORK</footer>
+    <div id="video-viewer">
+        <div class="v-header">
+            <span id="v-video-name" style="font-weight: 600; color: var(--primary);"></span>
+            <button id="closeVideoBtn" style="background: var(--error); color:white; border:none; padding:10px 25px; border-radius:8px; cursor: pointer; font-weight: 600;">EXIT VIDEO</button>
+        </div>
+        <div style="flex:1; background:#000; display:flex; align-items:center; justify-content:center;">
+            <iframe id="video-frame" allowfullscreen loading="lazy" style="max-width:1100px; aspect-ratio:16/9; width:95%; border-radius: 15px;"></iframe>
+        </div>
+    </div>
 
-<script>
-    // --- VISITOR & ANALYSIS LOGIC ---
-    let clickCount = 0;
-    const counterEl = document.getElementById('visitor-counter');
-    const analysisPanel = document.getElementById('analysis-panel');
-    const closeAnalysis = document.getElementById('closeAnalysis');
-    const viewCountDisplay = document.getElementById('view-count');
-    const analysisDataContainer = document.getElementById('analysisData');
+    <footer>
+        &copy; 2026 STUDY HUB PORTAL &bull; REVANTH SAI KUMAR REDDY &bull; ACADEMIC RESOURCE NETWORK
+    </footer>
 
-    // 1. Handle Visitor Tracking (Simulation using LocalStorage)
-    function trackVisit() {
-        let stats = JSON.parse(localStorage.getItem('studyHubStats')) || {};
-        let today = new Date().toLocaleDateString();
+    <script type="module" src="studyapp.js"></script>
 
-        // Increment today's count
-        stats[today] = (stats[today] || 0) + 1;
-        localStorage.setItem('studyHubStats', JSON.stringify(stats));
+    <script>
+        // Quick UI Interactions
+        const helpBtn = document.getElementById('help-btn');
+        const helpPanel = document.getElementById('help-panel');
+        const closeHelp = document.getElementById('closeHelpX');
 
-        // Calculate Total
-        let total = Object.values(stats).reduce((a, b) => a + b, 0);
-        viewCountDisplay.innerText = total;
-    }
-
-    // 2. Secret 5-Click Trigger
-    counterEl.addEventListener('click', () => {
-        clickCount++;
-        if (clickCount === 5) {
-            showAnalysis();
-            clickCount = 0; // Reset
-        }
-        // Auto reset clicks if not finished within 3 seconds
-        setTimeout(() => { clickCount = 0; }, 3000);
-    });
-
-    // 3. Show Analysis Window
-    function showAnalysis() {
-        let stats = JSON.parse(localStorage.getItem('studyHubStats')) || {};
-        let html = '<strong>Daily Visitors:</strong><br><br>';
+        helpBtn.onclick = () => helpPanel.style.display = 'flex';
+        closeHelp.onclick = () => helpPanel.style.display = 'none';
         
-        // Sort dates descending
-        const sortedDates = Object.keys(stats).sort((a, b) => new Date(b) - new Date(a));
-        
-        sortedDates.forEach(date => {
-            html += `
-                <div class="stats-row">
-                    <span><i class="fa-regular fa-calendar"></i> ${date}</span>
-                    <span style="font-weight:600; color:var(--primary)">${stats[date]} users</span>
-                </div>`;
-        });
-
-        analysisDataContainer.innerHTML = html;
-        analysisPanel.style.display = 'flex';
-    }
-
-    closeAnalysis.onclick = () => analysisPanel.style.display = 'none';
-
-    // Initialize tracking on load
-    window.onload = trackVisit;
-</script>
-
-<script type="module" src="studyapp.js"></script>
+        // Hide modal on outside click
+        window.onclick = (e) => { if(e.target == helpPanel) helpPanel.style.display = 'none'; }
+    </script>
 </body>
 </html>
