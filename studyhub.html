@@ -17,8 +17,12 @@
         
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2d3436; color: var(--neon-green); padding: 12px 25px; border-radius: 50px; font-weight: 600; display: none; z-index: 11000; border: 1px solid var(--neon-green); }
         #help-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 1000; animation: sonarWave 2s infinite; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); }
+        
+        /* Visitor Counter Styling */
+        #visitor-counter { position: fixed; background: var(--primary); color: white; padding: 8px 15px; border-radius: 50px; font-size: 0.75rem; z-index: 1000; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+        
         @keyframes sonarWave { 0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(108, 92, 231, 0); } 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); } }
-        #visitor-counter { position: fixed; background: var(--primary); color: white; padding: 8px 15px; border-radius: 50px; font-size: 0.75rem; z-index: 1000; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 8px; }
+        
         .header { text-align: center; padding: 40px 20px 10px; }
         .logo { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--primary); letter-spacing: 5px; font-weight: 700; text-transform: uppercase; }
         .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; position: relative; }
@@ -26,33 +30,47 @@
         .search-icon { position: absolute; left: 35px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
         .bc-box { padding: 12px 25px; background: var(--card-bg); border-radius: 12px; font-size: 0.85rem; border: 1px solid var(--border); margin-bottom: 20px; }
-        .bc-link { color: var(--primary); cursor: pointer; font-weight: 600; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; padding-bottom: 40px; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 50px 20px; border-radius: 24px; text-align: center; cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(108, 92, 231, 0.1); }
-        .unit-item { background: var(--card-bg); border: 1px solid var(--border); margin: 10px 0; padding: 18px 22px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .unit-item:hover { border-color: var(--primary); background: #fcfbff; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 50px 20px; border-radius: 24px; text-align: center; cursor: pointer; position: relative; }
+        
+        /* Analysis Modal Styling */
+        #analysis-panel { display: none; position: fixed; inset: 0; z-index: 10002; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); justify-content: center; align-items: center; }
+        .analysis-card { width: 90%; max-width: 500px; background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .analysis-header { background: #2d3436; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .analysis-body { padding: 20px; max-height: 400px; overflow-y: auto; }
+        .stats-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        
         #v2-loader { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10001; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        
         #viewer, #video-viewer, #help-panel { display: none; position: fixed; inset: 0; z-index: 9999; background: var(--bg); flex-direction: column; }
         .v-header { background: var(--card-bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
         iframe { width: 100%; height: 100%; border: none; }
-        #help-panel { background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); justify-content: center; align-items: center; }
-        .help-card { width: 90%; max-width: 450px; background: #fff; border-radius: 30px; overflow: hidden; animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .help-top { background: var(--primary); padding: 30px; text-align: center; color: white; position: relative; }
-        .msg-input { width: 100%; height: 120px; padding: 15px; border: 2px solid #eee; border-radius: 15px; margin-bottom: 20px; resize: none; outline: none; font-size: 0.9rem; }
-        .submit-help-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; }
         footer { padding: 60px; text-align: center; color: var(--text-muted); opacity: 0.7; font-size: 0.8rem; }
-        .back-btn { background: var(--blue-accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
 
 <div id="toast">Copied!</div>
 <div id="v2-loader"><div class="spinner"></div><p style="margin-top:10px; font-weight: 600;">Accessing Resource...</p></div>
-<div id="visitor-counter"><i class="fa-solid fa-eye"></i> <span id="view-count">...</span></div>
+
+<div id="visitor-counter" title="Click 5 times for analytics">
+    <i class="fa-solid fa-eye"></i> 
+    <span id="view-count">0</span>
+</div>
+
+<div id="analysis-panel">
+    <div class="analysis-card">
+        <div class="analysis-header">
+            <h3><i class="fa-solid fa-chart-line"></i> Traffic Analysis</h3>
+            <i class="fa-solid fa-xmark" id="closeAnalysis" style="cursor:pointer;"></i>
+        </div>
+        <div class="analysis-body" id="analysisData">
+            </div>
+    </div>
+</div>
+
 <div id="help-btn"><i class="fa-solid fa-headset"></i></div>
 
 <div class="header">
@@ -66,52 +84,74 @@
 
 <div class="container">
     <div class="bc-box" id="bc">Home</div>
-    
     <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 id="viewTitle" style="font-size: 1.1rem; color: var(--primary); font-family: 'Orbitron'; text-transform: uppercase;"></h2>
         <button id="globalBackBtn" class="back-btn"><i class="fa-solid fa-chevron-left"></i> BACK</button>
     </div>
-
     <div class="grid" id="mainGrid"></div>
-
-    <div id="notesArea" style="display:none;">
-        <div id="unitList"></div>
-    </div>
-</div>
-
-<div id="help-panel">
-    <div class="help-card">
-        <div class="help-top">
-            <i class="fa-solid fa-circle-question" style="font-size:3rem; margin-bottom: 10px; display: block;"></i>
-            <h2>SUPPORT CENTER</h2>
-            <div id="closeHelpX" style="position:absolute; top:15px; right:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="help-body" style="padding:30px;">
-            <textarea id="helpMsg" class="msg-input" placeholder="Is a link broken? Notes missing? Describe the issue here..."></textarea>
-            <button class="submit-help-btn" id="sendReportBtn">SEND REPORT</button>
-        </div>
-    </div>
-</div>
-
-<div id="viewer">
-    <div class="v-header">
-        <span id="v-name" style="font-weight: 600; color: var(--primary);"></span>
-        <button id="closeViewerBtn" style="background:#e74c3c; color:white; border:none; padding:8px 20px; border-radius:5px; cursor: pointer; font-weight: 600;">CLOSE</button>
-    </div>
-    <iframe id="v-frame"></iframe>
-</div>
-
-<div id="video-viewer">
-    <div class="v-header">
-        <span id="v-video-name" style="font-weight: 600; color: var(--primary);"></span>
-        <button id="closeVideoBtn" style="background:#e74c3c; color:white; border:none; padding:8px 20px; border-radius:5px; cursor: pointer; font-weight: 600;">CLOSE</button>
-    </div>
-    <div style="flex:1; background:#000; display:flex; align-items:center; justify-content:center;">
-        <iframe id="video-frame" allowfullscreen style="max-width:1000px; aspect-ratio:16/9; width:95%;"></iframe>
-    </div>
 </div>
 
 <footer>&copy; 2026 STUDY HUB PORTAL • ACADEMIC RESOURCE NETWORK</footer>
+
+<script>
+    // --- VISITOR & ANALYSIS LOGIC ---
+    let clickCount = 0;
+    const counterEl = document.getElementById('visitor-counter');
+    const analysisPanel = document.getElementById('analysis-panel');
+    const closeAnalysis = document.getElementById('closeAnalysis');
+    const viewCountDisplay = document.getElementById('view-count');
+    const analysisDataContainer = document.getElementById('analysisData');
+
+    // 1. Handle Visitor Tracking (Simulation using LocalStorage)
+    function trackVisit() {
+        let stats = JSON.parse(localStorage.getItem('studyHubStats')) || {};
+        let today = new Date().toLocaleDateString();
+
+        // Increment today's count
+        stats[today] = (stats[today] || 0) + 1;
+        localStorage.setItem('studyHubStats', JSON.stringify(stats));
+
+        // Calculate Total
+        let total = Object.values(stats).reduce((a, b) => a + b, 0);
+        viewCountDisplay.innerText = total;
+    }
+
+    // 2. Secret 5-Click Trigger
+    counterEl.addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 5) {
+            showAnalysis();
+            clickCount = 0; // Reset
+        }
+        // Auto reset clicks if not finished within 3 seconds
+        setTimeout(() => { clickCount = 0; }, 3000);
+    });
+
+    // 3. Show Analysis Window
+    function showAnalysis() {
+        let stats = JSON.parse(localStorage.getItem('studyHubStats')) || {};
+        let html = '<strong>Daily Visitors:</strong><br><br>';
+        
+        // Sort dates descending
+        const sortedDates = Object.keys(stats).sort((a, b) => new Date(b) - new Date(a));
+        
+        sortedDates.forEach(date => {
+            html += `
+                <div class="stats-row">
+                    <span><i class="fa-regular fa-calendar"></i> ${date}</span>
+                    <span style="font-weight:600; color:var(--primary)">${stats[date]} users</span>
+                </div>`;
+        });
+
+        analysisDataContainer.innerHTML = html;
+        analysisPanel.style.display = 'flex';
+    }
+
+    closeAnalysis.onclick = () => analysisPanel.style.display = 'none';
+
+    // Initialize tracking on load
+    window.onload = trackVisit;
+</script>
 
 <script type="module" src="studyapp.js"></script>
 </body>
