@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USEAS LITE Splash Screen</title>
+
     <style>
         :root {
-            /* Branding colors from image_0.png */
             --useas-purple-logo: #7155d3;
             --useas-gradient-end: #b67dff;
             --useas-accent-blue: #6d66e5;
@@ -22,11 +22,10 @@
             width: 100%;
             height: 100%;
             overflow-x: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-family: sans-serif;
             background-color: var(--bg-body);
         }
 
-        /* Full Screen Splash Wrapper */
         #splash-container {
             position: fixed;
             top: 0;
@@ -38,11 +37,9 @@
             align-items: center;
             z-index: 10000;
             background: linear-gradient(135deg, var(--useas-purple-logo) 0%, var(--useas-gradient-end) 100%);
-            /* Fade out at 5s */
             animation: exitSplash 0.8s ease-in forwards 4.2s;
         }
 
-        /* Splash Content (Centered Text) */
         .splash-content {
             text-align: center;
             z-index: 10;
@@ -55,34 +52,16 @@
             margin: 0;
             opacity: 0;
             letter-spacing: 5px;
-            animation: textReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.3s;
+            animation: textReveal 1.2s forwards 0.3s;
         }
 
-        .splash-text span.purple-logo {
-            color: #ffffff; /* We make the 'USEAS' white to pop against the purple */
-            font-weight: 900;
-        }
-
-        .splash-text span.lite-white {
-            color: rgba(255,255,255,0.8); /* We make 'LITE' slightly softer */
-            font-weight: 400;
-            font-size: 0.8em;
-            letter-spacing: 2px;
-        }
-
-        /* Suitable Backside Elements (Code Icons from your app) */
         .code-icons {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             width: 80%;
             height: 80%;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             opacity: 0.15;
-            filter: blur(2px);
-            z-index: 5;
         }
 
         .code-icons div {
@@ -91,222 +70,49 @@
             align-items: center;
             font-size: 8rem;
             color: #fff;
-            animation: iconFloat 10s ease-in-out infinite;
+            animation: iconFloat 10s infinite;
         }
 
-        /* Keyframes */
         @keyframes textReveal {
-            from {
-                opacity: 0;
-                letter-spacing: 20px;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                letter-spacing: 5px;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes iconFloat {
-            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
-            50% { transform: translateY(-30px) scale(1.05) rotate(5deg); }
+            50% { transform: translateY(-30px); }
         }
 
         @keyframes exitSplash {
             to { opacity: 0; visibility: hidden; pointer-events: none; }
         }
-
-        /* --- Site-Like Content ---
-           This is a replica of your app UI to show behind the splash.
-           When you integrate, this <div class="app-ui-content"> will contain YOUR real site.
-        */
-        .app-ui-content {
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* UI Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            color: var(--useas-purple-logo);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        .icon-btn {
-            background: #fff;
-            border-radius: 12px;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        /* Zone Title */
-        .zone-title {
-            color: var(--text-dark);
-            font-weight: 700;
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-        }
-
-        /* Lab Card */
-        .lab-card {
-            background: linear-gradient(135deg, var(--useas-accent-blue) 0%, var(--useas-gradient-end) 100%);
-            border-radius: 20px;
-            padding: 20px;
-            color: #fff;
-            position: relative;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(113, 85, 211, 0.3);
-        }
-        .live-tag {
-            background: rgba(255,255,255,0.2);
-            border-radius: 50px;
-            padding: 4px 12px;
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        .live-tag span.dot {
-            width: 8px;
-            height: 8px;
-            background: var(--icon-light-green);
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-        .lab-card h2 {
-            font-size: 1.5rem;
-            margin: 0 0 8px 0;
-        }
-        .lab-card p {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.8);
-            margin: 0 0 20px 0;
-        }
-        .launch-btn {
-            background: #fff;
-            color: var(--useas-purple-logo);
-            border: none;
-            border-radius: 12px;
-            padding: 12px 24px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .card-code-icons {
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-            font-size: 6rem;
-            color: rgba(255,255,255,0.1);
-        }
-
-        /* Study grid */
-        .study-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .study-item {
-            background: #fff;
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.03);
-        }
-        .study-icon-wrapper {
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-        }
-        .study-icon {
-            font-size: 2.5rem;
-        }
-        .study-item h3 {
-            color: var(--text-dark);
-            margin: 0 0 6px 0;
-            font-size: 1.1rem;
-        }
-        .study-item p {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 0.8rem;
-        }
     </style>
 </head>
+
 <body>
 
-    <div id="splash-container">
-        <div class="code-icons">
-            <div style="animation-delay: 1s;">{ }</div>
-            <div style="animation-delay: 2s; font-size: 12rem;">&lt;/&gt;</div>
-            <div style="animation-delay: 0.5s;">{ }</div>
-            <div style="animation-delay: 1.5s; font-size: 10rem;">{ }</div>
-            <div style="animation-delay: 0s;">&lt;/&gt;</div>
-            <div style="animation-delay: 2.5s; font-size: 14rem;">{ }</div>
-        </div>
-
-        <div class="splash-content">
-            <h1 class="splash-text">
-                <span class="purple-logo">USEAS</span><br>
-                <span class="lite-white">LITE</span>
-            </h1>
-        </div>
+<div id="splash-container">
+    <div class="code-icons">
+        <div>{ }</div>
+        <div>&lt;/&gt;</div>
+        <div>{ }</div>
+        <div>{ }</div>
+        <div>&lt;/&gt;</div>
+        <div>{ }</div>
     </div>
-    <div class="app-ui-content">
-        <header class="header">
-            <div class="icon-btn">
-                <div style="width:20px; height: 16px; border-top: 2px solid #555; border-bottom: 2px solid #555; position: relative;"><div style="width:20px; height: 2px; background:#555; position: absolute; top: 7px;"></div></div>
-            </div>
-            <h1>USEAS</h1>
-            <div class="icon-btn">
-                <div style="color:var(--useas-purple-logo); font-weight:900; font-size:1.2rem;">⚡</div>
-            </div>
-        </header>
 
-        <h3 class="zone-title">Lab Zone</h3>
-        <div class="lab-card">
-            <div class="live-tag">
-                <span class="dot"></span>
-                LIVE NOW
-            </div>
-            <h2>Abhyas Lab Keys</h2>
-            <p>Get instant solutions for your lab codes with one click.</p>
-            <button class="launch-btn">Launch Lab</button>
-            <div class="card-code-icons">&lt;/&gt;</div>
-        </div>
-
-        <h3 class="zone-title">Study Essentials</h3>
-        <div class="study-grid">
-            <div class="study-item">
-                <div class="study-icon-wrapper">
-                    <span class="study-icon">📖</span>
-                </div>
-                <h3>Notes</h3>
-                <p>Detailed PDF files</p>
-            </div>
-            <div class="study-item">
-                <div class="study-icon-wrapper">
-                    <span class="study-icon">⚡</span>
-                </div>
-                <h3>Short Notes</h3>
-                <p>Quick Revision</p>
-            </div>
-        </div>
+    <div class="splash-content">
+        <h1 class="splash-text">
+            USEAS<br>LITE
+        </h1>
     </div>
+</div>
+
+<script>
+    // Redirect after 5 seconds
+    setTimeout(function() {
+        window.location.href = "https://www.useas.online/Useas";
+    }, 5000);
+</script>
 
 </body>
 </html>
