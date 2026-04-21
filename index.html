@@ -136,6 +136,33 @@
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- App Promo Banner --- */
+        .app-promo-banner {
+            background: #fff;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+        .app-info { display: flex; align-items: center; gap: 15px; }
+        .app-icon-mini { 
+            width: 45px; height: 45px; background: var(--primary-accent); 
+            border-radius: 12px; display: flex; align-items: center; 
+            justify-content: center; color: white; font-size: 1.2rem;
+        }
+        .app-text h4 { font-size: 0.95rem; color: #1e293b; }
+        .app-text p { font-size: 0.75rem; color: #64748b; }
+        .download-mini-btn {
+            background: #0f172a; color: white; border: none; 
+            padding: 8px 16px; border-radius: 10px; font-size: 0.8rem; 
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .download-mini-btn:hover { background: var(--primary-accent); }
+
         /* --- Lab Banner --- */
         .lab-scroll { padding: 5px 0 25px; }
         .lab-banner {
@@ -145,7 +172,7 @@
         }
 
         /* --- Grid Responsiveness --- */
-        .section-header { margin: 35px 0 20px; }
+        .section-header { margin: 25px 0 15px; }
         .section-header h3 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
 
         .main-grid { 
@@ -248,6 +275,22 @@
         <iframe id="feedbackFrame" class="iframe-container" src="https://www.useas.online/feedback"></iframe>
 
         <div id="home" class="page active">
+            
+            <div class="app-promo-banner">
+                <div class="app-info">
+                    <div class="app-icon-mini">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <div class="app-text">
+                        <h4>USEAS LITE OFFICAL APP</h4>
+                        <p>Get a faster experience on your phone on windows</p>
+                    </div>
+                </div>
+                <button class="download-mini-btn" onclick="window.open('https://www.useas.online/useaslite', '_blank')">
+                    Download
+                </button>
+            </div>
+
             <div class="section-header">
                 <h3>Lab Zone</h3>
             </div>
