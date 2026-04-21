@@ -3,45 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USEAS Premium</title>
+    <title>USEAS Premium Portal</title>
     <style>
-        body { font-family: sans-serif; background: #0f0f0f; color: white; text-align: center; padding: 20px; }
-        .card { background: #1a1a1a; padding: 20px; border-radius: 15px; max-width: 500px; margin: auto; border: 1px solid #333; }
+        :root { --main: #00d2ff; --bg: #0f0f0f; --card: #1a1a1a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .hidden { display: none; }
-        button { background: #00d2ff; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        input { width: 90%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
-        video { width: 100%; border-radius: 10px; margin-top: 20px; border: 2px solid #00d2ff; }
-        .alert { color: #ff4757; font-size: 14px; padding: 10px; }
+        button { background: var(--main); color: black; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 16px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 8px; text-align: center; }
+        .video-box { margin-bottom: 25px; background: #222; padding: 10px; border-radius: 12px; }
+        iframe, video { width: 100%; border-radius: 10px; border: 1px solid #444; height: 250px; }
+        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>USEAS PREMIUM</h2>
+    <div class="container">
+        <h2 style="color: var(--main)">USEAS PREMIUM</h2>
+        
         <div id="auth-section">
+            <p>Login with your college email to access videos</p>
             <button id="login-btn">Login with Google</button>
         </div>
 
         <div id="content-section" class="hidden">
+            <p>Welcome, <b id="user-name"></b></p>
+
             <div id="locked-ui">
-                <p>Pay ₹1 for 7 Days Access</p>
-                <button id="pay-upi-btn" style="background:#f1c40f; color:black;">1. Pay via UPI</button>
-                <input type="text" id="utr-input" placeholder="Paste 12-digit UTR Code">
-                <button id="unlock-btn">2. Unlock & Watch</button>
+                <div style="border: 1px dashed #f1c40f; padding: 15px; border-radius: 15px;">
+                    <h3 style="color:#f1c40f">Premium Access Required 🔒</h3>
+                    <p>Pay <b>₹1</b> to unlock videos for 7 days.</p>
+                    <button id="pay-btn" style="background:#f1c40f;">1. Click to Pay via UPI</button>
+                    <input type="text" id="utr-input" placeholder="Paste 12-digit UTR/Ref No.">
+                    <button id="unlock-btn">2. Unlock & Watch Now</button>
+                </div>
             </div>
 
             <div id="unlocked-ui" class="hidden">
-                <h3 id="status-tag" style="color:#2ecc71">Access Active</h3>
-                <div id="video-container"></div>
+                <div id="status-area"></div>
+                <div id="video-list"></div>
             </div>
             
-            <div id="banned-ui" class="hidden">
-                <h3 style="color:#ff4757">Payment Rejected ❌</h3>
-                <p>Your UTR was invalid. Pay again to unlock.</p>
-                <button id="retry-btn">Try Again</button>
-            </div>
-
-            <br><button onclick="logout()" style="background:#333; font-size:11px; width:auto; padding:5px 15px;">Logout</button>
+            <button onclick="logout()" style="background:transparent; color:#777; border: 1px solid #333; font-size:12px; margin-top:30px;">Logout</button>
         </div>
     </div>
 
@@ -64,38 +67,47 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        // 1. LOGIN
         document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-section').classList.add('hidden');
                 document.getElementById('content-section').classList.remove('hidden');
-                checkUserAccess(user);
+                document.getElementById('user-name').innerText = user.displayName;
+                checkAccess(user);
+            } else {
+                document.getElementById('auth-section').classList.remove('hidden');
+                document.getElementById('content-section').classList.add('hidden');
             }
         });
 
-        document.getElementById('pay-upi-btn').onclick = () => {
-            window.location.href = "upi://pay?pa=revanth@ybl&pn=Revanth&am=1&cu=INR";
+        // 2. PAYMENT REDIRECT
+        document.getElementById('pay-btn').onclick = () => {
+            window.location.href = "upi://pay?pa=revanth@ybl&pn=Revanth&am=1&cu=INR&tn=Premium_Access";
         };
 
+        // 3. UNLOCK (TRUST-FIRST)
         document.getElementById('unlock-btn').onclick = async () => {
             const utr = document.getElementById('utr-input').value;
-            if(utr.length < 10) return alert("Enter valid UTR");
+            if(utr.length < 10) return alert("Please enter a valid 12-digit UTR number.");
             
             const user = auth.currentUser;
             const expiry = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
 
             await setDoc(doc(db, "users", user.uid), {
-                status: "pending", // Starts as pending
+                status: "pending",
                 expiryDate: expiry,
                 utr: utr,
-                userName: user.displayName
+                name: user.displayName,
+                email: user.email
             }, { merge: true });
 
             location.reload();
         };
 
-        async function checkUserAccess(user) {
+        // 4. ACCESS CHECK
+        async function checkAccess(user) {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (!userDoc.exists()) return;
 
@@ -103,25 +115,35 @@
             const now = new Date().getTime();
 
             if (data.status === "rejected") {
-                document.getElementById('locked-ui').classList.add('hidden');
-                document.getElementById('banned-ui').classList.remove('hidden');
+                document.getElementById('locked-ui').innerHTML = `<h3 style="color:#ff4757">Payment Rejected ❌</h3><p>Your UTR was invalid. Contact admin or pay again.</p><button onclick="location.reload()">Try Again</button>`;
             } else if (data.expiryDate > now) {
                 document.getElementById('locked-ui').classList.add('hidden');
                 document.getElementById('unlocked-ui').classList.remove('hidden');
-                document.getElementById('status-tag').innerText = data.status === "pending" ? "Access Active (Pending Verification)" : "Access Verified ✅";
+                
+                const badgeColor = data.status === "pending" ? "#f1c40f" : "#2ecc71";
+                const badgeText = data.status === "pending" ? "Pending Admin Approval" : "Verified Premium ✅";
+                document.getElementById('status-area').innerHTML = `<span class="status-badge" style="background:${badgeColor}; color:black">${badgeText}</span>`;
+                
                 loadVideos();
             }
         }
 
+        // 5. LOAD VIDEOS (HYBRID)
         async function loadVideos() {
-            const querySnapshot = await getDocs(collection(db, "videos"));
-            const container = document.getElementById('video-container');
-            querySnapshot.forEach((doc) => {
-                container.innerHTML += `<video controls src="${doc.data().url}"></video><p>${doc.data().title}</p>`;
+            const snap = await getDocs(collection(db, "videos"));
+            const list = document.getElementById('video-list');
+            snap.forEach(d => {
+                const v = d.data();
+                let html = `<div class="video-box"><p>${v.title}</p>`;
+                if (v.type === "youtube") {
+                    html += `<iframe src="${v.url}" frameborder="0" allowfullscreen></iframe>`;
+                } else {
+                    html += `<video controls src="${v.url}"></video>`;
+                }
+                list.innerHTML += html + `</div>`;
             });
         }
 
-        document.getElementById('retry-btn').onclick = () => location.reload();
         window.logout = () => signOut(auth);
     </script>
 </body>
