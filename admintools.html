@@ -15,6 +15,7 @@
             --text: #e0e0e0;
             --danger: #ff4b5c;
             --success: #00e676;
+            --warning: #f1c40f;
         }
 
         body {
@@ -29,80 +30,76 @@
             min-height: 100vh;
         }
 
-        /* Header Styling */
         #admin-header {
             font-size: 3rem;
             font-weight: 700;
             margin-top: 60px;
-            cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 4px;
             background: linear-gradient(to right, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        #admin-header:hover { transform: scale(1.05); text-shadow: 0 0 20px rgba(79, 172, 254, 0.5); }
+        /* Auth Overlay */
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 14, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
 
-        .tagline { color: #666; margin-bottom: 40px; font-weight: 300; }
-
-        /* Hidden Admin Panel */
-        #admin-panel {
-            display: none;
-            width: 100%;
-            max-width: 600px;
+        .auth-card {
             background: var(--glass);
-            backdrop-filter: blur(15px);
-            padding: 30px;
+            padding: 40px;
             border-radius: 24px;
             border: 1px solid var(--glass-border);
-            margin-bottom: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            animation: slideDown 0.6s ease forwards;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
         }
 
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-        h2 { margin-top: 0; color: var(--primary); font-weight: 600; }
+        #admin-panel, #projectList { display: none; }
 
         input, textarea {
             width: 100%;
             padding: 14px;
             margin: 10px 0;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             color: white;
             box-sizing: border-box;
-            font-family: inherit;
+            outline: none;
         }
 
-        input:focus { border-color: var(--primary); outline: none; }
-
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        
         button {
-            flex: 1;
+            width: 100%;
             padding: 14px;
+            margin-top: 10px;
             border-radius: 12px;
             border: none;
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
-            text-transform: uppercase;
         }
 
+        .google-btn { background: #fff; color: #000; }
+        .verify-btn { background: var(--primary); color: #000; }
         #submitBtn { background: linear-gradient(45deg, var(--accent), var(--primary)); color: #000; }
-        #cancelEdit { background: #333; color: white; display: none; }
 
-        /* Projects Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
             width: 100%;
             max-width: 1100px;
+            margin-top: 30px;
         }
 
         .card {
@@ -111,147 +108,170 @@
             border-radius: 20px;
             padding: 25px;
             text-align: center;
-            transition: 0.4s;
             position: relative;
-            cursor: pointer;
         }
 
-        .card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--primary);
-            transform: translateY(-10px);
+        .commit-badge {
+            font-size: 10px;
+            background: var(--glass-border);
+            padding: 4px 8px;
+            border-radius: 10px;
+            display: block;
+            margin-bottom: 10px;
+            color: var(--accent);
         }
 
-        .card strong { display: block; font-size: 1.3rem; color: #fff; margin-bottom: 8px; }
-        .card span { font-size: 0.8rem; color: var(--accent); letter-spacing: 2px; }
-
-        /* Admin Action Buttons (Hidden until login) */
-        .admin-actions {
-            display: none; 
-            margin-top: 20px;
-            gap: 10px;
-            justify-content: center;
+        .admin-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
+        .edit-btn { background: var(--success); color: #000; padding: 5px 10px; width: auto; font-size: 12px;}
+        .del-btn { background: var(--danger); color: #fff; padding: 5px 10px; width: auto; font-size: 12px;}
+        
+        #commit-container {
+            border-top: 1px solid var(--glass-border);
+            margin-top: 15px;
+            padding-top: 10px;
+            display: none;
         }
-
-        .edit-btn { background: var(--success); color: #000; padding: 6px 15px; border-radius: 6px; font-size: 0.75rem; }
-        .del-btn { background: var(--danger); color: #fff; padding: 6px 15px; border-radius: 6px; font-size: 0.75rem; }
-
     </style>
 </head>
 <body>
 
-    <h1 id="admin-header">USEAS</h1>
-    <p class="tagline">mee prayanam maa bhadyatha</p>
-
-    <div id="admin-panel">
-        <h2 id="panel-title">Add New Web Tool</h2>
-        <input type="hidden" id="editKey">
-        <input type="text" id="webName" placeholder="Application Name (e.g. Note Finder)">
-        <textarea id="htmlCode" rows="6" placeholder="Paste your HTML Code here..."></textarea>
-        
-        <div class="btn-group">
-            <button id="submitBtn">Deploy Tool</button>
-            <button id="cancelEdit">Cancel Edit</button>
+    <div id="auth-overlay">
+        <div class="auth-card" id="step1">
+            <h2>Admin Login</h2>
+            <button class="google-btn" id="googleLogin">Login with Google</button>
+        </div>
+        <div class="auth-card" id="step2" style="display: none;">
+            <h2>Verify Identity</h2>
+            <input type="text" id="adCode" placeholder="Enter AdCode (Phone)">
+            <input type="password" id="adPass" placeholder="Enter Admin Password">
+            <button class="verify-btn" id="verifyBtn">Verify Access</button>
         </div>
     </div>
 
-    <div class="grid" id="projectList">
+    <h1 id="admin-header">USEAS</h1>
+    
+    <div id="admin-panel" style="width: 100%; max-width: 600px;">
+        <h2 id="panel-title">Add New Web Tool</h2>
+        <input type="hidden" id="editKey">
+        <input type="text" id="webName" placeholder="Application Name">
+        <textarea id="htmlCode" rows="6" placeholder="Paste HTML..."></textarea>
+        
+        <div id="commit-section">
+            <input type="text" id="commitMsg" placeholder="Commit message (e.g., Fixed attendance bug)">
         </div>
+
+        <button id="submitBtn">Deploy Tool</button>
+    </div>
+
+    <div class="grid" id="projectList"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const encodedConfig = "QUl6YVN5RHQ4U1JPd0ZPUlRaRnFWZTV4TGMzbmxEdWtiT0FnZHpzO3VzZWFzbm90ZXMuZmlyZWJhc2VhcHAuY29tO2h0dHBzOi8vdXNlYXNub3Rlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb207dXNlYXNub3Rlczt1c2Vhc25vdGVzLmZpcmViYXNlc3RvcmFnZS5hcHA7MTA2NjYwMTcxNTA5ODsxOjEwNjY2MDE3MTUwOTg6d2ViOjg4MDU0OGUzMzMyOTcwNzlkMDk2MjM=";
+        const c = atob(encodedConfig).split(';');
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
-            authDomain: "useasnotes.firebaseapp.com",
-            databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
-            projectId: "useasnotes",
-            storageBucket: "useasnotes.firebasestorage.app",
-            messagingSenderId: "1066601715098",
-            appId: "1:1066601715098:web:880548e333297079d09623"
+            apiKey: c[0], authDomain: c[1], databaseURL: c[2],
+            projectId: c[3], storageBucket: c[4], messagingSenderId: c[5], appId: c[6]
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let isAdmin = false;
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
-        // 1. Secret Admin Access
-        let clicks = 0;
-        document.getElementById('admin-header').addEventListener('click', () => {
-            clicks++;
-            if (clicks === 5) {
-                const pass = prompt("Enter Admin Password:");
-                if (pass === "admin@123") {
-                    isAdmin = true;
-                    document.getElementById('admin-panel').style.display = "block";
-                    renderData(); // Refresh UI to show edit/delete buttons
-                    alert("Welcome back, Revanth.");
-                } else {
-                    alert("Access Denied.");
-                    clicks = 0;
-                }
+        let currentAdmin = null;
+
+        document.getElementById('googleLogin').onclick = () => {
+            signInWithPopup(auth, provider).catch(err => alert(err.message));
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+                currentAdmin = user;
             }
         });
 
-        // 2. Submit or Update Data
-        const submitBtn = document.getElementById('submitBtn');
-        const webName = document.getElementById('webName');
-        const htmlCode = document.getElementById('htmlCode');
-        const editKey = document.getElementById('editKey');
+        document.getElementById('verifyBtn').onclick = async () => {
+            const adCode = document.getElementById('adCode').value;
+            const adPass = document.getElementById('adPass').value;
+            const adminRef = ref(db, 'authorizedAdmins/' + adCode);
+            const snapshot = await get(adminRef);
 
-        submitBtn.onclick = () => {
-            const name = webName.value;
-            const code = htmlCode.value;
-            const key = editKey.value;
+            if (snapshot.exists() && snapshot.val().password === adPass && snapshot.val().email === currentAdmin.email) {
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('projectList').style.display = 'grid';
+                renderData();
+            } else {
+                alert("Invalid Admin Credentials!");
+            }
+        };
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.onclick = async () => {
+            const name = document.getElementById('webName').value;
+            const code = document.getElementById('htmlCode').value;
+            const msg = document.getElementById('commitMsg').value || "No description provided";
+            const key = document.getElementById('editKey').value;
+            const timestamp = new Date().toLocaleString();
 
             if (!name || !code) return alert("Fill all fields");
 
             if (key) {
-                // Update existing
-                update(ref(db, `adminTools/${key}`), { name, code });
-                resetForm();
+                // Feature: Save to history (Commits) before updating
+                const historyRef = ref(db, `adminTools/${key}/history`);
+                const currentData = await get(ref(db, `adminTools/${key}`));
+                
+                // Backup current version
+                await push(historyRef, {
+                    code: currentData.val().code,
+                    message: currentData.val().lastCommit || "Initial Version",
+                    date: currentData.val().lastUpdated || "N/A"
+                });
+
+                // Update Main
+                update(ref(db, `adminTools/${key}`), { 
+                    name, 
+                    code, 
+                    lastCommit: msg, 
+                    lastUpdated: timestamp 
+                }).then(() => resetForm());
             } else {
-                // Add new
-                push(ref(db, 'adminTools'), { name, code });
-                resetForm();
+                // New Deploy
+                push(ref(db, 'adminTools'), { 
+                    name, 
+                    code, 
+                    lastCommit: "Initial Deployment", 
+                    lastUpdated: timestamp 
+                }).then(() => resetForm());
             }
         };
 
-        function resetForm() {
-            webName.value = "";
-            htmlCode.value = "";
-            editKey.value = "";
-            submitBtn.innerText = "Deploy Tool";
-            document.getElementById('cancelEdit').style.display = "none";
-            document.getElementById('panel-title').innerText = "Add New Web Tool";
-        }
-
-        document.getElementById('cancelEdit').onclick = resetForm;
-
-        // 3. Render and View
         function renderData() {
             onValue(ref(db, 'adminTools'), (snapshot) => {
                 const projectList = document.getElementById('projectList');
                 projectList.innerHTML = "";
                 const data = snapshot.val();
-                
                 if (data) {
                     Object.keys(data).forEach(key => {
                         const item = data[key];
                         const card = document.createElement('div');
                         card.className = 'card';
-                        
                         card.innerHTML = `
-                            <span>SECURE TOOL</span>
-                            <strong>${item.name}</strong>
-                            <div class="admin-actions" style="display: ${isAdmin ? 'flex' : 'none'}">
-                                <button class="edit-btn" onclick="triggerEdit('${key}', '${item.name.replace(/'/g, "\\'")}')">Edit</button>
+                            <span class="commit-badge">Latest: ${item.lastUpdated || 'Recently'}</span>
+                            <strong style="display:block; margin-bottom:5px;">${item.name}</strong>
+                            <small style="color:#888; font-size:11px;">"${item.lastCommit || 'Deployed'}"</small>
+                            <div class="admin-actions">
+                                <button class="edit-btn" onclick="triggerEdit('${key}')">Edit / Commit</button>
                                 <button class="del-btn" onclick="triggerDelete('${key}')">Delete</button>
                             </div>
                         `;
-
-                        // Open code on card click (not buttons)
                         card.onclick = (e) => {
                             if (e.target.tagName !== 'BUTTON') {
                                 const win = window.open("", "_blank");
@@ -265,30 +285,29 @@
             });
         }
 
-        // 4. Global Admin Functions
         window.triggerDelete = (key) => {
-            if (confirm("Delete this tool permanently?")) {
-                remove(ref(db, `adminTools/${key}`));
-            }
+            if (confirm("Delete permanently? This will also delete history.")) remove(ref(db, `adminTools/${key}`));
         };
 
-        window.triggerEdit = (key, name) => {
-            // Fetch latest code from Firebase for editing
-            onValue(ref(db, `adminTools/${key}`), (snap) => {
+        window.triggerEdit = (key) => {
+            get(ref(db, `adminTools/${key}`)).then((snap) => {
                 const item = snap.val();
-                webName.value = item.name;
-                htmlCode.value = item.code;
-                editKey.value = key;
-                submitBtn.innerText = "Update Tool";
-                document.getElementById('cancelEdit').style.display = "block";
-                document.getElementById('panel-title').innerText = "Editing Tool";
+                document.getElementById('webName').value = item.name;
+                document.getElementById('htmlCode').value = item.code;
+                document.getElementById('editKey').value = key;
+                document.getElementById('commitMsg').value = ""; // Clear msg for new update
+                submitBtn.innerText = "Commit Changes";
                 window.scrollTo({top: 0, behavior: 'smooth'});
-            }, { onlyOnce: true });
+            });
         };
 
-        // Initial Load
-        renderData();
-
+        function resetForm() {
+            document.getElementById('webName').value = "";
+            document.getElementById('htmlCode').value = "";
+            document.getElementById('editKey').value = "";
+            document.getElementById('commitMsg').value = "";
+            submitBtn.innerText = "Deploy Tool";
+        }
     </script>
 </body>
 </html>
