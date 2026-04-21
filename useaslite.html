@@ -1,127 +1,154 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Useas App - Install</title>
+<title>Download USEAS App</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-}
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
 
-body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background-color:#f4f7fe;
-color:#333;
-text-align:center;
-}
+    body {
+        height: 100vh;
+        background: linear-gradient(135deg, #5f2c82, #49a09d);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+    }
 
-.container{
-background:#ffffff;
-padding:50px 40px;
-border-radius:24px;
-width:380px;
-box-shadow:0 10px 40px rgba(0,0,0,0.04);
-border:1px solid rgba(0,0,0,0.03);
-}
+    .card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        border-radius: 25px;
+        padding: 40px 25px;
+        width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        animation: fadeIn 1s ease;
+    }
 
-h1{
-font-size:32px;
-margin-bottom:8px;
-color:#6a59d1;
-font-weight:700;
-}
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-.version{
-font-size:14px;
-color:#a0a0a0;
-margin-bottom:30px;
-font-weight:500;
-}
+    .logo {
+        width: 120px;
+        border-radius: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    }
 
-.install-btn{
-background:linear-gradient(135deg,#6a59d1,#a389f4);
-color:#ffffff;
-padding:16px 40px;
-border:none;
-border-radius:14px;
-font-size:17px;
-cursor:pointer;
-font-weight:600;
-text-decoration:none;
-display:inline-block;
-transition:all 0.3s ease;
-box-shadow:0 8px 25px rgba(106,89,209,0.25);
-}
+    h1 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
 
-.install-btn:hover{
-transform:translateY(-2px);
-box-shadow:0 12px 30px rgba(106,89,209,0.35);
-}
+    p {
+        font-size: 14px;
+        opacity: 0.8;
+        margin-bottom: 25px;
+    }
 
-.qr{
-margin-top:30px;
-}
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 14px;
+        margin: 10px 0;
+        border-radius: 15px;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: 0.3s;
+        cursor: pointer;
+    }
 
-.qr img{
-width:160px;
-height:160px;
-}
+    .android {
+        background: linear-gradient(135deg, #00c853, #64dd17);
+        color: white;
+        box-shadow: 0 5px 20px rgba(0, 200, 83, 0.4);
+    }
 
-.qr-text{
-margin-top:10px;
-font-size:14px;
-color:#666;
-}
+    .android:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 200, 83, 0.6);
+    }
 
-.note{
-margin-top:25px;
-font-size:14px;
-color:#777;
-line-height:2;
-text-align:left;
-display:inline-block;
-}
+    .windows {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
 
-.check{
-color:#6a59d1;
-margin-right:8px;
-font-weight:bold;
-}
+    .windows:hover {
+        transform: scale(1.05);
+        background: rgba(255,255,255,0.3);
+    }
+
+    .coming {
+        margin-top: 15px;
+        font-size: 13px;
+        opacity: 0.7;
+    }
+
+    .footer {
+        margin-top: 20px;
+        font-size: 12px;
+        opacity: 0.6;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="card">
 
-<h1>USEAS</h1>
-<div class="version">Version 1.0</div>
+    <!-- Logo -->
+    <img src="https://file.garden/abrK4_rpWxJegn7w/InShot_20260421_141015501.jpg" class="logo">
 
-<a href="https://files.catbox.moe/8qx40j.apk" class="install-btn">
-Download App
-</a>
+    <h1>USEAS App</h1>
+    <p>Fast • Simple • Powerful tools in one place</p>
 
-<div class="note">
-<span class="check">✓</span> Works on Android devices<br>
-<span class="check">✓</span> Secure & Fast Download<br>
-<span class="check">✓</span> All modern browsers supported
+    <!-- Android Button -->
+    <a href="https://mega.nz/file/aCow1RgZ#Lajn4hjBih-xOD_HHSS5VkIneh_wwLUVMMweMqcVD04" class="btn android">
+        📱 Download for Android
+    </a>
+
+    <!-- Windows Button -->
+    <div class="btn windows" onclick="comingSoon()">
+        💻 Download for Windows
+    </div>
+
+    <div class="coming">Windows version coming soon</div>
+
+    <div class="footer">© 2026 USEAS</div>
+
 </div>
 
-<!-- QR CODE BELOW -->
-<div class="qr">
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://mega.nz/file/EI12SDqR#yMLXGL2XDD1Hh3aKu7rm9Jk7ou-lGU045FmqmcFs8_U">
-<div class="qr-text">Scan QR to Download</div>
-</div>
-
-</div>
+<script>
+function comingSoon() {
+    alert("Windows version is coming soon!");
+}
+</script>
 
 </body>
 </html>
