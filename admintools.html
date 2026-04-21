@@ -15,7 +15,6 @@
             --text: #e0e0e0;
             --danger: #ff4b5c;
             --success: #00e676;
-            --warning: #f1c40f;
         }
 
         body {
@@ -43,15 +42,11 @@
 
         /* Auth Overlay */
         #auth-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(11, 14, 20, 0.95);
             backdrop-filter: blur(10px);
             z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
 
         .auth-card {
@@ -60,33 +55,22 @@
             border-radius: 24px;
             border: 1px solid var(--glass-border);
             text-align: center;
-            max-width: 400px;
-            width: 90%;
+            max-width: 400px; width: 90%;
         }
 
         #admin-panel, #projectList { display: none; }
 
         input, textarea {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
+            width: 100%; padding: 14px; margin: 10px 0;
             background: rgba(0,0,0,0.3);
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: white;
-            box-sizing: border-box;
-            outline: none;
+            border-radius: 12px; color: white; box-sizing: border-box;
         }
 
         button {
-            width: 100%;
-            padding: 14px;
-            margin-top: 10px;
-            border-radius: 12px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+            width: 100%; padding: 14px; margin-top: 10px;
+            border-radius: 12px; border: none; font-weight: 600;
+            cursor: pointer; transition: 0.3s;
         }
 
         .google-btn { background: #fff; color: #000; }
@@ -94,43 +78,21 @@
         #submitBtn { background: linear-gradient(45deg, var(--accent), var(--primary)); color: #000; }
 
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 1100px;
-            margin-top: 30px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px; width: 100%; max-width: 1100px; margin-top: 30px;
         }
 
         .card {
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            position: relative;
+            border-radius: 20px; padding: 25px; text-align: center;
         }
 
-        .commit-badge {
-            font-size: 10px;
-            background: var(--glass-border);
-            padding: 4px 8px;
-            border-radius: 10px;
-            display: block;
-            margin-bottom: 10px;
-            color: var(--accent);
-        }
-
-        .admin-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
-        .edit-btn { background: var(--success); color: #000; padding: 5px 10px; width: auto; font-size: 12px;}
-        .del-btn { background: var(--danger); color: #fff; padding: 5px 10px; width: auto; font-size: 12px;}
+        .admin-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
+        .edit-btn { background: var(--success); color: #000; padding: 5px 10px; width: auto; font-size: 11px;}
+        .del-btn { background: var(--danger); color: #fff; padding: 5px 10px; width: auto; font-size: 11px;}
         
-        #commit-container {
-            border-top: 1px solid var(--glass-border);
-            margin-top: 15px;
-            padding-top: 10px;
-            display: none;
-        }
+        .history-tag { font-size: 10px; color: var(--accent); display: block; margin-top: 5px; opacity: 0.7;}
     </style>
 </head>
 <body>
@@ -151,16 +113,12 @@
     <h1 id="admin-header">USEAS</h1>
     
     <div id="admin-panel" style="width: 100%; max-width: 600px;">
-        <h2 id="panel-title">Add New Web Tool</h2>
+        <h2 id="panel-title">Add/Commit Tool</h2>
         <input type="hidden" id="editKey">
         <input type="text" id="webName" placeholder="Application Name">
+        <input type="text" id="commitNote" placeholder="What did you change? (Commit Message)">
         <textarea id="htmlCode" rows="6" placeholder="Paste HTML..."></textarea>
-        
-        <div id="commit-section">
-            <input type="text" id="commitMsg" placeholder="Commit message (e.g., Fixed attendance bug)">
-        </div>
-
-        <button id="submitBtn">Deploy Tool</button>
+        <button id="submitBtn">Deploy & Save Commit</button>
     </div>
 
     <div class="grid" id="projectList"></div>
@@ -209,7 +167,7 @@
                 document.getElementById('projectList').style.display = 'grid';
                 renderData();
             } else {
-                alert("Invalid Admin Credentials!");
+                alert("Access Denied!");
             }
         };
 
@@ -217,39 +175,43 @@
         submitBtn.onclick = async () => {
             const name = document.getElementById('webName').value;
             const code = document.getElementById('htmlCode').value;
-            const msg = document.getElementById('commitMsg').value || "No description provided";
+            const note = document.getElementById('commitNote').value || "Manual Update";
             const key = document.getElementById('editKey').value;
-            const timestamp = new Date().toLocaleString();
+            const time = new Date().toLocaleString();
 
-            if (!name || !code) return alert("Fill all fields");
+            if (!name || !code) return alert("Missing data");
 
             if (key) {
-                // Feature: Save to history (Commits) before updating
-                const historyRef = ref(db, `adminTools/${key}/history`);
-                const currentData = await get(ref(db, `adminTools/${key}`));
-                
-                // Backup current version
-                await push(historyRef, {
-                    code: currentData.val().code,
-                    message: currentData.val().lastCommit || "Initial Version",
-                    date: currentData.val().lastUpdated || "N/A"
-                });
+                // 1. Update the Main Tool
+                await update(ref(db, `adminTools/${key}`), { name, code, lastUpdate: time });
 
-                // Update Main
-                update(ref(db, `adminTools/${key}`), { 
-                    name, 
-                    code, 
-                    lastCommit: msg, 
-                    lastUpdated: timestamp 
-                }).then(() => resetForm());
+                // 2. BACKEND COMMITS: Create a separate "folder" for this version
+                const commitRef = ref(db, `toolCommits/${key}`);
+                await push(commitRef, {
+                    versionName: name,
+                    versionCode: code,
+                    commitMessage: note,
+                    timestamp: time
+                });
+                
+                alert("Commit Successful! Version saved in toolCommits.");
+                resetForm();
             } else {
-                // New Deploy
-                push(ref(db, 'adminTools'), { 
-                    name, 
-                    code, 
-                    lastCommit: "Initial Deployment", 
-                    lastUpdated: timestamp 
-                }).then(() => resetForm());
+                // New Tool Deployment
+                const newToolRef = push(ref(db, 'adminTools'));
+                const newKey = newToolRef.key;
+                
+                await set(newToolRef, { name, code, lastUpdate: time });
+                
+                // Initial Commit
+                await push(ref(db, `toolCommits/${newKey}`), {
+                    versionName: name,
+                    versionCode: code,
+                    commitMessage: "Initial Deployment",
+                    timestamp: time
+                });
+                
+                resetForm();
             }
         };
 
@@ -264,11 +226,10 @@
                         const card = document.createElement('div');
                         card.className = 'card';
                         card.innerHTML = `
-                            <span class="commit-badge">Latest: ${item.lastUpdated || 'Recently'}</span>
-                            <strong style="display:block; margin-bottom:5px;">${item.name}</strong>
-                            <small style="color:#888; font-size:11px;">"${item.lastCommit || 'Deployed'}"</small>
+                            <strong>${item.name}</strong>
+                            <span class="history-tag">Updated: ${item.lastUpdate || 'Just now'}</span>
                             <div class="admin-actions">
-                                <button class="edit-btn" onclick="triggerEdit('${key}')">Edit / Commit</button>
+                                <button class="edit-btn" onclick="triggerEdit('${key}')">Edit & Commit</button>
                                 <button class="del-btn" onclick="triggerDelete('${key}')">Delete</button>
                             </div>
                         `;
@@ -286,7 +247,10 @@
         }
 
         window.triggerDelete = (key) => {
-            if (confirm("Delete permanently? This will also delete history.")) remove(ref(db, `adminTools/${key}`));
+            if (confirm("Delete this tool and all its commit history?")) {
+                remove(ref(db, `adminTools/${key}`));
+                remove(ref(db, `toolCommits/${key}`));
+            }
         };
 
         window.triggerEdit = (key) => {
@@ -295,8 +259,8 @@
                 document.getElementById('webName').value = item.name;
                 document.getElementById('htmlCode').value = item.code;
                 document.getElementById('editKey').value = key;
-                document.getElementById('commitMsg').value = ""; // Clear msg for new update
-                submitBtn.innerText = "Commit Changes";
+                document.getElementById('commitNote').value = "";
+                submitBtn.innerText = "Push New Commit";
                 window.scrollTo({top: 0, behavior: 'smooth'});
             });
         };
@@ -305,8 +269,8 @@
             document.getElementById('webName').value = "";
             document.getElementById('htmlCode').value = "";
             document.getElementById('editKey').value = "";
-            document.getElementById('commitMsg').value = "";
-            submitBtn.innerText = "Deploy Tool";
+            document.getElementById('commitNote').value = "";
+            submitBtn.innerText = "Deploy & Save Commit";
         }
     </script>
 </body>
