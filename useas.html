@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1847020814272884"
+     crossorigin="anonymous"></script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
@@ -132,6 +136,54 @@
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- Slider Section --- */
+        .slider-section {
+            width: 100%;
+            margin: 10px 0 25px;
+            display: none; /* Only show when data exists */
+        }
+        .slider-section.visible { display: block; }
+
+        .slider-container {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 24px;
+            position: relative;
+            aspect-ratio: 16 / 7;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .slider-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+        }
+        .slider-dots {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        .dot-node {
+            width: 8px; height: 8px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .dot-node.active {
+            background: #fff;
+            width: 24px;
+            border-radius: 10px;
+        }
+
         /* --- Lab Banner --- */
         .lab-scroll { padding: 5px 0 25px; }
         .lab-banner {
@@ -141,7 +193,7 @@
         }
 
         /* --- Grid Responsiveness --- */
-        .section-header { margin: 35px 0 20px; }
+        .section-header { margin: 15px 0 20px; }
         .section-header h3 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
 
         .main-grid { 
@@ -159,6 +211,7 @@
             .page { padding-top: 120px; }
             .lab-banner { padding: 50px 60px; }
             .lab-banner h2 { font-size: 2.2rem; }
+            .slider-container { aspect-ratio: 21 / 7; }
         }
 
         .feature-card {
@@ -166,6 +219,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);
             display: flex; flex-direction: column; align-items: center; text-align: center;
             gap: 15px; cursor: pointer; transition: all 0.3s ease;
+            position: relative;
         }
         .feature-card:hover { 
             transform: translateY(-8px); 
@@ -185,19 +239,22 @@
         @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } 100% { transform: scale(1); } }
         .lab-btn { background: white; color: #4f46e5; border: none; padding: 12px 28px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .lab-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        /* Badge Style */
+        .new-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: #ff4757; color: white; padding: 4px 8px;
+            border-radius: 8px; font-size: 0.65rem; font-weight: 800;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+        }
     </style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1847020814272884"
-     crossorigin="anonymous"></script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1847020814272884"
-     crossorigin="anonymous"></script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1847020814272884"
-     crossorigin="anonymous"></script>
-    <meta name="google-adsense-account" content="ca-pub-1847020814272884">
-    <meta name="google-adsense-account" content="ca-pub-1847020814272884">
 </head>
 <body>
 
-    
+    <amp-auto-ads type="adsense"
+        data-ad-client="ca-pub-1847020814272884">
+    </amp-auto-ads>
+
     <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
@@ -234,11 +291,23 @@
         <iframe id="chatFrame" class="iframe-container" src="https://revanthreddy150.github.io/useaschatbot/"></iframe>
         <iframe id="notificationFrame" class="iframe-container" src="https://www.useas.online/notifications"></iframe>
         <iframe id="papersFrame" class="iframe-container" src="https://www.useas.online/paperhub"></iframe>
+        <iframe id="mid1Frame" class="iframe-container" src="https://www.useas.online/mid1paper"></iframe>
         <iframe id="aboutFrame" class="iframe-container" src="https://revanthreddy150.github.io/aboutus/"></iframe>
         <iframe id="termsFrame" class="iframe-container" src="https://revanthreddy150.github.io/termsandconditions/"></iframe>
         <iframe id="feedbackFrame" class="iframe-container" src="https://www.useas.online/feedback"></iframe>
 
         <div id="home" class="page active">
+            
+            <div class="slider-section" id="newsSliderSection">
+                <div class="section-header">
+                    <h3>Featured Updates</h3>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-track" id="newsSliderTrack"></div>
+                    <div class="slider-dots" id="newsSliderDots"></div>
+                </div>
+            </div>
+
             <div class="section-header">
                 <h3>Lab Zone</h3>
             </div>
@@ -248,7 +317,7 @@
                         <div class="pulse-box"><div class="dot"></div> LIVE NOW</div>
                         <h2 style="margin: 15px 0 8px;">Abhyas Lab Keys</h2>
                         <p style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px;">Get instant solutions for your lab codes with one click.</p>
-                        <button class="lab-btn" onclick="showExternal('labFrame', 'lab')">Launch Lab</button>
+                        <button class="lab-btn" onclick="window.open('https://www.useas.online/abhyaslabkeys', '_blank')">Launch Lab</button>
                     </div>
                     <i class="fa-solid fa-code" style="font-size: 8rem; opacity: 0.1; position: absolute; right: 20px;"></i>
                 </div>
@@ -258,6 +327,15 @@
                 <h3>Study Essentials</h3>
             </div>
             <div class="main-grid">
+                <div class="feature-card" onclick="showMid1()">
+                    <div class="new-badge">NEW</div>
+                    <div class="card-icon" style="background: #f1f5f9; color: #1e293b;"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div>
+                        <b style="display: block; font-size: 0.9rem;">SEM - 2 (MID 1)</b>
+                        <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">PAPERS</span>
+                    </div>
+                </div>
+
                 <div class="feature-card" onclick="showNotes()">
                     <div class="card-icon" style="background: #eef2ff; color: #6366f1;"><i class="fa-solid fa-book-open"></i></div>
                     <div>
@@ -318,6 +396,79 @@
         </div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // REPLACE THIS WITH YOUR FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const sliderRef = ref(db, 'sliders');
+
+        const track = document.getElementById('newsSliderTrack');
+        const dotsContainer = document.getElementById('newsSliderDots');
+        const section = document.getElementById('newsSliderSection');
+        let currentSlide = 0;
+        let slideInterval;
+
+        onValue(sliderRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                section.classList.remove('visible');
+                return;
+            }
+
+            section.classList.add('visible');
+            track.innerHTML = '';
+            dotsContainer.innerHTML = '';
+            
+            const slidersArray = Object.keys(data).map(key => data[key]);
+            
+            slidersArray.forEach((item, index) => {
+                // Create Slide
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                slide.style.backgroundImage = `url('${item.img}')`;
+                slide.onclick = () => window.open(item.link, '_blank');
+                track.appendChild(slide);
+
+                // Create Dot
+                const dot = document.createElement('div');
+                dot.className = `dot-node ${index === 0 ? 'active' : ''}`;
+                dotsContainer.appendChild(dot);
+            });
+
+            startAutoSlide(slidersArray.length);
+        });
+
+        function startAutoSlide(count) {
+            if (slideInterval) clearInterval(slideInterval);
+            if (count <= 1) return;
+
+            slideInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % count;
+                updateSlider();
+            }, 4000);
+        }
+
+        function updateSlider() {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            const dots = document.querySelectorAll('.dot-node');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+    </script>
+
     <script>
         const sidebar = document.getElementById('sidebar');
         const mainHeader = document.getElementById('main-header');
@@ -344,19 +495,17 @@
             closeSidebar();
         }
 
+        function showMid1() { resetViews(false); document.getElementById('mid1Frame').classList.add('active'); isHome = false; window.history.pushState({page: 'mid1'}, ""); }
         function showNotes() { resetViews(false); document.getElementById('notesFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'notes'}, ""); }
         function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'papers'}, ""); }
         function showShorts() { resetViews(false); document.getElementById('shortsFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); }
         function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); }
-        function showExternal(fId, pName) { resetViews(false); document.getElementById(fId).classList.add('active'); isHome = false; window.history.pushState({page: pName}, ""); }
         
         function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); closeSidebar(); }
         function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); closeSidebar(); }
         function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'chat'}, ""); closeSidebar(); }
         function showAboutUs() { resetViews(false); document.getElementById('aboutFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'about'}, ""); closeSidebar(); }
         function showTerms() { resetViews(false); document.getElementById('termsFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'terms'}, ""); closeSidebar(); }
-        
-        // Function to show Feedback
         function showFeedback() { resetViews(false); document.getElementById('feedbackFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'feedback'}, ""); closeSidebar(); }
 
         function toggleSidebar() { 
@@ -368,6 +517,5 @@
             document.getElementById('overlay').style.display = 'none'; 
         }
     </script>
- 
 </body>
 </html>
