@@ -136,30 +136,33 @@
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- FIXED Slider Section --- */
-        .slider-section { width: 100%; margin: 10px 0 25px; display: none; }
+        /* --- UPDATED FIXED Slider Section --- */
+        .slider-section { width: 100%; margin: 5px 0 25px; display: none; }
         .slider-section.visible { display: block; }
         .slider-container { 
             width: 100%; 
             overflow: hidden; 
-            border-radius: 24px; 
+            border-radius: 28px; 
             position: relative; 
-            aspect-ratio: 16 / 7; /* Maintains consistent height on all screens */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            background: #e2e8f0;
+            /* Larger size: Changed to 16/9 for more height on mobile */
+            aspect-ratio: 16 / 9; 
+            min-height: 200px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12); 
+            background: #f1f5f9;
         }
         .slider-track { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
         .slide { 
             min-width: 100%; 
             height: 100%; 
-            background-size: cover; /* Fixed: Ensures image covers the area */
-            background-position: center; /* Fixed: Centers the image */
+            background-size: cover; 
+            background-position: center center;
             background-repeat: no-repeat;
             cursor: pointer; 
+            display: block;
         }
-        .slider-dots { position: absolute; bottom: 12px; width: 100%; display: flex; justify-content: center; gap: 8px; z-index: 5; }
-        .dot-node { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s; }
-        .dot-node.active { background: #fff; width: 24px; border-radius: 10px; }
+        .slider-dots { position: absolute; bottom: 15px; width: 100%; display: flex; justify-content: center; gap: 8px; z-index: 10; }
+        .dot-node { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .dot-node.active { background: #fff; width: 26px; border-radius: 10px; }
 
         /* --- Lab Banner --- */
         .lab-scroll { padding: 5px 0 25px; }
@@ -170,8 +173,8 @@
         }
 
         /* --- Grid Responsiveness --- */
-        .section-header { margin: 15px 0 20px; }
-        .section-header h3 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+        .section-header { margin: 15px 0 15px; }
+        .section-header h3 { font-size: 1.25rem; font-weight: 800; color: #1e293b; }
         .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
         @media (min-width: 640px) { .main-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -180,7 +183,7 @@
             .page { padding-top: 120px; }
             .lab-banner { padding: 50px 60px; }
             .lab-banner h2 { font-size: 2.2rem; }
-            .slider-container { aspect-ratio: 21 / 7; } /* Wider ratio for desktop */
+            .slider-container { aspect-ratio: 21 / 8; } /* Keep it slightly wider on PC */
         }
 
         .feature-card {
