@@ -137,52 +137,14 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Slider Section --- */
-        .slider-section {
-            width: 100%;
-            margin: 10px 0 25px;
-            display: none; /* Only show when data exists */
-        }
+        .slider-section { width: 100%; margin: 10px 0 25px; display: none; }
         .slider-section.visible { display: block; }
-
-        .slider-container {
-            width: 100%;
-            overflow: hidden;
-            border-radius: 24px;
-            position: relative;
-            aspect-ratio: 16 / 7;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .slider-track {
-            display: flex;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            height: 100%;
-        }
-        .slide {
-            min-width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            cursor: pointer;
-        }
-        .slider-dots {
-            position: absolute;
-            bottom: 15px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-        .dot-node {
-            width: 8px; height: 8px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 50%;
-            transition: 0.3s;
-        }
-        .dot-node.active {
-            background: #fff;
-            width: 24px;
-            border-radius: 10px;
-        }
+        .slider-container { width: 100%; overflow: hidden; border-radius: 24px; position: relative; aspect-ratio: 16 / 7; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .slider-track { display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
+        .slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; cursor: pointer; }
+        .slider-dots { position: absolute; bottom: 15px; width: 100%; display: flex; justify-content: center; gap: 8px; }
+        .dot-node { width: 8px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s; }
+        .dot-node.active { background: #fff; width: 24px; border-radius: 10px; }
 
         /* --- Lab Banner --- */
         .lab-scroll { padding: 5px 0 25px; }
@@ -195,17 +157,9 @@
         /* --- Grid Responsiveness --- */
         .section-header { margin: 15px 0 20px; }
         .section-header h3 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
-        .main-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 20px; 
-        }
-
-        @media (min-width: 640px) {
-            .main-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
+        @media (min-width: 640px) { .main-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1024px) {
             .main-grid { grid-template-columns: repeat(4, 1fr); }
             .page { padding-top: 120px; }
@@ -221,39 +175,20 @@
             gap: 15px; cursor: pointer; transition: all 0.3s ease;
             position: relative;
         }
-        .feature-card:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border-color: var(--primary-accent);
-        }
-
-        .card-icon { 
-            width: 56px; height: 56px; border-radius: 18px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 1.5rem; transition: 0.3s;
-        }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-color: var(--primary-accent); }
+        .card-icon { width: 56px; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: 0.3s; }
         .feature-card:hover .card-icon { transform: scale(1.1); }
-
         .pulse-box { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 100px; font-size: 0.8rem; font-weight: 700; }
         .dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } 100% { transform: scale(1); } }
         .lab-btn { background: white; color: #4f46e5; border: none; padding: 12px 28px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .lab-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-
-        /* Badge Style */
-        .new-badge {
-            position: absolute; top: 15px; right: 15px;
-            background: #ff4757; color: white; padding: 4px 8px;
-            border-radius: 8px; font-size: 0.65rem; font-weight: 800;
-            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
-        }
+        .new-badge { position: absolute; top: 15px; right: 15px; background: #ff4757; color: white; padding: 4px 8px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); }
     </style>
 </head>
 <body>
 
-    <amp-auto-ads type="adsense"
-        data-ad-client="ca-pub-1847020814272884">
-    </amp-auto-ads>
+    <amp-auto-ads type="adsense" data-ad-client="ca-pub-1847020814272884"></amp-auto-ads>
 
     <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
     
@@ -274,9 +209,7 @@
             <button class="header-btn" id="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars-staggered"></i></button>
             <button class="header-btn" id="back-btn" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i></button>
         </div>
-        
         <div class="logo-container">USEAS</div>
-        
         <div style="display: flex; gap: 10px; pointer-events: auto;">
             <button class="header-btn" id="help-btn" onclick="showChatbot()"><i class="fa-solid fa-bolt"></i></button>
         </div>
@@ -299,18 +232,14 @@
         <div id="home" class="page active">
             
             <div class="slider-section" id="newsSliderSection">
-                <div class="section-header">
-                    <h3>Featured Updates</h3>
-                </div>
+                <div class="section-header"><h3>Featured Updates</h3></div>
                 <div class="slider-container">
                     <div class="slider-track" id="newsSliderTrack"></div>
                     <div class="slider-dots" id="newsSliderDots"></div>
                 </div>
             </div>
 
-            <div class="section-header">
-                <h3>Lab Zone</h3>
-            </div>
+            <div class="section-header"><h3>Lab Zone</h3></div>
             <div class="lab-scroll">
                 <div class="lab-banner">
                     <div style="z-index: 1;">
@@ -323,75 +252,17 @@
                 </div>
             </div>
 
-            <div class="section-header">
-                <h3>Study Essentials</h3>
-            </div>
+            <div class="section-header"><h3>Study Essentials</h3></div>
             <div class="main-grid">
-                <div class="feature-card" onclick="showMid1()">
-                    <div class="new-badge">NEW</div>
-                    <div class="card-icon" style="background: #f1f5f9; color: #1e293b;"><i class="fa-solid fa-graduation-cap"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 0.9rem;">SEM - 2 (MID 1)</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">PAPERS</span>
-                    </div>
-                </div>
-
-                <div class="feature-card" onclick="showNotes()">
-                    <div class="card-icon" style="background: #eef2ff; color: #6366f1;"><i class="fa-solid fa-book-open"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">Notes</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Detailed PDF files</span>
-                    </div>
-                </div>
-                <div class="feature-card" onclick="showShorts()">
-                    <div class="card-icon" style="background: #fff7ed; color: #f59e0b;"><i class="fa-solid fa-bolt-lightning"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">Short Notes</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Quick Revision</span>
-                    </div>
-                </div>
-                <div class="feature-card" onclick="showPapers()">
-                    <div class="card-icon" style="background: #fdf2f8; color: #ec4899;"><i class="fa-solid fa-file-invoice"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">Prev Papers</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Exam Prep</span>
-                    </div>
-                </div>
-                <div class="feature-card" onclick="showNotifications()">
-                    <div class="card-icon" style="background: #f0fdf4; color: #22c55e;"><i class="fa-solid fa-bullhorn"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">Alerts</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Latest Updates ( <b>Crt keys </b>)</span>
-                    </div>
-                </div>
-                <div class="feature-card" onclick="showPDFTools()">
-                    <div class="card-icon" style="background: #fff1f2; color: #e11d48;"><i class="fa-solid fa-file-pdf"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">PDF Tools</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Merge & Convert</span>
-                    </div>
-                </div>
-                <div class="feature-card" onclick="showFeedback()">
-                    <div class="card-icon" style="background: #fdfce8; color: #ca8a04;"><i class="fa-solid fa-star"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">Feedback</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Rate your experience</span>
-                    </div>
-                </div>
-                <div class="feature-card" onclick="showChatbot()">
-                    <div class="card-icon" style="background: #f0f9ff; color: #0ea5e9;"><i class="fa-solid fa-robot"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">AI Chat</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Smart Assistant</span>
-                    </div>
-                </div>
-                <div class="feature-card" onclick="showProfile()">
-                    <div class="card-icon" style="background: #f5f3ff; color: #8b5cf6;"><i class="fa-solid fa-id-card"></i></div>
-                    <div>
-                        <b style="display: block; font-size: 1rem;">My Profile</b>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">Student Info</span>
-                    </div>
-                </div>
+                <div class="feature-card" onclick="showMid1()"><div class="new-badge">NEW</div><div class="card-icon" style="background: #f1f5f9; color: #1e293b;"><i class="fa-solid fa-graduation-cap"></i></div><div><b style="display: block; font-size: 0.9rem;">SEM - 2 (MID 1)</b><span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">PAPERS</span></div></div>
+                <div class="feature-card" onclick="showNotes()"><div class="card-icon" style="background: #eef2ff; color: #6366f1;"><i class="fa-solid fa-book-open"></i></div><div><b style="display: block; font-size: 1rem;">Notes</b><span style="font-size: 0.75rem; color: #94a3b8;">Detailed PDF files</span></div></div>
+                <div class="feature-card" onclick="showShorts()"><div class="card-icon" style="background: #fff7ed; color: #f59e0b;"><i class="fa-solid fa-bolt-lightning"></i></div><div><b style="display: block; font-size: 1rem;">Short Notes</b><span style="font-size: 0.75rem; color: #94a3b8;">Quick Revision</span></div></div>
+                <div class="feature-card" onclick="showPapers()"><div class="card-icon" style="background: #fdf2f8; color: #ec4899;"><i class="fa-solid fa-file-invoice"></i></div><div><b style="display: block; font-size: 1rem;">Prev Papers</b><span style="font-size: 0.75rem; color: #94a3b8;">Exam Prep</span></div></div>
+                <div class="feature-card" onclick="showNotifications()"><div class="card-icon" style="background: #f0fdf4; color: #22c55e;"><i class="fa-solid fa-bullhorn"></i></div><div><b style="display: block; font-size: 1rem;">Alerts</b><span style="font-size: 0.75rem; color: #94a3b8;">Latest Updates ( <b>Crt keys </b>)</span></div></div>
+                <div class="feature-card" onclick="showPDFTools()"><div class="card-icon" style="background: #fff1f2; color: #e11d48;"><i class="fa-solid fa-file-pdf"></i></div><div><b style="display: block; font-size: 1rem;">PDF Tools</b><span style="font-size: 0.75rem; color: #94a3b8;">Merge & Convert</span></div></div>
+                <div class="feature-card" onclick="showFeedback()"><div class="card-icon" style="background: #fdfce8; color: #ca8a04;"><i class="fa-solid fa-star"></i></div><div><b style="display: block; font-size: 1rem;">Feedback</b><span style="font-size: 0.75rem; color: #94a3b8;">Rate your experience</span></div></div>
+                <div class="feature-card" onclick="showChatbot()"><div class="card-icon" style="background: #f0f9ff; color: #0ea5e9;"><i class="fa-solid fa-robot"></i></div><div><b style="display: block; font-size: 1rem;">AI Chat</b><span style="font-size: 0.75rem; color: #94a3b8;">Smart Assistant</span></div></div>
+                <div class="feature-card" onclick="showProfile()"><div class="card-icon" style="background: #f5f3ff; color: #8b5cf6;"><i class="fa-solid fa-id-card"></i></div><div><b style="display: block; font-size: 1rem;">My Profile</b><span style="font-size: 0.75rem; color: #94a3b8;">Student Info</span></div></div>
             </div>
         </div>
     </div>
@@ -400,14 +271,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // REPLACE THIS WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+            authDomain: "studyhub-33164.firebaseapp.com",
+            databaseURL: "https://studyhub-33164-default-rtdb.firebaseio.com",
+            projectId: "studyhub-33164",
+            storageBucket: "studyhub-33164.firebasestorage.app",
+            messagingSenderId: "918352715015",
+            appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -434,14 +305,12 @@
             const slidersArray = Object.keys(data).map(key => data[key]);
             
             slidersArray.forEach((item, index) => {
-                // Create Slide
                 const slide = document.createElement('div');
                 slide.className = 'slide';
                 slide.style.backgroundImage = `url('${item.img}')`;
                 slide.onclick = () => window.open(item.link, '_blank');
                 track.appendChild(slide);
 
-                // Create Dot
                 const dot = document.createElement('div');
                 dot.className = `dot-node ${index === 0 ? 'active' : ''}`;
                 dotsContainer.appendChild(dot);
@@ -453,7 +322,6 @@
         function startAutoSlide(count) {
             if (slideInterval) clearInterval(slideInterval);
             if (count <= 1) return;
-
             slideInterval = setInterval(() => {
                 currentSlide = (currentSlide + 1) % count;
                 updateSlider();
@@ -463,9 +331,7 @@
         function updateSlider() {
             track.style.transform = `translateX(-${currentSlide * 100}%)`;
             const dots = document.querySelectorAll('.dot-node');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
+            dots.forEach((dot, index) => { dot.classList.toggle('active', index === currentSlide); });
         }
     </script>
 
@@ -479,11 +345,8 @@
 
         function resetViews(isHomeView) {
             document.querySelectorAll('.page, .iframe-container').forEach(el => el.classList.remove('active'));
-            if (isHomeView) {
-                mainHeader.classList.remove('minimal');
-            } else {
-                mainHeader.classList.add('minimal');
-            }
+            if (isHomeView) { mainHeader.classList.remove('minimal'); } 
+            else { mainHeader.classList.add('minimal'); }
             window.scrollTo(0,0);
         }
 
@@ -500,7 +363,6 @@
         function showPapers() { resetViews(false); document.getElementById('papersFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'papers'}, ""); }
         function showShorts() { resetViews(false); document.getElementById('shortsFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'shorts'}, ""); }
         function showNotifications() { resetViews(false); document.getElementById('notificationFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'alerts'}, ""); }
-        
         function showProfile() { resetViews(false); document.getElementById('profileFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'profile'}, ""); closeSidebar(); }
         function showPDFTools() { resetViews(false); document.getElementById('pdfFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'pdf'}, ""); closeSidebar(); }
         function showChatbot() { resetViews(false); document.getElementById('chatFrame').classList.add('active'); isHome = false; window.history.pushState({page: 'chat'}, ""); closeSidebar(); }
