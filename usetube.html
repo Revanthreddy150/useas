@@ -1,150 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USEAS Premium Portal</title>
+    <title>USEAS | Admin Monitor</title>
     <style>
-        :root { --main: #00d2ff; --bg: #0f0f0f; --card: #1a1a1a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; text-align: center; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .hidden { display: none; }
-        button { background: var(--main); color: black; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 16px; }
-        input { width: 90%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; border-radius: 8px; text-align: center; }
-        .video-box { margin-bottom: 25px; background: #222; padding: 10px; border-radius: 12px; }
-        iframe, video { width: 100%; border-radius: 10px; border: 1px solid #444; height: 250px; }
-        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 15px; }
+        body { font-family: sans-serif; background: #f0f4f8; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; background: #6366f1; color: white; padding: 15px; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        .ip-tag { background: #e0e7ff; color: #4338ca; padding: 5px; border-radius: 5px; font-family: monospace; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h2 style="color: var(--main)">USEAS PREMIUM</h2>
-        
-        <div id="auth-section">
-            <p>Login with your college email to access videos</p>
-            <button id="login-btn">Login with Google</button>
-        </div>
-
-        <div id="content-section" class="hidden">
-            <p>Welcome, <b id="user-name"></b></p>
-
-            <div id="locked-ui">
-                <div style="border: 1px dashed #f1c40f; padding: 15px; border-radius: 15px;">
-                    <h3 style="color:#f1c40f">Premium Access Required 🔒</h3>
-                    <p>Pay <b>₹1</b> to unlock videos for 7 days.</p>
-                    <button id="pay-btn" style="background:#f1c40f;">1. Click to Pay via UPI</button>
-                    <input type="text" id="utr-input" placeholder="Paste 12-digit UTR/Ref No.">
-                    <button id="unlock-btn">2. Unlock & Watch Now</button>
-                </div>
-            </div>
-
-            <div id="unlocked-ui" class="hidden">
-                <div id="status-area"></div>
-                <div id="video-list"></div>
-            </div>
-            
-            <button onclick="logout()" style="background:transparent; color:#777; border: 1px solid #333; font-size:12px; margin-top:30px;">Logout</button>
-        </div>
+        <h1>Traffic Logs</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>IP Address</th>
+                    <th>Location</th>
+                    <th>ISP (Provider)</th>
+                    <th>Device</th>
+                </tr>
+            </thead>
+            <tbody id="logs"></tbody>
+        </table>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxikO_YSe0LZFz5vWHyI7de3RHt5uvRd8",
-            authDomain: "premiumforyou-cd97b.firebaseapp.com",
-            projectId: "premiumforyou-cd97b",
-            storageBucket: "premiumforyou-cd97b.firebasestorage.app",
-            messagingSenderId: "41795546476",
-            appId: "1:41795546476:web:b43d200c9afc98a8775749"
-        };
-
+        const firebaseConfig = { /* SAME CONFIG AS ABOVE */ };
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+        const db = getDatabase(app);
 
-        // 1. LOGIN
-        document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('content-section').classList.remove('hidden');
-                document.getElementById('user-name').innerText = user.displayName;
-                checkAccess(user);
-            } else {
-                document.getElementById('auth-section').classList.remove('hidden');
-                document.getElementById('content-section').classList.add('hidden');
-            }
-        });
-
-        // 2. PAYMENT REDIRECT
-        document.getElementById('pay-btn').onclick = () => {
-            window.location.href = "upi://pay?pa=revanth@ybl&pn=Revanth&am=1&cu=INR&tn=Premium_Access";
-        };
-
-        // 3. UNLOCK (TRUST-FIRST)
-        document.getElementById('unlock-btn').onclick = async () => {
-            const utr = document.getElementById('utr-input').value;
-            if(utr.length < 10) return alert("Please enter a valid 12-digit UTR number.");
-            
-            const user = auth.currentUser;
-            const expiry = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
-
-            await setDoc(doc(db, "users", user.uid), {
-                status: "pending",
-                expiryDate: expiry,
-                utr: utr,
-                name: user.displayName,
-                email: user.email
-            }, { merge: true });
-
-            location.reload();
-        };
-
-        // 4. ACCESS CHECK
-        async function checkAccess(user) {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (!userDoc.exists()) return;
-
-            const data = userDoc.data();
-            const now = new Date().getTime();
-
-            if (data.status === "rejected") {
-                document.getElementById('locked-ui').innerHTML = `<h3 style="color:#ff4757">Payment Rejected ❌</h3><p>Your UTR was invalid. Contact admin or pay again.</p><button onclick="location.reload()">Try Again</button>`;
-            } else if (data.expiryDate > now) {
-                document.getElementById('locked-ui').classList.add('hidden');
-                document.getElementById('unlocked-ui').classList.remove('hidden');
-                
-                const badgeColor = data.status === "pending" ? "#f1c40f" : "#2ecc71";
-                const badgeText = data.status === "pending" ? "Pending Admin Approval" : "Verified Premium ✅";
-                document.getElementById('status-area').innerHTML = `<span class="status-badge" style="background:${badgeColor}; color:black">${badgeText}</span>`;
-                
-                loadVideos();
-            }
-        }
-
-        // 5. LOAD VIDEOS (HYBRID)
-        async function loadVideos() {
-            const snap = await getDocs(collection(db, "videos"));
-            const list = document.getElementById('video-list');
-            snap.forEach(d => {
-                const v = d.data();
-                let html = `<div class="video-box"><p>${v.title}</p>`;
-                if (v.type === "youtube") {
-                    html += `<iframe src="${v.url}" frameborder="0" allowfullscreen></iframe>`;
-                } else {
-                    html += `<video controls src="${v.url}"></video>`;
-                }
-                list.innerHTML += html + `</div>`;
+        onValue(ref(db, 'site_visits/'), (snapshot) => {
+            const list = document.getElementById('logs');
+            list.innerHTML = "";
+            snapshot.forEach((child) => {
+                const v = child.val();
+                list.innerHTML = `<tr>
+                    <td>${v.time}</td>
+                    <td><span class="ip-tag">${v.ip}</span></td>
+                    <td>${v.location}</td>
+                    <td>${v.isp}</td>
+                    <td>${v.device}</td>
+                </tr>` + list.innerHTML;
             });
-        }
-
-        window.logout = () => signOut(auth);
+        });
     </script>
 </body>
 </html>
