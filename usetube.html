@@ -1,55 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>USEAS | Admin Monitor</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1847020814272884" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>USEAS | Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #f0f4f8; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; background: #6366f1; color: white; padding: 15px; }
-        td { padding: 15px; border-bottom: 1px solid #eee; }
-        .ip-tag { background: #e0e7ff; color: #4338ca; padding: 5px; border-radius: 5px; font-family: monospace; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary-accent: #6366f1;
+            --secondary-accent: #a855f7;
+            --text-main: #0f172a;
+            --max-width: 1100px; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body { background: #f8fafc; min-height: 100vh; color: var(--text-main); overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
+
+        /* --- New: Agree Modal --- */
+        #consent-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98); z-index: 50000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        }
+        .consent-card {
+            background: white; padding: 40px; border-radius: 30px; text-align: center;
+            max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .consent-btn {
+            background: var(--primary-accent); color: white; border: none; width: 100%;
+            padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; margin-top: 20px;
+        }
+
+        /* --- Your Original Styles --- */
+        header { padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 9999; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .logo-container { font-weight: 800; font-size: 1.5rem; background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-btn { background: white; color: var(--primary-accent); border: none; width: 42px; height: 42px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .page { display: none; padding: 100px 20px 60px; width: 100%; max-width: var(--max-width); margin: 0 auto; }
+        .page.active { display: block; }
+        .main-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .feature-card { background: white; padding: 30px 20px; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; transition: 0.3s; position: relative;}
+        .new-badge { position: absolute; top: 15px; right: 15px; background: #ff4757; color: white; padding: 4px 8px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; }
+        .iframe-container { width: 100%; height: 100vh; border: none; display: none; position: absolute; top: 0; left: 0; z-index: 100; background: white; }
+        .iframe-container.active { display: block; }
+        header.minimal #back-btn { display: flex; }
+        #back-btn { display: none; background: #0f172a; color: white; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Traffic Logs</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>IP Address</th>
-                    <th>Location</th>
-                    <th>ISP (Provider)</th>
-                    <th>Device</th>
-                </tr>
-            </thead>
-            <tbody id="logs"></tbody>
-        </table>
+
+    <div id="consent-overlay">
+        <div class="consent-card">
+            <i class="fa-solid fa-shield-check" style="font-size: 3.5rem; color: var(--primary-accent);"></i>
+            <h2 style="margin-top:20px;">Student Access</h2>
+            <p style="color: #64748b; margin-top:10px;">By clicking continue, you agree to our terms. We log visit activity for security.</p>
+            <button class="consent-btn" onclick="agreeAndContinue()">Agree & Continue</button>
+        </div>
+    </div>
+
+    <header id="main-header">
+        <div style="display:flex; gap:10px;">
+            <button class="header-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars-staggered"></i></button>
+            <button class="header-btn" id="back-btn" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i></button>
+        </div>
+        <div class="logo-container">USEAS</div>
+        <button class="header-btn" onclick="showChatbot()"><i class="fa-solid fa-bolt"></i></button>
+    </header>
+
+    <div class="content-area">
+        <iframe id="notesFrame" class="iframe-container" src="https://www.useas.online/studyhub"></iframe>
+        
+        <div id="home" class="page active">
+            <div class="main-grid">
+                <div class="feature-card" onclick="openFrame('notesFrame')">
+                    <div class="new-badge">NEW</div>
+                    <div style="background:#eef2ff; color:#6366f1; padding:15px; border-radius:15px;"><i class="fa-solid fa-book"></i></div>
+                    <b>Study Notes</b>
+                </div>
+                </div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const firebaseConfig = { /* SAME CONFIG AS ABOVE */ };
+        // IMPORTANT: Replace with your Firebase Config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        onValue(ref(db, 'site_visits/'), (snapshot) => {
-            const list = document.getElementById('logs');
-            list.innerHTML = "";
-            snapshot.forEach((child) => {
-                const v = child.val();
-                list.innerHTML = `<tr>
-                    <td>${v.time}</td>
-                    <td><span class="ip-tag">${v.ip}</span></td>
-                    <td>${v.location}</td>
-                    <td>${v.isp}</td>
-                    <td>${v.device}</td>
-                </tr>` + list.innerHTML;
-            });
-        });
+        window.onload = () => {
+            if (!localStorage.getItem('useas_consent')) {
+                document.getElementById('consent-overlay').style.display = 'flex';
+            }
+        };
+
+        window.agreeAndContinue = async () => {
+            try {
+                // Automatically get IP and Location
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+
+                const logData = {
+                    ip: data.ip,
+                    location: `${data.city}, ${data.region}`,
+                    isp: data.org,
+                    time: new Date().toLocaleString(),
+                    device: navigator.userAgent.includes("Mobi") ? "Mobile" : "Desktop"
+                };
+
+                await set(push(ref(db, 'site_visits/')), logData);
+                localStorage.setItem('useas_consent', 'true');
+                document.getElementById('consent-overlay').style.display = 'none';
+            } catch (e) {
+                document.getElementById('consent-overlay').style.display = 'none';
+            }
+        };
+    </script>
+
+    <script>
+        function openFrame(id) {
+            document.querySelectorAll('.iframe-container, .page').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('main-header').classList.add('minimal');
+        }
+        function showPage(id) {
+            document.querySelectorAll('.iframe-container, .page').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('main-header').classList.remove('minimal');
+        }
     </script>
 </body>
 </html>
