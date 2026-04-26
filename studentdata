@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Student Directory</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #dfe1e5;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        #searchInput:focus {
+            border-color: #1a73e8;
+            outline: none;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 600px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #ededed;
+        }
+        th {
+            background-color: #1a73e8;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #d93025;
+            font-weight: bold;
+        }
+        .count-info {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Class Student Directory</h2>
+    <div class="count-info">Total Students: 41 (Roll 21 excluded)</div>
+    
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search by Roll No, Name, or Phone Number...">
+
+    <div class="table-wrapper">
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>SUC</th>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Phone No</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>2546640703</td><td>SAI GANESH LAVETI</td><td>siddhul7852@gmail.com</td><td>9133944606</td></tr>
+                <tr><td>2</td><td>2546640367</td><td>DANDI SIVA GANESH SIRIMALLA</td><td>siva2005@gmail.com</td><td>9347634739</td></tr>
+                <tr><td>3</td><td>2546640067</td><td>REVANTH SAI KUMAR REDDY MALLIDI</td><td>revanthreddy5292m@gmail.com</td><td>8247584384</td></tr>
+                <tr><td>4</td><td>2546640075</td><td>CHANDRAHASA VENKAT PITHAPURAPU</td><td>venkatachandra372@gmail.com</td><td>8328646158</td></tr>
+                <tr><td>5</td><td>2546640171</td><td>RISHITHA AMPOLU</td><td>rishithaampolu@gmail.com</td><td>9989089677</td></tr>
+                <tr><td>6</td><td>2546640172</td><td>ALEKHYA KATA</td><td>alekhyakata08@gmail.com</td><td>9848349430</td></tr>
+                <tr><td>7</td><td>2546640694</td><td>SANTHOSH MARUKURTHI</td><td>santhoshyadav1106@gmail.com</td><td>7207536909</td></tr>
+                <tr><td>8</td><td>2546640689</td><td>NAGA SURYA LAKSHMAN SAI RAM ROKKAM</td><td>sairamrokkam85@gmail.com</td><td>8790131156</td></tr>
+                <tr><td>9</td><td>2546640188</td><td>RAKSHITHA TILLAPUDI</td><td>rakshithatillapudi@gmail.com</td><td>9492469831</td></tr>
+                <tr><td>10</td><td>2546640204</td><td>YASWANTH SUNDHAR ANKAM</td><td>yaswanthsundharankam@gmail.com</td><td>9908438932</td></tr>
+                <tr><td>11</td><td>2546640210</td><td>MOUNIKA KOMATI</td><td>veerababukomati047@gmail.com</td><td>9949545629</td></tr>
+                <tr><td>12</td><td>2546640211</td><td>DIVYA SRI LANKA</td><td>dsri08506@gmail.com</td><td>8121526784</td></tr>
+                <tr><td>13</td><td>2546640218</td><td>JAYARAM DURGA PRADEEP KALLA</td><td>kallapradeep15@gmail.com</td><td>7981496595</td></tr>
+                <tr><td>14</td><td>2546640229</td><td>TARUN KUMAR JAGARAPU</td><td>jagaraputarunkumar9@gmail.com</td><td>9515587169</td></tr>
+                <tr><td>15</td><td>2546640232</td><td>BHAGAT RAJ SWAROOP MEDETI</td><td>bhagatarajswaroopm@gmail.com</td><td>9866993510</td></tr>
+                <tr><td>16</td><td>2546640242</td><td>VENKATA SAI SANTHOSH MUNGANDA</td><td>mungandasanthosh72@gmail.com</td><td>9949578747</td></tr>
+                <tr><td>17</td><td>2546640259</td><td>LAKSHMI SAI PRANUSHA PAALURI</td><td>paluri.pranusha@gmail.com</td><td>9490152855</td></tr>
+                <tr><td>18</td><td>2546640637</td><td>SIVA MEGHANA MANGALAGIRI</td><td>kumarmangalagiri02@gmail.com</td><td>6281011662</td></tr>
+                <tr><td>19</td><td>2546640292</td><td>BINDHU SAI SRI TUTI</td><td>bindhusaisree3@gmail.com</td><td>9912505506</td></tr>
+                <tr><td>20</td><td>2546640301</td><td>SAMUEL RAJU MAJJI</td><td>samisamul2164@gmail.com</td><td>9885358493</td></tr>
+                <tr><td>22</td><td>2546640307</td><td>SATYA VARA PRASAD GOLLA</td><td>gollav732@gmail.com</td><td>9121392876</td></tr>
+                <tr><td>23</td><td>2546640326</td><td>PHANENDRA BHASKAR KUMAR KOTTAPALLI</td><td>phanendrakottapalli40@gmail.com</td><td>9985446128</td></tr>
+                <tr><td>24</td><td>2546640596</td><td>SIMHADRI MYLAPILLI</td><td>mylapillisimhadri9@gmail.com</td><td>7672081367</td></tr>
+                <tr><td>25</td><td>2546640383</td><td>CHANDU SIVA RAM CHALLA</td><td>chandusivaram40@gmail.com</td><td>8886108864</td></tr>
+                <tr><td>26</td><td>2546640391</td><td>GANGA BHAVANI GEESALA</td><td>gangabhavani9958839@gmail.com</td><td>9392407337</td></tr>
+                <tr><td>27</td><td>2546640540</td><td>D V S D BALA RAMA KRISHNA ATHKOORI</td><td>avhprjy@gmail.com</td><td>8074774083</td></tr>
+                <tr><td>28</td><td>2546640419</td><td>DEEVEN KUMAR AKULA</td><td>deevenkumar143@gmail.com</td><td>8179706960</td></tr>
+                <tr><td>29</td><td>2546640438</td><td>DHANA SAI DEEPAK PARAMKUSAM</td><td>deepaknaidu92@gmail.com</td><td>8688087843</td></tr>
+                <tr><td>30</td><td>2546640440</td><td>RISHITHA NAVYA PENUGONDA</td><td>rishithanavyapenugonda@gmail.com</td><td>6304115514</td></tr>
+                <tr><td>31</td><td>2546640450</td><td>MOKSHAGNA YELLA</td><td>subramanyamyalla30@gmail.com</td><td>9866996533</td></tr>
+                <tr><td>32</td><td>2546640456</td><td>FARIDA SAYYED</td><td>sayyedfarida159@gmail.com</td><td>9701259158</td></tr>
+                <tr><td>33</td><td>2546640462</td><td>TARUN REDDY BADE</td><td>tarunreddybade@gmail.com</td><td>8790264299</td></tr>
+                <tr><td>34</td><td>2546640468</td><td>SHAJAHAN SHAIK</td><td>shajahanshaik7797@gmail.com</td><td>8099803312</td></tr>
+                <tr><td>35</td><td>2546640471</td><td>MEGHANA KATTA</td><td>meghanakatta6411@gmail.com</td><td>9347195760</td></tr>
+                <tr><td>36</td><td>2546640481</td><td>MANIKANTA KUKKALA</td><td>m9515456118@gmail.com</td><td>6300864122</td></tr>
+                <tr><td>37</td><td>2546640486</td><td>SAI GANESH RAMINETI</td><td>saiganeshramineti@gmail.com</td><td>9666756065</td></tr>
+                <tr><td>38</td><td>2546640491</td><td>CHITTU USHA DEVI KILLADA</td><td>ushalily2007@gmail.com</td><td>9966318293</td></tr>
+                <tr><td>39</td><td>2546640496</td><td>SAI SANDEEP REGULABANDA</td><td>saisandeepregulabandha@gmail.com</td><td>7285986781</td></tr>
+                <tr><td>40</td><td>2546640516</td><td>HARSHITH VIVEK MEDISETTI</td><td>mharshithvivek@gmail.com</td><td>8341162331</td></tr>
+                <tr><td>41</td><td>2546640524</td><td>V V SIVA SATYA ASHOK MADDALA</td><td>ashokmaddala720@gmail.com</td><td>7207550449</td></tr>
+                <tr><td>42</td><td>2546640535</td><td>ARUN SAI MANDA</td><td>arunsaimanda2222@gmail.com</td><td>8500797655</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="noResults" class="no-results">No matches found. Try searching a different Name or Roll No.</div>
+</div>
+
+<script>
+function searchTable() {
+    var input, filter, table, tr, td, i, j, txtValue, found;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("studentTable");
+    tr = table.getElementsByTagName("tr");
+    var noResults = document.getElementById("noResults");
+    var anyFound = false;
+
+    // Start loop from index 1 to skip table header
+    for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td");
+        found = false;
+        
+        // Loop through all cells in the row
+        for (j = 0; j < td.length; j++) {
+            if (td[j]) {
+                txtValue = td[j].textContent || td[j].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    found = true;
+                    anyFound = true;
+                    break;
+                }
+            }
+        }
+        
+        if (found) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+    
+    // Show "No Results" message if nothing matches
+    noResults.style.display = anyFound ? "none" : "block";
+}
+</script>
+
+</body>
+</html>
