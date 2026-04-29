@@ -3,56 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Result Portal</title>
+    <title>Class Results Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen">
-    <div class="max-w-4xl mx-auto py-12 px-4">
-        <div class="text-center mb-10">
-            <h1 class="text-3xl font-extrabold text-slate-800">Exam Result Portal 2026</h1>
-            <p class="text-slate-500 text-lg">Search by Roll Number or select a name from the list below</p>
+    <div class="max-w-4xl mx-auto py-10 px-4">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-slate-800">Student Result Portal</h1>
+            <p class="text-slate-500">Search by Roll No or select a name below</p>
         </div>
 
-        <div class="flex gap-2 mb-4">
-            <input type="text" id="searchInput" placeholder="Enter Roll Number or Name..." 
-                   class="flex-1 p-4 rounded-lg border-2 border-slate-200 focus:border-blue-500 outline-none shadow-sm text-lg">
-            <button id="searchBtn" class="bg-blue-600 text-white px-8 rounded-lg hover:bg-blue-700 font-bold shadow-md transition">
-                SEARCH
-            </button>
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="searchInput" placeholder="Enter Roll Number..." class="flex-1 p-4 rounded-lg border shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="searchBtn" class="bg-blue-600 text-white px-6 rounded-lg font-bold hover:bg-blue-700">SEARCH</button>
         </div>
 
-        <div class="mb-8 p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
-            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Recent Uploads / Student List</h3>
-            <div id="studentDirectory" class="flex flex-wrap gap-2">
-                <span class="text-slate-400 italic text-sm">Loading students...</span>
+        <div class="bg-white p-4 rounded-lg shadow-sm mb-8 border border-slate-200">
+            <h3 class="text-xs font-bold text-slate-400 uppercase mb-3">Student List</h3>
+            <div id="directory" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="resultCard" class="hidden bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
+            <div class="bg-blue-600 p-6 text-white">
+                <h2 id="resName" class="text-2xl font-bold uppercase"></h2>
+                <p id="resDetails" class="opacity-80"></p>
             </div>
-        </div>
-
-        <div id="resultCard" class="hidden bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200 animate-in fade-in duration-500">
-            <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
-                <div>
-                    <h2 id="resName" class="text-2xl font-bold uppercase"></h2>
-                    <p id="resDetails" class="opacity-90"></p>
-                </div>
-                <button onclick="window.print()" class="bg-white/20 hover:bg-white/30 p-2 rounded text-sm">Print PDF</button>
-            </div>
-            
             <div class="p-6">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left">
                     <thead>
-                        <tr class="border-b-2 border-slate-100">
-                            <th class="py-3 px-2 text-slate-600">Subject</th>
-                            <th class="py-3 px-2 text-slate-600 text-center">Grade</th>
+                        <tr class="border-b text-slate-400 text-sm uppercase">
+                            <th class="py-3 px-2">Subject Name</th>
+                            <th class="py-3 px-2 text-center">Grade</th>
                         </tr>
                     </thead>
                     <tbody id="resultBody"></tbody>
                 </table>
             </div>
         </div>
-
-        <div id="noData" class="hidden text-center text-red-500 font-medium py-10 bg-white rounded-lg border border-dashed border-red-200">
-            No record found. Please check the Roll Number and try again.
-        </div>
+        <div id="noData" class="hidden text-center py-10 text-red-500 font-bold">Record not found!</div>
     </div>
 
     <script type="module">
@@ -71,69 +59,49 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const studentsRef = ref(db, 'students');
 
-        // --- 1. LOAD STUDENT DIRECTORY ---
-        onValue(studentsRef, (snapshot) => {
-            const directory = document.getElementById('studentDirectory');
-            directory.innerHTML = "";
-            
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                Object.keys(data).forEach(id => {
+        // Load Directory
+        onValue(ref(db, 'students'), (snap) => {
+            const dir = document.getElementById('directory');
+            dir.innerHTML = "";
+            if(snap.exists()){
+                Object.entries(snap.val()).forEach(([id, data]) => {
                     const btn = document.createElement('button');
-                    btn.className = "px-3 py-1 bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-700 rounded-full text-sm border border-slate-200 transition font-medium";
-                    btn.innerText = data[id].name;
-                    btn.onclick = () => {
-                        document.getElementById('searchInput').value = id;
-                        fetchResult(id);
-                    };
-                    directory.appendChild(btn);
+                    btn.className = "px-3 py-1 bg-slate-100 hover:bg-blue-600 hover:text-white rounded-full text-sm transition border";
+                    btn.innerText = data.name;
+                    btn.onclick = () => { document.getElementById('searchInput').value = id; showResult(id); };
+                    dir.appendChild(btn);
                 });
-            } else {
-                directory.innerHTML = "<span class='text-slate-400 text-sm'>No students uploaded yet.</span>";
             }
         });
 
-        // --- 2. SEARCH FUNCTION ---
-        async function fetchResult(id) {
+        async function showResult(id) {
+            const val = id || document.getElementById('searchInput').value.trim();
+            const snap = await get(ref(db, `students/${val}`));
             const card = document.getElementById('resultCard');
-            const noData = document.getElementById('noData');
             const tbody = document.getElementById('resultBody');
-            const searchVal = id || document.getElementById('searchInput').value.trim();
-
-            if(!searchVal) return;
-
-            const studentRef = ref(db, `students/${searchVal}`);
-            const snapshot = await get(studentRef);
-
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                noData.classList.add('hidden');
+            
+            if(snap.exists()){
+                const data = snap.val();
+                document.getElementById('noData').classList.add('hidden');
                 card.classList.remove('hidden');
-
                 document.getElementById('resName').innerText = data.name;
-                document.getElementById('resDetails').innerText = `${data.course} | Semester: ${data.semester} | Roll: ${data.rollNo}`;
-
-                tbody.innerHTML = "";
-                data.results.forEach(item => {
-                    const row = `
-                        <tr class="border-b border-slate-50 hover:bg-slate-100 transition">
-                            <td class="py-4 px-2 text-slate-700 font-medium">${item.SubjectName}</td>
-                            <td class="py-4 px-2 text-center font-bold text-blue-600">${item.Grade}</td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-                // Smooth scroll to result
+                document.getElementById('resDetails').innerText = `Roll: ${data.rollNo} | ${data.course} | Sem: ${data.semester}`;
+                
+                tbody.innerHTML = data.results.map(r => `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="py-4 px-2 font-medium text-slate-700">${r.sub}</td>
+                        <td class="py-4 px-2 text-center font-bold text-blue-600">${r.grade}</td>
+                    </tr>
+                `).join('');
                 card.scrollIntoView({ behavior: 'smooth' });
             } else {
                 card.classList.add('hidden');
-                noData.classList.remove('hidden');
+                document.getElementById('noData').classList.remove('hidden');
             }
         }
 
-        document.getElementById('searchBtn').addEventListener('click', () => fetchResult());
+        document.getElementById('searchBtn').addEventListener('click', () => showResult());
     </script>
 </body>
 </html>
