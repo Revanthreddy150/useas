@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div class="max-w-4xl mx-auto py-12 px-4">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-slate-800">Exam Result Portal 2026</h1>
+            <p class="text-slate-500 text-lg">Search by Roll Number or select a name from the list below</p>
+        </div>
+
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="searchInput" placeholder="Enter Roll Number or Name..." 
+                   class="flex-1 p-4 rounded-lg border-2 border-slate-200 focus:border-blue-500 outline-none shadow-sm text-lg">
+            <button id="searchBtn" class="bg-blue-600 text-white px-8 rounded-lg hover:bg-blue-700 font-bold shadow-md transition">
+                SEARCH
+            </button>
+        </div>
+
+        <div class="mb-8 p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Recent Uploads / Student List</h3>
+            <div id="studentDirectory" class="flex flex-wrap gap-2">
+                <span class="text-slate-400 italic text-sm">Loading students...</span>
+            </div>
+        </div>
+
+        <div id="resultCard" class="hidden bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200 animate-in fade-in duration-500">
+            <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
+                <div>
+                    <h2 id="resName" class="text-2xl font-bold uppercase"></h2>
+                    <p id="resDetails" class="opacity-90"></p>
+                </div>
+                <button onclick="window.print()" class="bg-white/20 hover:bg-white/30 p-2 rounded text-sm">Print PDF</button>
+            </div>
+            
+            <div class="p-6">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b-2 border-slate-100">
+                            <th class="py-3 px-2 text-slate-600">Subject</th>
+                            <th class="py-3 px-2 text-slate-600 text-center">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="noData" class="hidden text-center text-red-500 font-medium py-10 bg-white rounded-lg border border-dashed border-red-200">
+            No record found. Please check the Roll Number and try again.
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCkWMaV8wevVBSKj4kin7r8-qZqqOe5hhA",
+            authDomain: "ndbackend-77756.firebaseapp.com",
+            databaseURL: "https://ndbackend-77756-default-rtdb.firebaseio.com",
+            projectId: "ndbackend-77756",
+            storageBucket: "ndbackend-77756.firebasestorage.app",
+            messagingSenderId: "672027347736",
+            appId: "1:672027347736:web:7b643b45959956a32fac6d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const studentsRef = ref(db, 'students');
+
+        // --- 1. LOAD STUDENT DIRECTORY ---
+        onValue(studentsRef, (snapshot) => {
+            const directory = document.getElementById('studentDirectory');
+            directory.innerHTML = "";
+            
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                Object.keys(data).forEach(id => {
+                    const btn = document.createElement('button');
+                    btn.className = "px-3 py-1 bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-700 rounded-full text-sm border border-slate-200 transition font-medium";
+                    btn.innerText = data[id].name;
+                    btn.onclick = () => {
+                        document.getElementById('searchInput').value = id;
+                        fetchResult(id);
+                    };
+                    directory.appendChild(btn);
+                });
+            } else {
+                directory.innerHTML = "<span class='text-slate-400 text-sm'>No students uploaded yet.</span>";
+            }
+        });
+
+        // --- 2. SEARCH FUNCTION ---
+        async function fetchResult(id) {
+            const card = document.getElementById('resultCard');
+            const noData = document.getElementById('noData');
+            const tbody = document.getElementById('resultBody');
+            const searchVal = id || document.getElementById('searchInput').value.trim();
+
+            if(!searchVal) return;
+
+            const studentRef = ref(db, `students/${searchVal}`);
+            const snapshot = await get(studentRef);
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                noData.classList.add('hidden');
+                card.classList.remove('hidden');
+
+                document.getElementById('resName').innerText = data.name;
+                document.getElementById('resDetails').innerText = `${data.course} | Semester: ${data.semester} | Roll: ${data.rollNo}`;
+
+                tbody.innerHTML = "";
+                data.results.forEach(item => {
+                    const row = `
+                        <tr class="border-b border-slate-50 hover:bg-slate-100 transition">
+                            <td class="py-4 px-2 text-slate-700 font-medium">${item.SubjectName}</td>
+                            <td class="py-4 px-2 text-center font-bold text-blue-600">${item.Grade}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                // Smooth scroll to result
+                card.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                card.classList.add('hidden');
+                noData.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('searchBtn').addEventListener('click', () => fetchResult());
+    </script>
+</body>
+</html>
