@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Download USEAS App</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -18,22 +16,25 @@
     }
 
     body {
-        height: 100vh;
-        background: linear-gradient(135deg, #5f2c82, #49a09d);
+        min-height: 100vh;
+        background: linear-gradient(135deg, #ffffff, #f1f5f9);
         display: flex;
         justify-content: center;
         align-items: center;
-        color: white;
+        color: #1e293b;
+        padding: 20px;
     }
 
     .card {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px); 
+        border: 1px solid rgba(226, 232, 240, 0.8);
         border-radius: 25px;
-        padding: 40px 25px;
-        width: 320px;
+        padding: 35px 25px;
+        width: 340px;
         text-align: center;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 30px rgba(148, 163, 184, 0.2);
         animation: fadeIn 1s ease;
     }
 
@@ -49,23 +50,82 @@
     }
 
     .logo {
-        width: 120px;
+        width: 100px;
         border-radius: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        margin-bottom: 12px;
+        box-shadow: 0 5px 15px rgba(148, 163, 184, 0.3);
     }
 
     h1 {
         font-size: 22px;
+        margin-bottom: 6px;
+        color: #0f172a;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 20px;
+    }
+
+    /* --- Interactive QR Code Tab/Toggle styling --- */
+    .qr-toggle-tab {
+        background: rgba(241, 245, 249, 0.8);
+        border: 1px solid rgba(203, 213, 225, 0.8);
+        color: #475569;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        user-select: none;
+        transition: 0.3s ease;
         margin-bottom: 10px;
     }
 
-    p {
-        font-size: 14px;
-        opacity: 0.8;
-        margin-bottom: 25px;
+    .qr-toggle-tab:hover {
+        background: rgba(226, 232, 240, 1);
+        color: #1e293b;
     }
 
+    /* Content block hidden by default */
+    .qr-content-wrapper {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out, opacity 0.3s ease;
+        opacity: 0;
+    }
+
+    /* Class applied when tab is active */
+    .qr-content-wrapper.open {
+        max-height: 220px;
+        opacity: 1;
+        margin-bottom: 15px;
+    }
+
+    .qr-container {
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(226, 232, 240, 1);
+        border-radius: 18px;
+        padding: 15px;
+        display: inline-block;
+        margin-top: 5px;
+    }
+
+    .qr-code {
+        width: 130px;
+        height: 130px;
+        display: block;
+        margin: 0 auto 8px auto;
+    }
+
+    .qr-text {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    /* --- Buttons --- */
     .btn {
         display: flex;
         align-items: center;
@@ -76,7 +136,7 @@
         margin: 10px 0;
         border-radius: 15px;
         text-decoration: none;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 500;
         transition: 0.3s;
         cursor: pointer;
@@ -85,35 +145,36 @@
     .android {
         background: linear-gradient(135deg, #00c853, #64dd17);
         color: white;
-        box-shadow: 0 5px 20px rgba(0, 200, 83, 0.4);
+        box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3);
     }
 
     .android:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 25px rgba(0, 200, 83, 0.6);
+        transform: scale(1.03);
+        box-shadow: 0 8px 22px rgba(0, 200, 83, 0.5);
     }
 
     .windows {
-        background: rgba(255,255,255,0.2);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(241, 245, 249, 0.8);
+        color: #334155;
+        border: 1px solid rgba(203, 213, 225, 1);
     }
 
     .windows:hover {
-        transform: scale(1.05);
-        background: rgba(255,255,255,0.3);
+        transform: scale(1.03);
+        background: rgba(226, 232, 240, 1);
     }
 
     .coming {
         margin-top: 15px;
-        font-size: 13px;
-        opacity: 0.7;
+        font-size: 12px;
+        color: #94a3b8;
+        line-height: 1.5;
     }
 
     .footer {
         margin-top: 20px;
-        font-size: 12px;
-        opacity: 0.6;
+        font-size: 11px;
+        color: #94a3b8;
     }
 </style>
 </head>
@@ -122,14 +183,27 @@
 
 <div class="card">
 
-    <!-- Logo -->
-    <img src="https://file.garden/abrK4_rpWxJegn7w/InShot_20260421_141015501.jpg" class="logo">
+    <img src="https://file.garden/aZ1i9e6aIVfqSsYT/ChatGPT%20Image%20Jun%208%2C%202026%2C%2003_29_39%20PM.png" class="logo" alt="USEAS Logo">
 
     <h1>USEAS App</h1>
-    <p>Fast • Simple • Powerful tools in one place</p>
+    <p class="subtitle">Fast • Simple • Powerful tools in one place</p>
+
+    <!-- Interactive Toggle Tab -->
+    <div class="qr-toggle-tab" id="qrTab" onclick="toggleQRCode()">
+        📱 Android QR Code
+    </div>
+
+    <div class="qr-content-wrapper" id="qrWrapper">
+        <a href="https://file.garden/aZ1i9e6aIVfqSsYT/useasdownloading-qr.png" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+            <div class="qr-container">
+                <img src="https://file.garden/aZ1i9e6aIVfqSsYT/useasdownloading-qr.png" class="qr-code" alt="Scan to download USEAS Android App">
+                <div class="qr-text">Scan or Tap to download App</div>
+            </div>
+        </a>
+    </div>
 
     <!-- Android Button -->
-    <a href="https://mega.nz/file/aCow1RgZ#Lajn4hjBih-xOD_HHSS5VkIneh_wwLUVMMweMqcVD04" class="btn android">
+    <a href="https://tinyurl.com/useasdownloading" class="btn android" target="_blank" rel="noopener noreferrer">
         📱 Download for Android
     </a>
 
@@ -138,13 +212,29 @@
         💻 Download for Windows
     </div>
 
-    <div class="coming">Windows version coming soon</div>
+    <div class="coming">
+        Windows version coming soon. <br>
+        Android application package (qi09yc.apk) is downloading. Do not worry, it is installing the USEAS student portal securely.
+    </div>
 
     <div class="footer">© 2026 USEAS</div>
 
 </div>
 
 <script>
+function toggleQRCode() {
+    const wrapper = document.getElementById('qrWrapper');
+    const tab = document.getElementById('qrTab');
+    
+    if (wrapper.classList.contains('open')) {
+        wrapper.classList.remove('open');
+        tab.innerHTML = '📱 Android QR Code';
+    } else {
+        wrapper.classList.add('open');
+        tab.innerHTML = '✨ Hide QR Code';
+    }
+}
+
 function comingSoon() {
     alert("Windows version is coming soon!");
 }
