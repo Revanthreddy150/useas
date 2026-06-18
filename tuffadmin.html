@@ -3,67 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USEAS | Super Admin Console</title>
+    <title>USEAS | Admin Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0e14;
             --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --primary: #ef4444;
-            --accent: #f97316;
+            --primary: #00f2fe;
+            --accent: #4facfe;
             --text: #e0e0e0;
+            --danger: #ff4b5c;
+            --success: #00e676;
         }
+
         body {
             font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at top right, #251616, var(--bg));
-            color: var(--text); margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            background: radial-gradient(circle at top right, #1a1f2c, var(--bg));
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        .container { width: 100%; max-width: 600px; margin-top: 40px; }
-        .card {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            padding: 30px; border-radius: 20px; margin-bottom: 25px;
+
+        #admin-header {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-top: 60px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        h1, h2 { background: linear-gradient(to right, #ff6b6b, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        input {
+
+        /* Auth Overlay */
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 14, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+
+        .auth-card {
+            background: var(--glass);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            max-width: 400px; width: 90%;
+        }
+
+        #admin-panel, #projectList { display: none; }
+
+        input, textarea {
             width: 100%; padding: 14px; margin: 10px 0;
-            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
             border-radius: 12px; color: white; box-sizing: border-box;
         }
+
         button {
-            width: 100%; padding: 14px; margin-top: 10px; border-radius: 12px;
-            border: none; font-weight: 600; cursor: pointer; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white;
+            width: 100%; padding: 14px; margin-top: 10px;
+            border-radius: 12px; border: none; font-weight: 600;
+            cursor: pointer; transition: 0.3s;
         }
-        .badge { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--primary); padding: 5px 10px; border-radius: 8px; font-size: 13px; color: #f87171; }
+
+        .verify-btn { background: var(--primary); color: #000; }
+        #submitBtn { background: linear-gradient(45deg, var(--accent), var(--primary)); color: #000; }
+
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px; width: 100%; max-width: 1100px; margin-top: 30px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 25px; text-align: center;
+        }
+
+        .admin-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
+        .edit-btn { background: var(--success); color: #000; padding: 5px 10px; width: auto; font-size: 11px;}
+        .del-btn { background: var(--danger); color: #fff; padding: 5px 10px; width: auto; font-size: 11px;}
+        
+        .history-tag { font-size: 10px; color: var(--accent); display: block; margin-top: 5px; opacity: 0.7;}
     </style>
 </head>
 <body>
 
-    <h1>Super Admin Dashboard</h1>
-    <p>Configure dynamic infrastructure permissions and set root deletion privileges here.</p>
-
-    <div class="container">
-        <div class="card">
-            <h2>1. Assign Master Deletion Email</h2>
-            <p>The Google account specified here is granted permission to bypass and execute structural database purges inside `admin.html`.</p>
-            <p>Current Active Super Admin: <span id="currentSuperAdmin" class="badge">Loading...</span></p>
-            <input type="email" id="superEmail" placeholder="e.g. boss.account@gmail.com">
-            <button id="saveSuperBtn">Update Master Account</button>
-        </div>
-
-        <div class="card">
-            <h2>2. Provision Standard Staff Member</h2>
-            <input type="text" id="staffCode" placeholder="Staff AdCode (Phone)">
-            <input type="email" id="staffEmail" placeholder="Staff Google Email Address">
-            <input type="text" id="staffPass" placeholder="Assign Local Password Pin">
-            <button id="saveStaffBtn" style="background: #3b82f6;">Create/Update Staff Login</button>
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2>Portal Access</h2>
+            <p style="font-size:13px; color:var(--accent); opacity:0.8;">Enter the gateway key provided by the Super Admin</p>
+            <input type="password" id="gatewayPassword" placeholder="Enter Portal Password">
+            <button class="verify-btn" id="loginBtn">Verify Passkey</button>
         </div>
     </div>
 
+    <h1 id="admin-header">USEAS</h1>
+    
+    <div id="admin-panel" style="width: 100%; max-width: 600px;">
+        <h2 id="panel-title">Add/Commit Tool</h2>
+        <input type="hidden" id="editKey">
+        <input type="text" id="webName" placeholder="Application Name">
+        <input type="text" id="commitNote" placeholder="What did you change? (Commit Message)">
+        <textarea id="htmlCode" rows="6" placeholder="Paste HTML..."></textarea>
+        <button id="submitBtn">Deploy & Save Commit</button>
+    </div>
+
+    <div class="grid" id="projectList"></div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const encodedConfig = "QUl6YVN5RHQ4U1JPd0ZPUlRaRnFWZTV4TGMzbmxEdWtiT0FnZHpzO3VzZWFzbm90ZXMuZmlyZWJhc2VhcHAuY29tO2h0dHBzOi8vdXNlYXNub3Rlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb207dXNlYXNub3Rlczt1c2Vhc25vdGVzLmZpcmViYXNlc3RvcmFnZS5hcHA7MTA2NjYwMTcxNTA5ODsxOjEwNjY2MDE3MTUwOTg6d2ViOjg4MDU0OGUzMzMyOTcwNzlkMDk2MjM=";
         const c = atob(encodedConfig).split(';');
@@ -76,39 +133,155 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Realtime Listener displaying configuration changes instantly
-        onValue(ref(db, 'superAdminConfig'), (snapshot) => {
-            const data = snapshot.val();
-            document.getElementById('currentSuperAdmin').innerText = data && data.email ? data.email : "None Configured Yet";
-        });
+        let validatedSessionPass = "";
 
-        // Set Super Admin Global
-        document.getElementById('saveSuperBtn').onclick = async () => {
-            const email = document.getElementById('superEmail').value.trim();
-            if(!email) return alert("Provide a valid email address first.");
+        // Single password authentication validator
+        document.getElementById('loginBtn').onclick = async () => {
+            const enteredPass = document.getElementById('gatewayPassword').value;
+            if (!enteredPass) return alert("Please enter a password.");
+
+            const staffRef = ref(db, 'authorizedAdmins');
+            const snapshot = await get(staffRef);
             
-            await set(ref(db, 'superAdminConfig'), { email: email });
-            alert("Master permissions updated successfully.");
-            document.getElementById('superEmail').value = "";
+            let accessGranted = false;
+
+            if (snapshot.exists()) {
+                const standardUsers = snapshot.val();
+                // Check if the password matches any of the user entries
+                Object.keys(standardUsers).forEach(username => {
+                    if (standardUsers[username].password === enteredPass) {
+                        accessGranted = true;
+                    }
+                });
+            }
+
+            // Also check against the master super admin password
+            const superSnap = await get(ref(db, 'superAdminConfig'));
+            if (superSnap.exists() && superSnap.val().masterPassword === enteredPass) {
+                accessGranted = true;
+            }
+
+            if (accessGranted) {
+                validatedSessionPass = enteredPass;
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('projectList').style.display = 'grid';
+                renderData();
+            } else {
+                alert("Invalid Gateway Passkey!");
+            }
         };
 
-        // Provision Staff Member
-        document.getElementById('saveStaffBtn').onclick = async () => {
-            const code = document.getElementById('staffCode').value.trim();
-            const email = document.getElementById('staffEmail').value.trim();
-            const pass = document.getElementById('staffPass').value.trim();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.onclick = async () => {
+            const name = document.getElementById('webName').value;
+            const code = document.getElementById('htmlCode').value;
+            const note = document.getElementById('commitNote').value || "Manual Update";
+            const key = document.getElementById('editKey').value;
+            const time = new Date().toLocaleString();
 
-            if(!code || !email || !pass) return alert("All fields required to update database nodes.");
+            if (!name || !code) return alert("Missing data");
 
-            await set(ref(db, 'authorizedAdmins/' + code), {
-                email: email,
-                password: pass
+            if (key) {
+                await update(ref(db, `adminTools/${key}`), { name, code, lastUpdate: time });
+                await push(ref(db, `toolCommits/${key}`), {
+                    versionName: name,
+                    versionCode: code,
+                    commitMessage: note,
+                    timestamp: time
+                });
+                alert("Commit Successful! Version saved in toolCommits.");
+                resetForm();
+            } else {
+                const newToolRef = push(ref(db, 'adminTools'));
+                const newKey = newToolRef.key;
+                await set(newToolRef, { name, code, lastUpdate: time });
+                await push(ref(db, `toolCommits/${newKey}`), {
+                    versionName: name,
+                    versionCode: code,
+                    commitMessage: "Initial Deployment",
+                    timestamp: time
+                });
+                resetForm();
+            }
+        };
+
+        function renderData() {
+            onValue(ref(db, 'adminTools'), (snapshot) => {
+                const projectList = document.getElementById('projectList');
+                projectList.innerHTML = "";
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const item = data[key];
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <strong>${item.name}</strong>
+                            <span class="history-tag">Updated: ${item.lastUpdate || 'Just now'}</span>
+                            <div class="admin-actions">
+                                <button class="edit-btn" onclick="triggerEdit('${key}')">Edit & Commit</button>
+                                <button class="del-btn" onclick="triggerDelete('${key}')">Delete</button>
+                            </div>
+                        `;
+                        card.onclick = (e) => {
+                            if (e.target.tagName !== 'BUTTON') {
+                                const win = window.open("", "_blank");
+                                win.document.write(item.code);
+                                win.document.close();
+                            }
+                        };
+                        projectList.appendChild(card);
+                    });
+                }
             });
-            alert(`Staff credentials created under AdCode: ${code}`);
-            document.getElementById('staffCode').value = "";
-            document.getElementById('staffEmail').value = "";
-            document.getElementById('staffPass').value = "";
+        }
+
+        // Deletion explicitly requires the unique Super Admin password matching the database configuration
+        window.triggerDelete = async (key) => {
+            const superAdminConfigRef = ref(db, 'superAdminConfig');
+            const configSnapshot = await get(superAdminConfigRef);
+            
+            let requiredMasterPass = "";
+            if (configSnapshot.exists()) {
+                requiredMasterPass = configSnapshot.val().masterPassword;
+            }
+
+            if (!requiredMasterPass) {
+                alert("Configuration Error: No Super Admin Master Password setup found.");
+                return;
+            }
+
+            if (validatedSessionPass === requiredMasterPass) {
+                if (confirm("Super Admin Identity Verified. Delete this tool permanently along with all version commits?")) {
+                    await remove(ref(db, `adminTools/${key}`));
+                    await remove(ref(db, `toolCommits/${key}`));
+                    alert("Repository completely purged.");
+                }
+            } else {
+                alert("Access Denied! Standard admin passes cannot execute deletions. Please login with the Master Password to run purges.");
+            }
         };
+
+        window.triggerEdit = (key) => {
+            get(ref(db, `adminTools/${key}`)).then((snap) => {
+                const item = snap.val();
+                document.getElementById('webName').value = item.name;
+                document.getElementById('htmlCode').value = item.code;
+                document.getElementById('editKey').value = key;
+                document.getElementById('commitNote').value = "";
+                submitBtn.innerText = "Push New Commit";
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            });
+        };
+
+        function resetForm() {
+            document.getElementById('webName').value = "";
+            document.getElementById('htmlCode').value = "";
+            document.getElementById('editKey').value = "";
+            document.getElementById('commitNote').value = "";
+            submitBtn.innerText = "Deploy & Save Commit";
+        }
     </script>
 </body>
 </html>
