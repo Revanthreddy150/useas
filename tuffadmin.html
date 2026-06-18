@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS | Super Admin Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #ef4444;
+            --accent: #f97316;
+            --text: #e0e0e0;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #251616, var(--bg));
+            color: var(--text); margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+        .container { width: 100%; max-width: 600px; margin-top: 40px; }
+        .card {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            padding: 30px; border-radius: 20px; margin-bottom: 25px;
+        }
+        h1, h2 { background: linear-gradient(to right, #ff6b6b, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        input {
+            width: 100%; padding: 14px; margin: 10px 0;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+            border-radius: 12px; color: white; box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 14px; margin-top: 10px; border-radius: 12px;
+            border: none; font-weight: 600; cursor: pointer; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white;
+        }
+        .badge { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--primary); padding: 5px 10px; border-radius: 8px; font-size: 13px; color: #f87171; }
+    </style>
+</head>
+<body>
+
+    <h1>Super Admin Dashboard</h1>
+    <p>Configure dynamic infrastructure permissions and set root deletion privileges here.</p>
+
+    <div class="container">
+        <div class="card">
+            <h2>1. Assign Master Deletion Email</h2>
+            <p>The Google account specified here is granted permission to bypass and execute structural database purges inside `admin.html`.</p>
+            <p>Current Active Super Admin: <span id="currentSuperAdmin" class="badge">Loading...</span></p>
+            <input type="email" id="superEmail" placeholder="e.g. boss.account@gmail.com">
+            <button id="saveSuperBtn">Update Master Account</button>
+        </div>
+
+        <div class="card">
+            <h2>2. Provision Standard Staff Member</h2>
+            <input type="text" id="staffCode" placeholder="Staff AdCode (Phone)">
+            <input type="email" id="staffEmail" placeholder="Staff Google Email Address">
+            <input type="text" id="staffPass" placeholder="Assign Local Password Pin">
+            <button id="saveStaffBtn" style="background: #3b82f6;">Create/Update Staff Login</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const encodedConfig = "QUl6YVN5RHQ4U1JPd0ZPUlRaRnFWZTV4TGMzbmxEdWtiT0FnZHpzO3VzZWFzbm90ZXMuZmlyZWJhc2VhcHAuY29tO2h0dHBzOi8vdXNlYXNub3Rlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb207dXNlYXNub3Rlczt1c2Vhc25vdGVzLmZpcmViYXNlc3RvcmFnZS5hcHA7MTA2NjYwMTcxNTA5ODsxOjEwNjY2MDE3MTUwOTg6d2ViOjg4MDU0OGUzMzMyOTcwNzlkMDk2MjM=";
+        const c = atob(encodedConfig).split(';');
+
+        const firebaseConfig = {
+            apiKey: c[0], authDomain: c[1], databaseURL: c[2],
+            projectId: c[3], storageBucket: c[4], messagingSenderId: c[5], appId: c[6]
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Realtime Listener displaying configuration changes instantly
+        onValue(ref(db, 'superAdminConfig'), (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('currentSuperAdmin').innerText = data && data.email ? data.email : "None Configured Yet";
+        });
+
+        // Set Super Admin Global
+        document.getElementById('saveSuperBtn').onclick = async () => {
+            const email = document.getElementById('superEmail').value.trim();
+            if(!email) return alert("Provide a valid email address first.");
+            
+            await set(ref(db, 'superAdminConfig'), { email: email });
+            alert("Master permissions updated successfully.");
+            document.getElementById('superEmail').value = "";
+        };
+
+        // Provision Staff Member
+        document.getElementById('saveStaffBtn').onclick = async () => {
+            const code = document.getElementById('staffCode').value.trim();
+            const email = document.getElementById('staffEmail').value.trim();
+            const pass = document.getElementById('staffPass').value.trim();
+
+            if(!code || !email || !pass) return alert("All fields required to update database nodes.");
+
+            await set(ref(db, 'authorizedAdmins/' + code), {
+                email: email,
+                password: pass
+            });
+            alert(`Staff credentials created under AdCode: ${code}`);
+            document.getElementById('staffCode').value = "";
+            document.getElementById('staffEmail').value = "";
+            document.getElementById('staffPass').value = "";
+        };
+    </script>
+</body>
+</html>
