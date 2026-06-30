@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM SECURE :: HACKED BY OWNER</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Matrix rain effect overlay */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px;
+            border: 2px solid #00ff41;
+            background: rgba(0, 0, 0, 0.85);
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.2), inset 0 0 50px rgba(0, 255, 65, 0.05);
+            max-width: 800px;
+            width: 90%;
+            animation: flicker 3s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            3% { opacity: 0.85; }
+            6% { opacity: 1; }
+            7% { opacity: 0.9; }
+            8% { opacity: 1; }
+            50% { opacity: 0.98; }
+            53% { opacity: 0.87; }
+            55% { opacity: 1; }
+        }
+        
+        .glitch-text {
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #00ff41;
+            text-shadow: 
+                2px 0 #ff0000,
+                -2px 0 #0000ff,
+                0 0 20px #00ff41;
+            margin-bottom: 10px;
+            animation: glitch 1.5s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-1px, 1px); }
+            80% { transform: translate(1px, -1px); }
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            letter-spacing: 4px;
+            color: #00cc33;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .owner-image {
+            margin: 20px 0;
+        }
+        
+        .owner-image img {
+            max-width: 200px;
+            height: auto;
+            border: 2px solid #00ff41;
+            filter: drop-shadow(0 0 15px rgba(0, 255, 65, 0.5));
+        }
+        
+        .message {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #00e63a;
+            margin: 20px 0;
+        }
+        
+        .message .highlight {
+            color: #ff4444;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            font-weight: bold;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #00ff41;
+            border-bottom: 1px solid #00ff41;
+            padding: 10px 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            color: #008a22;
+            background: rgba(0, 255, 65, 0.03);
+        }
+        
+        .status-bar .online {
+            color: #00ff41;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .footer {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #005a16;
+            letter-spacing: 2px;
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #00ff41;
+            animation: typing 3s steps(40) 1s forwards, blink-caret 0.75s step-end infinite;
+            max-width: fit-content;
+            margin: 10px auto;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: #00ff41; }
+        }
+        
+        /* ASCII border */
+        .ascii-border {
+            color: #005a16;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .glitch-text { font-size: 1.8rem; }
+            .subtitle { font-size: 1rem; }
+            .container { padding: 20px; }
+            .typewriter { white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Matrix Rain Canvas -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="container">
+        <div class="ascii-border">[===== SYSTEM ACCESS GRANTED =====]</div>
+        
+        <div class="glitch-text">HACKED BY OWNER</div>
+        <div class="subtitle">◆ SYSTEM SECURE ◆</div>
+        
+        <div class="owner-image">
+            <img src="https://file.garden/abrK4_rpWxJegn7w/93656b62-2a01-4649-b2f3-84e9d0dde40a.jpg" alt="OWNER">
+        </div>
+        
+        <div class="message">
+            <div class="typewriter">root@system:~# whoami</div>
+            <br>
+            <span class="highlight">YOU'VE BEEN COMPROMISED</span><br>
+            This system has been <span class="highlight">OWNED</span> by its rightful owner.<br>
+            All security measures have been <strong>HARDENED</strong>.<br>
+            No unauthorized access will be <strong>TOLERATED</strong>.
+        </div>
+        
+        <div class="status-bar">
+            <span>[STATUS]</span>
+            <span class="online">● ONLINE &amp; SECURE</span>
+            <span>[IP: 127.0.0.1]</span>
+        </div>
+        
+        <div class="message" style="font-size: 0.95rem;">
+            > Firewall: <span style="color: #00ff41;">ACTIVE</span><br>
+            > Intrusion Detection: <span style="color: #00ff41;">ENABLED</span><br>
+            > Backdoors: <span style="color: #00ff41;">ALL PATCHED</span><br>
+            > Owner Access: <span style="color: #ff4444;">GRANTED</span><br>
+            > Your Access: <span style="color: #ff4444;">DENIED</span>
+        </div>
+        
+        <div class="footer">
+            =============================================<br>
+            [ SYSTEM UNDER OWNER CONTROL ]<br>
+            =============================================
+        </div>
+    </div>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789{}[]!@#$%^&*()_+-=<>?/\\|';
+        const fontSize = 14;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
+</body>
+</html>
