@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CENTRAL INTELLIGENCE DATABASE - ACCESS SECURITY MODE</title>
+    <style>
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            background-color: #050a05; 
+            color: #39ff14; 
+            margin: 0; 
+            padding: 20px;
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+        }
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9999;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+        
+        /* Auth Screen Viewport Display */
+        #authScreen {
+            position: fixed; top:0; left:0; width:100%; height:100%; background:#050a05;
+            z-index:10000; display:flex; flex-direction:column; justify-content:center; align-items:center;
+        }
+        .auth-container { background:#0a140a; border:2px dashed #39ff14; padding:40px; border-radius:4px; text-align:center; box-shadow:0 0 20px rgba(57,255,20,0.3); }
+
+        .container { 
+            max-width: 950px; 
+            background: #0a140a; 
+            padding: 30px; 
+            margin: 0 auto; 
+            border-radius: 4px; 
+            border: 1px solid #39ff14;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); 
+        }
+        h2 { 
+            text-align: center; 
+            color: #39ff14; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .status-bar {
+            text-align: center;
+            font-size: 12px;
+            color: #88ee88;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #39ff14;
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: 1px solid #225522;
+            color: #88ee88;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+        }
+        .tab-btn.active {
+            border-color: #39ff14;
+            color: #39ff14;
+            background-color: #153315;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+        }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        input[type="text"], input[type="password"] { 
+            padding: 12px; 
+            background-color: #000;
+            border: 1px solid #39ff14; 
+            border-radius: 4px; 
+            font-size: 16px; 
+            color: #39ff14;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+        }
+        button { 
+            padding: 12px 25px; 
+            background-color: #153315; 
+            color: #39ff14; 
+            border: 1px solid #39ff14; 
+            border-radius: 4px; 
+            font-size: 16px; 
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        button:hover { 
+            background-color: #39ff14; 
+            color: #000;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+        }
+
+        .filter-label { font-size: 12px; font-weight: bold; margin-bottom: 6px; color: #88ee88; text-transform: uppercase;}
+        .campus-filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; border: 1px dashed #225522; padding: 10px; background-color: #030703; }
+        .filter-chip { border: 1px solid #225522; color: #88ee88; background: transparent; padding: 5px 12px; font-size: 12px; text-transform: uppercase; cursor: pointer; }
+        .filter-chip.active { background-color: #153315; border-color: #39ff14; color: #39ff14; box-shadow: 0 0 8px rgba(57,255,20,0.4); }
+
+        .card { 
+            border: 1px solid #225522; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 4px; 
+            position: relative; 
+            background: #030703; 
+        }
+        .card:hover {
+            border-color: #39ff14;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+        .match-badge, .info-badge { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            background-color: #112211; 
+            color: #39ff14; 
+            padding: 5px 10px; 
+            border-radius: 2px; 
+            font-weight: bold; 
+            font-size: 12px; 
+            border: 1px solid #39ff14;
+        }
+        .match-badge { background-color: #ff3333; color: #fff; border-color: #ff0000; text-shadow: none; }
+        .card h3 { margin-top: 0; color: #fff; font-size: 20px; text-transform: uppercase; border-bottom: 1px dashed #225522; padding-bottom: 5px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .grid div { font-size: 14px; color: #aaddaa; }
+        strong { color: #39ff14; text-transform: uppercase; font-size: 12px; }
+        
+        .campus-ids-container { margin-top: 15px; display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto; border: 1px solid #225522; background-color: #000; padding: 10px; border-radius: 4px; }
+        .campus-id-item { font-size: 14px; color: #88ee88; padding: 4px 8px; border-bottom: 1px solid #0a140a; }
+        .campus-id-item:last-child { border-bottom: none; }
+        
+        .loading-text { color: #ffcc00; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div id="authScreen">
+    <div class="auth-container">
+        <h2 style="margin-bottom:20px;" id="authHeader">AUTHENTICATION REQUIRED</h2>
+        <p style="color:#ff3333; font-size:13px; margin-bottom:15px;" id="authErr"></p>
+        <div style="display:flex; gap:10px; justify-content:center;" id="authControlsRow">
+            <input type="password" id="sysPasswordInput" placeholder="ENTER ACCESS KEYWAY..." autocomplete="off">
+            <button id="sysAuthBtn">ACCESS</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h2>SYSTEM DIRECTORY OVERRIDE</h2>
+    <div class="status-bar">> ACCESS LEVEL: UNRESTRICTED // TARGET NODE ACTIVE</div>
+    
+    <div class="tabs">
+        <button class="tab-btn active" data-target="studentsSection">Student Database</button>
+        <button class="tab-btn" data-target="campusesSection">Campuses Directory</button>
+    </div>
+
+    <div id="studentsSection" class="view-section active">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ENTER QUERY (ANY FIELD LOGIC)..." style="flex:1;" autocomplete="off">
+            <button id="searchBtn">QUERY</button>
+        </div>
+        
+        <div class="filter-label">> AUTOMATIC CAMPUS FILTERS MATRIX:</div>
+        <div class="campus-filter-row" id="campusFiltersContainer">
+            <button class="filter-chip active" data-campus="ALL">SHOW ALL LOGS</button>
+        </div>
+
+        <div id="results"><span class="loading-text">INITIALIZING INTERCEPT PROTOCOLS... FETCHING MAIN RECORDSTREAM...</span></div>
+    </div>
+
+    <div id="campusesSection" class="view-section">
+        <div id="campusResults"><span class="loading-text">> SCANNING FOR REGIONAL CAMPUS NODES...</span></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD9VmsEv39OuyVwN58oMUzmZYvSJ_9HhPk",
+        authDomain: "mainheadhider.firebaseapp.com",
+        databaseURL: "https://mainheadhider-default-rtdb.firebaseio.com",
+        projectId: "mainheadhider",
+        storageBucket: "mainheadhider.firebasestorage.app",
+        messagingSenderId: "935649101059",
+        appId: "1:935649101059:web:259e3e28904582ec9b9536",
+        measurementId: "G-EYWLVZB82Z"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let allCachedStudents = [];
+    let activeSelectedCampus = "ALL";
+    let lastCalculatedSearchMatchedRecords = [];
+    
+    // User metadata global cache variables
+    let userIpAddress = "Unknown IP";
+    let userGeoLocation = { lat: null, lon: null };
+    let locationGranted = false;
+
+    // --- DevTools & Tampering Countermeasures Routine ---
+    document.addEventListener('contextmenu', event => event.preventDefault()); // Stop right-click
+    
+    document.addEventListener('keydown', function(e) {
+        // Blocks F12
+        if (e.key === "F12") {
+            e.preventDefault();
+            return false;
+        }
+        // Blocks Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J, Ctrl+U
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J' || e.key === 'i' || e.key === 'c' || e.key === 'j')) {
+            e.preventDefault();
+            return false;
+        }
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // --- Geolocation Verification Enforcement Loop ---
+    window.addEventListener('DOMContentLoaded', () => {
+        const errEl = document.getElementById('authErr');
+        const controlRow = document.getElementById('authControlsRow');
+        const headerEl = document.getElementById('authHeader');
+
+        if (navigator.geolocation) {
+            headerEl.innerText = "GEOLOCATION VERIFICATION PENDING";
+            errEl.innerText = "Please allow location synchronization to initialize directory routing structures.";
+            controlRow.style.visibility = "hidden";
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    userGeoLocation.lat = position.coords.latitude;
+                    userGeoLocation.lon = position.coords.longitude;
+                    locationGranted = true;
+                    
+                    // Fetch IP cleanly
+                    try {
+                        const response = await fetch('https://api.ipify.org?format=json');
+                        const data = await response.json();
+                        userIpAddress = data.ip;
+                    } catch (ipErr) {
+                        userIpAddress = "Failed to intercept public IP";
+                    }
+
+                    headerEl.innerText = "AUTHENTICATION REQUIRED";
+                    errEl.innerText = "";
+                    controlRow.style.visibility = "visible";
+                    
+                    // Fire an initial system log entry sequence
+                    sendLogEntry("System Portal Viewed");
+                },
+                (error) => {
+                    controlRow.style.display = "none";
+                    headerEl.innerText = "ACCESS SYSTEM LOCKED";
+                    errEl.innerText = "CRITICAL ERROR: Access rejected. Geolocation permission is absolutely mandatory.";
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            controlRow.style.display = "none";
+            headerEl.innerText = "ACCESS SYSTEM LOCKED";
+            errEl.innerText = "CRITICAL ERROR: Geolocation API tracking node missing inside client subsystem framework.";
+        }
+    });
+
+    // Logging controller pipeline helper
+    function sendLogEntry(actionType, queryStr = "N/A") {
+        if (!locationGranted) return;
+        const logRef = ref(db, 'system_security/user_logs');
+        push(logRef, {
+            timestamp: new Date().toLocaleString(),
+            ip: userIpAddress,
+            latitude: userGeoLocation.lat,
+            longitude: userGeoLocation.lon,
+            action: actionType,
+            searchQuery: queryStr
+        });
+    }
+
+    // --- Verification Access Loop Guard Routine ---
+    document.getElementById('sysAuthBtn').addEventListener('click', verifyCredentialKeys);
+    document.getElementById('sysPasswordInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyCredentialKeys(); });
+
+    function verifyCredentialKeys() {
+        const inputVal = document.getElementById('sysPasswordInput').value.trim();
+        const errEl = document.getElementById('authErr');
+        if(!inputVal) return;
+        
+        get(ref(db, 'system_security/passwords')).then((snapshot) => {
+            let cleared = false;
+            if(snapshot.exists()){
+                snapshot.forEach((child) => {
+                    if(child.val() === inputVal) cleared = true;
+                });
+            } else {
+                if(inputVal === "admin") cleared = true;
+            }
+
+            if(cleared) {
+                document.getElementById('authScreen').style.display = "none";
+                sendLogEntry("Authentication Verified Successfully", `Access Token: ${inputVal}`);
+                loadAllDataRandomly();
+                listenToCampuses();
+            } else {
+                errEl.innerText = "ACCESS REJECTED: AUTHORIZATION TOKEN KEY SIGNATURE INVALID.";
+                sendLogEntry("Failed Authentication Intrusive Attempt", `Entered Attempted key: ${inputVal}`);
+            }
+        }).catch(err => {
+            errEl.innerText = "SECURITY OVERRIDE ERROR: " + err.message;
+        });
+    }
+
+    // Navigation Tabs Control
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(this.getAttribute('data-target')).classList.add('active');
+            sendLogEntry("Tab Navigation Switched", `Target View: ${this.getAttribute('data-target')}`);
+        });
+    });
+
+    function loadAllDataRandomly() {
+        const studentsRootRef = ref(db, 'students/by_campus');
+        get(studentsRootRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                allCachedStudents = [];
+                
+                snapshot.forEach((campusSnap) => {
+                    const val = campusSnap.val();
+                    if (val && typeof val === 'object') {
+                        let hasChildren = false;
+                        campusSnap.forEach((studentSnap) => {
+                            const studentVal = studentSnap.val();
+                            if (studentVal && typeof studentVal === 'object' && (studentVal.studentName || studentVal.suc)) {
+                                allCachedStudents.push(studentVal);
+                                hasChildren = true;
+                            }
+                        });
+                        if (!hasChildren) {
+                            allCachedStudents.push(val);
+                        }
+                    }
+                });
+
+                if(allCachedStudents.length > 0) {
+                    performSearch(); 
+                } else {
+                    document.getElementById('results').innerHTML = "<p>> SYSTEM EMPTY: DATA PARSING RETURNED NO RECORDS.</p>";
+                }
+            } else {
+                document.getElementById('results').innerHTML = "<p>> SYSTEM EMPTY: NO TARGET PROFILES GENERATED YET.</p>";
+            }
+        }).catch(err => {
+            document.getElementById('results').innerHTML = "<p>> DECRYPTION FAULT: " + err.message + "</p>";
+        });
+    }
+
+    function populateCampusFilterChips(recordsMatrix) {
+        const filtersContainer = document.getElementById('campusFiltersContainer');
+        const discoveredCampuses = new Set();
+        
+        recordsMatrix.forEach(r => {
+            if (r.campus && r.campus !== 'NULL') discoveredCampuses.add(r.campus.trim());
+        });
+
+        if(activeSelectedCampus !== "ALL" && !discoveredCampuses.has(activeSelectedCampus)) {
+            activeSelectedCampus = "ALL";
+        }
+
+        filtersContainer.innerHTML = `<button class="filter-chip ${activeSelectedCampus === 'ALL' ? 'active' : ''}" data-campus="ALL">SHOW ALL MATCHES (${recordsMatrix.length})</button>`;
+        
+        discoveredCampuses.forEach(campusName => {
+            const count = recordsMatrix.filter(r => r.campus && r.campus.trim() === campusName).length;
+            const chip = document.createElement('button');
+            chip.className = `filter-chip ${activeSelectedCampus === campusName ? 'active' : ''}`;
+            chip.setAttribute('data-campus', campusName);
+            chip.innerText = `${campusName} (${count})`;
+            filtersContainer.appendChild(chip);
+        });
+
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.onclick = function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                activeSelectedCampus = this.getAttribute('data-campus');
+                sendLogEntry("Filter Campus Changed Matrix", `Campus Node: ${activeSelectedCampus}`);
+                renderResultsViewLayout(lastCalculatedSearchMatchedRecords, activeSelectedCampus === "ALL");
+            };
+        });
+    }
+
+    function listenToCampuses() {
+        const campusesRef = ref(db, 'campuses');
+        onValue(campusesRef, (snapshot) => {
+            const container = document.getElementById('campusResults');
+            container.innerHTML = "";
+            if (!snapshot.exists()) {
+                container.innerHTML = "<p>> NO REGIONAL CAMPUS ENTRIES STORED IN CORE LOGS.</p>";
+                return;
+            }
+            snapshot.forEach((childSnapshot) => {
+                const campus = childSnapshot.val();
+                const card = document.createElement('div');
+                card.className = 'card';
+                let itemsHtml = "";
+                
+                if (campus.ids && Array.isArray(campus.ids)) {
+                    campus.ids.forEach(id => { itemsHtml += `<div class="campus-id-item">> ${id}</div>`; });
+                } else if (campus.ids && typeof campus.ids === 'object') {
+                    Object.values(campus.ids).forEach(id => { itemsHtml += `<div class="campus-id-item">> ${id}</div>`; });
+                } else {
+                    itemsHtml = `<div class="campus-id-item" style="color: #666;">NO REGISTERED INDICES AVAILABLE</div>`;
+                }
+                
+                card.innerHTML = `
+                    <div class="info-badge">TOTAL PERSONS: ${campus.totalPersons || 0}</div>
+                    <h3>${campus.name || 'UNKNOWN CAMPUS'}</h3>
+                    <div style="margin-top: 15px;">
+                        <strong>[CAMPUS INDICES REGISTERED - VERTICAL LIST] :</strong>
+                        <div class="campus-ids-container">${itemsHtml}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+    }
+
+    function getSimilarity(s1, s2) {
+        let longer = s1.toLowerCase(), shorter = s2.toLowerCase();
+        if (s1.length < s2.length) { longer = s2; shorter = s1; }
+        if (longer.length === 0) return 1.0;
+        return (longer.length - editDistance(longer, shorter)) / parseFloat(longer.length);
+    }
+
+    function editDistance(s1, s2) {
+        let costs = [];
+        for (let i = 0; i <= s1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i == 0) costs[j] = j;
+                else if (j > 0) {
+                    let newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+            if (i > 0) costs[s2.length] = lastValue;
+        }
+        return costs[s2.length];
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
+    
+    function performSearch() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        
+        if (query) {
+            sendLogEntry("Student Database Search Query", query);
+        }
+
+        if (!query) {
+            let shuffled = [...allCachedStudents];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            lastCalculatedSearchMatchedRecords = shuffled.map(r => ({...r, matchPct: 100}));
+            populateCampusFilterChips(lastCalculatedSearchMatchedRecords);
+            renderResultsViewLayout(lastCalculatedSearchMatchedRecords, true);
+            return;
+        }
+
+        let filteredRecords = [];
+        allCachedStudents.forEach((data) => {
+            let maxScore = 0, isExactSubstring = false;
+            const textualFields = [
+                { val: data.suc, weight: 1.0 }, { val: data.aadhaar, weight: 1.0 },
+                { val: data.email, weight: 1.0 }, { val: data.course, weight: 1.0 },
+                { val: data.studentName, weight: 1.0 }, { val: data.mobile, weight: 1.0 },
+                { val: data.fatherName, weight: 0.95 }, { val: data.section, weight: 1.0 },
+                { val: data.gender, weight: 0.90 }, { val: data.dob, weight: 1.0 },
+                { val: data.motherName, weight: 0.95 }, { val: data.rollNo, weight: 1.0 },
+                { val: data.campus, weight: 1.0 }, { val: data.city, weight: 1.0 }
+            ];
+
+            textualFields.forEach(field => {
+                if (field.val) {
+                    const fieldStr = String(field.val).toLowerCase();
+                    if (fieldStr.includes(query)) {
+                        isExactSubstring = true;
+                        let substringScore = (query.length / fieldStr.length) * field.weight;
+                        if (substringScore < 0.75) substringScore = 0.75 * field.weight;
+                        if (substringScore > maxScore) maxScore = substringScore;
+                    } else {
+                        const fuzzyScore = getSimilarity(query, String(field.val)) * field.weight;
+                        if (fuzzyScore > maxScore) maxScore = fuzzyScore;
+                    }
+                }
+            });
+
+            const percentage = Math.round(maxScore * 100);
+            if (isExactSubstring || percentage > 25) filteredRecords.push({ ...data, matchPct: percentage });
+        });
+
+        filteredRecords.sort((a, b) => b.matchPct - a.matchPct);
+        lastCalculatedSearchMatchedRecords = filteredRecords;
+        
+        populateCampusFilterChips(lastCalculatedSearchMatchedRecords);
+        renderResultsViewLayout(lastCalculatedSearchMatchedRecords, false);
+    }
+
+    function renderResultsViewLayout(records, isDefaultView) {
+        const container = document.getElementById('results');
+        container.innerHTML = "";
+
+        const targetedDisplayRows = activeSelectedCampus === "ALL" 
+            ? records 
+            : records.filter(r => r.campus && r.campus.trim() === activeSelectedCampus);
+
+        if (targetedDisplayRows.length === 0) {
+            container.innerHTML = "<p>> MATCH PROTOCOL FAILED: NO PROFILES INSIDE THIS FILTER CATEGORY.</p>";
+            return;
+        }
+
+        targetedDisplayRows.forEach(student => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const badgeHTML = isDefaultView ? `<div class="info-badge">INDEXED</div>` : `<div class="match-badge">CONFIDENCE: ${student.matchPct}%</div>`;
+
+            card.innerHTML = `
+                ${badgeHTML}
+                <h3>${student.studentName || 'UNKNOWN ENTITY'}</h3>
+                <div class="grid">
+                    <div><strong>[SUC] :</strong> ${student.suc || 'NULL'}</div>
+                    <div><strong>[ROLL NO] :</strong> ${student.rollNo || 'NULL'}</div>
+                    <div><strong>[AADHAAR] :</strong> ${student.aadhaar || 'NULL'}</div>
+                    <div><strong>[EMAIL] :</strong> ${student.email || 'NULL'}</div>
+                    <div><strong>[MOBILE] :</strong> ${student.mobile || 'NULL'}</div>
+                    <div><strong>[COURSE] :</strong> ${student.course || 'NULL'}</div>
+                    <div><strong>[SECTION] :</strong> ${student.section || 'NULL'}</div>
+                    <div><strong>[CAMPUS] :</strong> ${student.campus || 'NULL'}</div>
+                    <div><strong>[CITY] :</strong> ${student.city || 'NULL'}</div>
+                    <div><strong>[GENDER] :</strong> ${student.gender || 'NULL'}</div>
+                    <div><strong>[DOB] :</strong> ${student.dob || 'NULL'}</div>
+                    <div><strong>[FATHER_NAME] :</strong> ${student.fatherName || 'NULL'}</div>
+                    <div><strong>[MOTHER_NAME] :</strong> ${student.motherName || 'NULL'}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+</script>
+</body>
+</html>
