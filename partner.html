@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QHP Partner Console</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-950 font-sans min-h-screen text-slate-100">
+
+    <div id="auth-container" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-slate-800 border border-slate-700 p-8 rounded-3xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-6"><h2 class="text-2xl font-black text-blue-400">QHP Partner Network</h2><p class="text-xs text-slate-400 mt-1 uppercase tracking-wider font-bold">Agent Access Node</p></div>
+            <div id="login-section">
+                <div class="mb-4"><label class="block text-slate-400 text-xs font-bold uppercase mb-2">Email or Phone</label><input type="text" id="login-identifier" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Enter credentials"></div>
+                <div class="mb-5"><label class="block text-slate-400 text-xs font-bold uppercase mb-2">Password</label><input type="password" id="login-password" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="••••••••"></div>
+                <button id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl cursor-pointer">Login as Agent</button>
+                <button id="go-to-register" class="w-full text-center text-xs text-slate-400 font-medium hover:underline mt-5 block cursor-pointer">New Agent Registration</button>
+            </div>
+            <div id="register-section" class="hidden space-y-4">
+                <h3 class="text-sm font-bold text-slate-300 uppercase">Submit Onboarding Credentials</h3>
+                <div><input type="text" id="reg-name" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Full Name"></div>
+                <div><input type="number" id="reg-age" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Age"></div>
+                <div><input type="text" id="reg-email" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Email Address"></div>
+                <div><input type="tel" id="reg-phone" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Phone Number"></div>
+                <div><input type="text" id="reg-aadhar" maxlength="12" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="12 Digit Identity Card Number"></div>
+                <div><input type="text" id="reg-pan" maxlength="10" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white uppercase" placeholder="PAN Card Number"></div>
+                <div><input type="text" id="reg-dl" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white uppercase" placeholder="Driving Licence (DL)"></div>
+                <button id="btn-submit-application" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs uppercase cursor-pointer">Submit Application</button>
+                <button id="back-to-login" class="w-full text-center text-xs text-slate-500 hover:underline mt-2 block cursor-pointer">Back to Login</button>
+            </div>
+            <div id="waiting-section" class="hidden text-center py-6"><div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div><h3 class="text-base font-bold text-white mb-2">Onboarding Verification Link Dispatched</h3></div>
+            <div id="password-setup-section" class="hidden space-y-4"><h3 class="text-base font-bold text-emerald-400 text-center">Identity Verified!</h3><div><input type="password" id="setup-password" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white" placeholder="Choose Password"></div><button id="btn-complete-setup" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer">Finalize Password</button></div>
+        </div>
+    </div>
+
+    <div id="home-container" class="hidden min-h-screen flex flex-col bg-slate-950">
+        <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center relative">
+            <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+                <span id="geo-dot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span id="geo-location-display" class="text-xs font-mono font-bold text-slate-400">Locking Agent GPS...</span>
+            </div>
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1 text-[11px] font-bold uppercase tracking-wide">
+                <button id="tab-avail-btn" class="px-3 py-1.5 rounded-lg text-white bg-blue-600 cursor-pointer">Available Open Jobs</button>
+                <button id="tab-active-btn" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer">My Progress Board</button>
+                <button id="tab-history-btn" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer">Agent History Log</button>
+            </div>
+            <div class="relative">
+                <button id="profile-menu-btn" class="w-9 h-10 bg-slate-800 border border-slate-700 text-blue-400 rounded-full flex items-center justify-center font-bold font-mono shadow-md focus:outline-none cursor-pointer">?</button>
+                <div id="profile-dropdown" class="hidden absolute right-0 mt-3 w-72 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-4 z-50 text-xs">
+                    <div class="border-b border-slate-800 pb-2 mb-3"><h4 id="prof-agent-name" class="font-black text-white text-sm">Agent Name</h4><span id="partner-status-badge" class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mt-1 inline-block">Unverified</span></div>
+                    <div class="space-y-2 font-mono text-slate-400 text-[11px]"><p class="break-all"><b>Agent UID:</b> <span id="prof-agent-uid" class="text-slate-200">Loading...</span></p><p><b>Contact Phone:</b> <span id="prof-agent-phone" class="text-slate-200">Loading...</span></p></div>
+                    <button id="btn-logout" class="w-full mt-4 bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-400 font-bold py-2 rounded-xl border border-slate-700 hover:border-red-900 transition cursor-pointer">Sign Out Account</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow p-6 overflow-y-auto max-h-[88vh]">
+            <div id="panel-avail-jobs" class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full content-start">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">🆘 Medicines & Agent Assistance Calls (20 KM)</h3>
+                    <div id="agent-helps-feed" class="space-y-3 overflow-y-auto flex-1 content-start"></div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">📦 Store Orders Delivery Feed (20 KM)</h3>
+                    <div id="agent-orders-feed" class="space-y-3 overflow-y-auto flex-1 content-start"></div>
+                </div>
+            </div>
+
+            <div id="panel-active-deliveries" class="hidden max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-full content-start">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">📋 Pipeline Ongoing Pipeline Milestones</h3>
+                <div id="active-jobs-progress-list" class="space-y-4 overflow-y-auto flex-1 content-start"></div>
+            </div>
+
+            <div id="panel-history" class="hidden max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-full content-start">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2">📜 Completed History & Log Registry</h3>
+                <div id="history-jobs-list" class="space-y-3 overflow-y-auto flex-1 content-start text-xs text-slate-400"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, update, onValue, remove, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const partnerFirebaseConfig = {
+            apiKey: "AIzaSyA1QeDf1E_Kb1ZC15ahw1dY8hk3J0gXopY",
+            authDomain: "thodu-65cb9.firebaseapp.com",
+            databaseURL: "https://thodu-65cb9-default-rtdb.firebaseio.com",
+            projectId: "thodu-65cb9",
+            storageBucket: "thodu-65cb9.firebasestorage.app",
+            messagingSenderId: "1070229943496",
+            appId: "1:1070229943496:web:038e2e74c463e7acefa1fd",
+            measurementId: "G-NF17LPGHWV"
+        };
+
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyDGI7b17RRfpgctXIVIgPtyECtUBLEcMAU",
+            databaseURL: "https://skill-bc495-default-rtdb.firebaseio.com",
+        };
+
+        const partnerApp = initializeApp(partnerFirebaseConfig, "partnerProject");
+        const userApp = initializeApp(userFirebaseConfig, "userProject");
+
+        const partnerAuth = getAuth(partnerApp);
+        const partnerDb = getDatabase(partnerApp);
+        const userDb = getDatabase(userApp);
+
+        let verificationLoopWorker = null, partnerLat = null, partnerLng = null, partnerAadharVerifiedState = "Unverified", activeAgentName = "", activeAgentPhone = "", liveListenersMap = {};
+        
+        // UPGRADE SYSTEM: Instantiates a synchronous localized workspace snapshot memory directory to block render flickers
+        let memoryCacheHelpsPosts = {};
+        let memoryCacheOrdersPosts = {};
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('go-to-register').addEventListener('click', () => showView('register'));
+            document.getElementById('back-to-login').addEventListener('click', () => showView('login'));
+            document.getElementById('btn-submit-application').addEventListener('click', executePartnerRegistrationStepOne);
+            document.getElementById('btn-complete-setup').addEventListener('click', completePartnerPasswordSetup);
+            document.getElementById('btn-login').addEventListener('click', executePartnerLogin);
+            document.getElementById('btn-logout').addEventListener('click', () => signOut(partnerAuth));
+            document.getElementById('profile-menu-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('profile-dropdown').classList.toggle('hidden'); });
+            document.addEventListener('click', () => document.getElementById('profile-dropdown').classList.add('hidden'));
+
+            document.getElementById('tab-avail-btn').addEventListener('click', () => switchInternalViewTab('avail'));
+            document.getElementById('tab-active-btn').addEventListener('click', () => switchInternalViewTab('active'));
+            document.getElementById('tab-history-btn').addEventListener('click', () => switchInternalViewTab('history'));
+        });
+
+        function switchInternalViewTab(v) {
+            const panelMap = { 'avail': 'panel-avail-jobs', 'active': 'panel-active-deliveries', 'history': 'panel-history' };
+            ['avail', 'active', 'history'].forEach(x => {
+                const btn = document.getElementById(`tab-${x}-btn`); const panel = document.getElementById(panelMap[x]);
+                if (panel) panel.classList.add('hidden'); if (btn) btn.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer";
+            });
+            const activeBtn = document.getElementById(`tab-${v}-btn`); const activePanel = document.getElementById(panelMap[v]);
+            if (activePanel) activePanel.classList.remove('hidden'); if (activeBtn) activeBtn.className = "px-3 py-1.5 rounded-lg text-white bg-blue-600 cursor-pointer";
+        }
+
+        function showView(view) {
+            document.getElementById('auth-container').classList.add('hidden'); document.getElementById('home-container').classList.add('hidden');
+            document.getElementById('login-section').classList.add('hidden'); document.getElementById('register-section').classList.add('hidden');
+            document.getElementById('waiting-section').classList.add('hidden'); document.getElementById('password-setup-section').classList.add('hidden');
+            if (view === 'home') { document.getElementById('home-container').classList.remove('hidden'); triggerAgentGPSHardwareTrack(); }
+            else { document.getElementById('auth-container').classList.remove('hidden'); document.getElementById(view + '-section').classList.remove('hidden'); }
+        }
+
+        onAuthStateChanged(partnerAuth, (user) => {
+            if (user) {
+                if (user.emailVerified) {
+                    clearInterval(verificationLoopWorker);
+                    onValue(ref(partnerDb, `partners/${user.uid}`), (snap) => {
+                        if (snap.exists()) {
+                            const data = snap.val(); if (!data.passwordConfigured) { showView('password-setup'); return; }
+                            partnerAadharVerifiedState = data.verificationStatus || "Unverified";
+                            activeAgentName = data.name || "Agent"; activeAgentPhone = data.phone || "N/A";
+                            document.getElementById('prof-agent-name').innerText = activeAgentName;
+                            document.getElementById('prof-agent-uid').innerText = data.uid;
+                            document.getElementById('prof-agent-phone').innerText = activeAgentPhone;
+                            document.getElementById('partner-status-badge').innerText = `Agent: ${partnerAadharVerifiedState}`;
+                            showView('home');
+                        }
+                    });
+                } else { showView('waiting'); startVerificationLoopTracker(user); }
+            } else { showView('login'); }
+        });
+
+        function getDistanceHaversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        }
+
+        function triggerAgentGPSHardwareTrack() {
+            navigator.geolocation.watchPosition((pos) => {
+                partnerLat = pos.coords.latitude; partnerLng = pos.coords.longitude;
+                document.getElementById('geo-location-display').innerText = `Locked: ${partnerLat.toFixed(4)}, ${partnerLng.toFixed(4)}`;
+                sync20KmRadiusLiveFeeds();
+            }, null, { enableHighAccuracy: true });
+        }
+
+        // UPGRADE STABILITY: Completely eliminated asynchronous async fetch loops inside the render engine to resolve panel flickering bugs
+        const processActiveJobsProgressPipelineRender = () => {
+            const progList = document.getElementById('active-jobs-progress-list');
+            const historyList = document.getElementById('history-jobs-list');
+            
+            progList.innerHTML = ""; 
+            historyList.innerHTML = "";
+            
+            if(!partnerAuth.currentUser) return;
+            const myUid = partnerAuth.currentUser.uid; 
+            let activeJobsCounter = 0;
+
+            // Stream from synchronous local memory state maps safely (helps)
+            Object.values(memoryCacheHelpsPosts).forEach(p => {
+                if(p.assignedAgent === myUid){
+                     if(p.status === "Approved" || p.status === "Picked Up"){ 
+                         activeJobsCounter++; 
+                         renderActiveTaskCard(p, "helps", progList); 
+                     } else if(p.status === "Delivered"){ 
+                         appendHistoryItem(p.shopName || "Medicine Emergency Run", historyList); 
+                     }
+                }
+            });
+
+            // Stream from synchronous local memory state maps safely (orders)
+            Object.values(memoryCacheOrdersPosts).forEach(o => {
+                if(o.assignedAgent === myUid){
+                    if (o.status === "Approved" || o.status === "Picked Up") { 
+                        activeJobsCounter++; 
+                        renderActiveTaskCard(o, "orders", progList); 
+                    } else if(o.status === "Delivered"){ 
+                        appendHistoryItem(o.shopName || "Unified Multi-Vendor Run", historyList); 
+                    }
+                }
+            });
+
+            if (activeJobsCounter === 0) {
+                progList.innerHTML = `<p class="text-slate-500 text-center py-8 text-xs font-medium">No active delivery assignments in progress.</p>`;
+            }
+            bindControlClickActions();
+        };
+
+        function appendHistoryItem(name, containerElement) {
+            const hDiv = document.createElement('div'); hDiv.className = "p-3 bg-slate-900 border border-slate-800 rounded-xl flex justify-between font-mono text-xs mb-1.5";
+            hDiv.innerHTML = `<span>✔ ${name}</span><span class="text-emerald-500 font-bold">Delivered</span>`;
+            containerElement.appendChild(hDiv);
+        }
+
+        function sync20KmRadiusLiveFeeds() {
+            if (!partnerLat || !partnerLng || !partnerAuth.currentUser) return;
+            Object.values(liveListenersMap).forEach(un => un());
+
+            // 1. MEDICINES & EMERGENCY ASSISTANCE PIPELINE MONITOR
+            liveListenersMap.helps = onValue(ref(userDb, 'helps_posts'), (snap) => {
+                memoryCacheHelpsPosts = snap.exists() ? snap.val() : {};
+                
+                const feed = document.getElementById('agent-helps-feed'); feed.innerHTML = "";
+                // Re-renders panels synchronously from local cache mappings instantly
+                processActiveJobsProgressPipelineRender();
+
+                if (!snap.exists()) { feed.innerHTML = `<p class="text-xs text-slate-500 p-4">No medicine assistance requests found.</p>`; return; }
+                
+                Object.values(memoryCacheHelpsPosts).forEach(p => {
+                    const dist = getDistanceHaversine(partnerLat, partnerLng, p.lat, p.lng); if (dist > 20) return;
+                    if (p.status === "Processing") {
+                        const div = document.createElement('div'); div.className = "p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-2 text-xs";
+                        div.innerHTML = `<div class="flex j
