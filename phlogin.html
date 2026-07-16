@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Hub - WhatsApp Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f9;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 5px;
+      color: #3ecf8e;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .sandbox-notice {
+      background: #eefcf6;
+      border: 1px solid #c2f5df;
+      color: #24b47e;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      text-align: left;
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+
+    .phone-input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin: 10px 0;
+      padding: 0 12px;
+      background: #fff;
+    }
+
+    .phone-input-wrapper:focus-within {
+      border-color: #3ecf8e;
+      box-shadow: 0 0 0 1px #3ecf8e;
+    }
+
+    .prefix {
+      font-size: 16px;
+      font-weight: 600;
+      color: #5f6368;
+      margin-right: 8px;
+      user-select: none;
+    }
+
+    .phone-input-wrapper input {
+      border: none;
+      padding: 12px 0;
+      margin: 0;
+      font-size: 16px;
+      outline: none;
+      width: 100%;
+    }
+
+    input[type="text"]#otp-code {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      outline: none;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    input[type="text"]#otp-code:focus {
+      border-color: #3ecf8e;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #3ecf8e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #2eaf75;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #home-screen {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+    }
+
+    header {
+      width: 100%;
+      padding: 15px 30px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #3ecf8e;
+    }
+
+    .profile-container {
+      position: relative;
+    }
+
+    .avatar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #3ecf8e;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 220px;
+      padding: 15px;
+      z-index: 100;
+      text-align: left;
+    }
+
+    .dropdown-menu p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+
+    .close-dropdown-btn {
+      background-color: #f1f3f4;
+      color: #333;
+      padding: 8px;
+      font-size: 14px;
+    }
+    
+    .close-dropdown-btn:hover {
+      background-color: #e8eaed;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f8f9fa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= AUTH SCREEN ================= -->
+  <div id="auth-screen" class="card">
+    <h2>WhatsApp OTP</h2>
+    <div class="subtitle">India Mobile Verification Only</div>
+    
+    <div class="sandbox-notice">
+      <strong>⚠️ Sandbox Step Needed:</strong><br>
+      Make sure you have messaged your Twilio sandbox text phrase to your testing sandbox router number from your WhatsApp application first.
+    </div>
+
+    <!-- Step 1: Input Phone Number -->
+    <div id="phone-input-section">
+      <div class="phone-input-wrapper">
+        <span class="prefix">+91</span>
+        <input type="tel" id="phone-number" placeholder="Enter 10-digit number" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      </div>
+      <button id="send-otp-btn">Send WhatsApp OTP</button>
+    </div>
+
+    <!-- Step 2: Input Verification Token -->
+    <div id="otp-input-section" class="hidden">
+      <p style="font-size: 14px; color: #5f6368; margin-bottom: 10px;">Enter the 6-digit code received on WhatsApp</p>
+      <input type="text" id="otp-code" placeholder="XXXXXX" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <button id="verify-otp-btn">Verify & Login</button>
+    </div>
+  </div>
+
+  <!-- ================= HOME SCREEN ================= -->
+  <div id="home-screen" class="hidden">
+    <header>
+      <div class="logo">Study Hub</div>
+      
+      <div class="profile-container">
+        <div class="avatar-btn" id="avatar-trigger">U</div>
+        
+        <div class="dropdown-menu hidden" id="profile-dropdown">
+          <strong style="display:block; margin-bottom: 4px; font-size: 15px;">User Profile</strong>
+          <p id="user-phone-display">Loading...</p>
+          <button class="close-dropdown-btn" id="close-dropdown-btn">Close</button>
+          <button style="background-color: #d93025; color: white; margin-top: 5px;" id="logout-btn">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <div style="text-align: center;">
+        <h1>Welcome to the Dashboard</h1>
+        <p style="color: #666; margin-top: 10px;">You have successfully logged in via WhatsApp OTP!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= APPLICATION LOGIC ================= -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    // Credentials initialized with exact parameters
+    const supabaseUrl = 'https://exmxyfbzpqzygjkjbqxo.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bXh5ZmJ6cHF6eWdramticXhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNDIxMzAsImV4cCI6MjA5OTcxODEzMH0.hFz6I4ahjauZS1XFHM5QNpBfSVlEqqVp34PpGgaYNtc'
+    
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const authScreen = document.getElementById('auth-screen');
+    const homeScreen = document.getElementById('home-screen');
+    const phoneInputSection = document.getElementById('phone-input-section');
+    const otpInputSection = document.getElementById('otp-input-section');
+    const phoneNumberInput = document.getElementById('phone-number');
+    const otpCodeInput = document.getElementById('otp-code');
+    const sendOtpBtn = document.getElementById('send-otp-btn');
+    const verifyOtpBtn = document.getElementById('verify-otp-btn');
+    const avatarTrigger = document.getElementById('avatar-trigger');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    const closeDropdownBtn = document.getElementById('close-dropdown-btn');
+    const userPhoneDisplay = document.getElementById('user-phone-display');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        authScreen.classList.add('hidden');
+        homeScreen.classList.remove('hidden');
+        userPhoneDisplay.textContent = session.user.phone || "No phone connected";
+      } else {
+        homeScreen.classList.add('hidden');
+        authScreen.classList.remove('hidden');
+        phoneInputSection.classList.remove('hidden');
+        otpInputSection.classList.add('hidden');
+        phoneNumberInput.value = "";
+        otpCodeInput.value = "";
+      }
+    });
+
+    sendOtpBtn.addEventListener('click', async () => {
+      const mobileDigits = phoneNumberInput.value.trim();
+      if (mobileDigits.length !== 10) {
+        alert("Please enter a valid 10-digit mobile number.");
+        return;
+      }
+
+      const formattedPhone = '+91' + mobileDigits;
+
+      const { data, error } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
+        options: {
+          channel: 'whatsapp'
+        }
+      });
+
+      if (error) {
+        console.error("Supabase Error:", error);
+        alert("Authentication failed: " + error.message);
+      } else {
+        phoneInputSection.classList.add('hidden');
+        otpInputSection.classList.remove('hidden');
+        alert("An OTP code has been sent directly to " + formattedPhone + " via WhatsApp.");
+      }
+    });
+
+    verifyOtpBtn.addEventListener('click', async () => {
+      const tokenDigits = otpCodeInput.value.trim();
+      const mobileDigits = phoneNumberInput.value.trim();
+
+      if (tokenDigits.length !== 6) {
+        alert("Please enter the complete 6-digit verification code.");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: '+91' + mobileDigits,
+        token: tokenDigits,
+        type: 'sms'
+      });
+
+      if (error) {
+        console.error("Verification Match Error:", error);
+        alert("Incorrect code. Please check your incoming WhatsApp notification channel again.");
+      } else {
+        alert("Successfully authenticated dashboard entry!");
+      }
+    });
+
+    avatarTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.toggle('hidden');
+    });
+
+    closeDropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.add('hidden');
+    });
+
+    document.addEventListener('click', () => {
+      profileDropdown.classList.add('hidden');
+    });
+
+    profileDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      profileDropdown.classList.add('hidden');
+      alert("Session closed successfully.");
+    });
+  </script>
+</body>
+</html>
