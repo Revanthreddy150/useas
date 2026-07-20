@@ -196,31 +196,18 @@
         }
 
         .profile-circle { 
-            width: 120px; 
-            height: 120px; 
-            background: #007bff; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 52px; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            color: white; 
-            margin-bottom: 10px; 
+            width: 120px; height: 120px; 
+            background: #007bff; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 52px; font-weight: bold; text-transform: uppercase; 
+            color: white; margin-bottom: 10px; 
         }
 
         .control-row { display: flex; gap: 20px; width: 100%; justify-content: center; margin-bottom: 30px; }
         .circle-btn { 
-            width: 65px; 
-            height: 65px; 
-            border-radius: 50%; 
-            background: #2c2c2e; 
-            border: none; 
-            color: white; 
-            font-size: 14px; 
-            font-weight: bold; 
-            cursor: pointer;
+            width: 65px; height: 65px; border-radius: 50%; 
+            background: #2c2c2e; border: none; color: white; 
+            font-size: 14px; font-weight: bold; cursor: pointer;
         }
 
         .circle-btn.active-mode { background: #ffffff; color: #1c1c1e; }
@@ -402,14 +389,14 @@
             peerConnection.ontrack = e => { 
                 const remoteAudio = document.getElementById('remoteAudio');
                 remoteAudio.srcObject = e.streams[0];
-                
-                // CRUCIAL ROUTING FIX: Forces default ear earpiece channel binding layout immediately when track plays
-                remoteAudio.onloadedmetadata = () => {
-                    if(window.AndroidAudio && window.AndroidAudio.toggleSpeaker) {
-                        try { window.AndroidAudio.toggleSpeaker(false); } catch(err){}
-                    }
-                };
             };
+
+            // FIX: Explicitly enforce standard earpiece routing instantly on setup
+            isSpeakerOn = false;
+            document.getElementById('speakerBtn').className = 'circle-btn';
+            if (window.AndroidAudio && window.AndroidAudio.toggleSpeaker) {
+                try { window.AndroidAudio.toggleSpeaker(false); } catch(err){}
+            }
         }
 
         window.triggerVoiceCall = async function(target) {
@@ -438,6 +425,12 @@
                         document.getElementById('stateText').innerText = 'Connected';
                         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                         runTimer();
+                        
+                        // Enforce earpiece audio mode explicitly upon active line confirmation connection
+                        if (window.AndroidAudio && window.AndroidAudio.toggleSpeaker) {
+                            try { window.AndroidAudio.toggleSpeaker(false); } catch(err){}
+                        }
+
                         onValue(ref(db, `calls/${currentCallId}/receiverCandidates`), s => {
                             s.forEach(c => peerConnection.addIceCandidate(new RTCIceCandidate(c.val())));
                         });
@@ -486,6 +479,11 @@
                     await update(callRef, { answer: { type: answer.type, sdp: answer.sdp }, status: 'connected' });
                     document.getElementById('stateText').innerText = 'Connected';
                     runTimer();
+
+                    // Enforce earpiece mode immediately for the call receiver as well
+                    if (window.AndroidAudio && window.AndroidAudio.toggleSpeaker) {
+                        try { window.AndroidAudio.toggleSpeaker(false); } catch(err){}
+                    }
                     
                     onValue(ref(db, `calls/${currentCallId}/hostCandidates`), s => {
                         s.forEach(c => peerConnection.addIceCandidate(new RTCIceCandidate(c.val())));
