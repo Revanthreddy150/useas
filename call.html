@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+        }
+
+        /* Top-Left Call Receiving UI */
+        #incomingCallBox {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: none;
+            background: #ffffff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            width: 250px;
+        }
+
+        #incomingCallBox p {
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .btn-lift {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* Main Screen styling */
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .screen { display: none; }
+        .active { display: block; }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover { background-color: #0056b3; }
+
+        .timer-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. INCOMING CALL SCREEN (TOP LEFT AS REQUESTED) -->
+    <div id="incomingCallBox">
+        <p><span id="callerName">Someone</span> is calling...</p>
+        <button class="btn-lift" id="liftBtn">Lift</button>
+    </div>
+
+    <div class="container">
+        <!-- 2. REGISTRATION SCREEN -->
+        <div id="registerScreen" class="screen active">
+            <h2>Register Account</h2>
+            <input type="text" id="usernameInput" placeholder="Enter your username...">
+            <button id="registerBtn">Register</button>
+        </div>
+
+        <!-- 3. MAIN DASHBOARD / LOAD SCREEN -->
+        <div id="mainScreen" class="screen">
+            <h2>Welcome, <span id="myUsernameDisplay">User</span></h2>
+            <p>Status: Online & Waiting</p>
+            <hr>
+            <h3>Search User to Call</h3>
+            <input type="text" id="searchBar" placeholder="Search exactly by username...">
+            <button id="callBtn">Call</button>
+
+            <!-- Call Info Display -->
+            <div id="callStatusArea" style="margin-top:20px; display:none;">
+                <p id="callStateText">Calling...</p>
+                <div class="timer-display" id="callTimer">00:00</div>
+                <button id="hangupBtn" style="background-color:#dc3545;">Hang Up</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden audio element to pipe the other person's voice into -->
+    <audio id="remoteAudio" autoplay></audio>
+
+    <!-- Load Firebase App and Realtime Database Modules directly from CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Your exact Firebase details plugged in
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+            authDomain: "useasnotes.firebaseapp.com",
+            databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
+            projectId: "useasnotes",
+            storageBucket: "useasnotes.firebasestorage.app",
+            messagingSenderId: "1066601715098",
+            appId: "1:1066601715098:web:880548e333297079d09623",
+            measurementId: "G-48C783281Y"
+        };
+
+        // Initialize App & Database
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // WebRTC Global Configuration using Google's free connection routing servers
+        const servers = {
+            iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }],
+            iceCandidatePoolSize: 10,
+        };
+
+        let peerConnection;
+        let localStream;
+        let myUsername = "";
+        let currentCallId = null;
+        let timerInterval;
+
+        // UI Element Selectors
+        const registerScreen = document.getElementById("registerScreen");
+        const mainScreen = document.getElementById("mainScreen");
+        const usernameInput = document.getElementById("usernameInput");
+        const registerBtn = document.getElementById("registerBtn");
+        const myUsernameDisplay = document.getElementById("myUsernameDisplay");
+        const searchBar = document.getElementById("searchBar");
+        const callBtn = document.getElementById("callBtn");
+        const incomingCallBox = document.getElementById("incomingCallBox");
+        const callerName = document.getElementById("callerName");
+        const liftBtn = document.getElementById("liftBtn");
+        const callStatusArea = document.getElementById("callStatusArea");
+        const callStateText = document.getElementById("callStateText");
+        const callTimer = document.getElementById("callTimer");
+        const hangupBtn = document.getElementById("hangupBtn");
+        const remoteAudio = document.getElementById("remoteAudio");
+
+        // --- ACCOUNT REGISTRATION ---
+        registerBtn.onclick = () => {
+            myUsername = usernameInput.value.trim().toLowerCase();
+            if (!myUsername) return alert("Please enter a username");
+
+            // Mark this user as registered/online in the database
+            set(ref(db, 'users/' + myUsername), {
+                online: true
+            }).then(() => {
+                myUsernameDisplay.innerText = myUsername;
+                registerScreen.classList.remove("active");
+                mainScreen.classList.add("active");
+
+                // Start checking if anyone is calling us
+                listenForIncomingCalls();
+            });
+        };
+
+        // --- INITIALIZE WEBRTC MEDIA CONNECTIONS ---
+        async function setupMedia() {
+            peerConnection = new RTCPeerConnection(servers);
+            
+            // Acquire microhpone stream
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            // Catch incoming audio track from the other peer
+            peerConnection.ontrack = (event) => {
+                remoteAudio.srcObject = event.streams[0];
+            };
+        }
+
+        // --- HOST: CALL ANOTHER USER ---
+        callBtn.onclick = async () => {
+            const targetUser = searchBar.value.trim().toLowerCase();
+            if (!targetUser) return alert("Enter a username to call");
+            if (targetUser === myUsername) return alert("You cannot call yourself");
+
+            callStatusArea.style.display = "block";
+            callStateText.innerText = "Ringing user...";
+
+            await setupMedia();
+
+            currentCallId = `${myUsername}_to_${targetUser}`;
+            const callRef = ref(db, 'calls/' + currentCallId);
+
+            // Handle ICE Candidates (Connection routes)
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    set(ref(db, `calls/${currentCallId}/hostCandidates/${Date.now()}`), event.candidate.toJSON());
+                }
+            };
+
+            // Build Offer
+            const offerDescription = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offerDescription);
+
+            // Publish call record
+            await set(callRef, {
+                host: myUsername,
+                receiver: targetUser,
+                status: "ringing",
+                offer: { type: offerDescription.type, sdp: offerDescription.sdp }
+            });
+
+            // Watch for answer or cancellation
+            onValue(callRef, async (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.status === "connected" && peerConnection.currentRemoteDescription === null) {
+                        callStateText.innerText = "Connected";
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                        startCallTimer();
+                        
+                        // Listen for their connection candidates
+                        onValue(ref(db, `calls/${currentCallId}/receiverCandidates`), (candSnapshot) => {
+                            candSnapshot.forEach((child) => {
+                                peerConnection.addIceCandidate(new RTCIceCandidate(child.val()));
+                            });
+                        });
+                    }
+                    if (data.status === "ended") {
+                        resetCallState();
+                    }
+                }
+            });
+        };
+
+        // --- RECEIVER: LISTEN FOR LIVE SYSTEM INCOMING CALLS ---
+        function listenForIncomingCalls() {
+            onValue(ref(db, 'calls'), (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const callData = childSnapshot.val();
+                    if (callData.receiver === myUsername && callData.status === "ringing") {
+                        currentCallId = childSnapshot.key;
+                        callerName.innerText = callData.host;
+                        incomingCallBox.style.display = "block"; // Appear at top-left
+                    }
+                });
+            });
+        }
+
+        // --- RECEIVER: LIFT (ANSWER) THE INCOMING CALL ---
+        liftBtn.onclick = async () => {
+            incomingCallBox.style.display = "none";
+            callStatusArea.style.display = "block";
+            callStateText.innerText = "Connecting...";
+
+            await setupMedia();
+
+            const callRef = ref(db, 'calls/' + currentCallId);
+            
+            // Read caller details
+            onValue(callRef, async (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.status === "ringing" && peerConnection.currentRemoteDescription === null) {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                    
+                    const answerDescription = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answerDescription);
+
+                    // Update call status database entry
+                    await update(callRef, {
+                        answer: { type: answerDescription.type, sdp: answerDescription.sdp },
+                        status: "connected"
+                    });
+
+                    callStateText.innerText = "Connected";
+                    startCallTimer();
+
+                    // Connect communication candidates
+                    onValue(ref(db, `calls/${currentCallId}/hostCandidates`), (candSnapshot) => {
+                        candSnapshot.forEach((child) => {
+                            peerConnection.addIceCandidate(new RTCIceCandidate(child.val()));
+                        });
+                    });
+                }
+                if (data && data.status === "ended") {
+                    resetCallState();
+                }
+            }, { onlyOnce: false });
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    set(ref(db, `calls/${currentCallId}/receiverCandidates/${Date.now()}`), event.candidate.toJSON());
+                }
+            };
+        };
+
+        // --- TIME DURATION MONITOR ---
+        function startCallTimer() {
+            clearInterval(timerInterval);
+            let totalSeconds = 0;
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                const mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+                const secs = String(totalSeconds % 60).padStart(2, '0');
+                callTimer.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        // --- END / HANG UP CALL ACTIONS ---
+        hangupBtn.onclick = async () => {
+            if (currentCallId) {
+                await update(ref(db, 'calls/' + currentCallId), { status: "ended" });
+                setTimeout(() => {
+                    remove(ref(db, 'calls/' + currentCallId));
+                }, 1000);
+            }
+            resetCallState();
+        };
+
+        function resetCallState() {
+            clearInterval(timerInterval);
+            callTimer.innerText = "00:00";
+            callStatusArea.style.display = "none";
+            incomingCallBox.style.display = "none";
+            
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnection) {
+                peerConnection.close();
+            }
+            currentCallId = null;
+        }
+    </script>
+</body>
+</html>
