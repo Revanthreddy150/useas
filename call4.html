@@ -398,14 +398,18 @@
             peerConnection = new RTCPeerConnection(servers);
             localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-            peerConnection.ontrack = e => { document.getElementById('remoteAudio').srcObject = e.streams[0]; };
             
-            // DELAY BRIDGE SYNC UNTIL AFTER SYSTEM ASSEMBLES WEB AUDIO BUFFERS TO PREVENT NOTALLOWEDERROR
-            setTimeout(() => {
-                if(window.AndroidAudio && window.AndroidAudio.toggleSpeaker) { 
-                    try { window.AndroidAudio.toggleSpeaker(false); } catch(err){}
-                }
-            }, 400);
+            peerConnection.ontrack = e => { 
+                const remoteAudio = document.getElementById('remoteAudio');
+                remoteAudio.srcObject = e.streams[0];
+                
+                // CRUCIAL ROUTING FIX: Forces default ear earpiece channel binding layout immediately when track plays
+                remoteAudio.onloadedmetadata = () => {
+                    if(window.AndroidAudio && window.AndroidAudio.toggleSpeaker) {
+                        try { window.AndroidAudio.toggleSpeaker(false); } catch(err){}
+                    }
+                };
+            };
         }
 
         window.triggerVoiceCall = async function(target) {
