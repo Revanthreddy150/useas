@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Connect Platform</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
+            padding: 0; 
+            margin: 0; 
+            background: #1c1c1e; 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            justify-content: flex-start; 
+            align-items: center; 
+        }
+
+        .view-panel { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            box-sizing: border-box; 
+            padding: 20px; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        .active-panel { display: flex; }
+
+        .header-bar { 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 5px; 
+            box-sizing: border-box; 
+            border-bottom: 1px solid #2c2c2e; 
+            margin-bottom: 15px; 
+        }
+
+        .profile-badge { 
+            background: #3a3a3c; 
+            padding: 8px 14px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            font-size: 14px; 
+            cursor: pointer; 
+        }
+
+        .love-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 20px; 
+            font-weight: bold; 
+        }
+
+        .love-btn { 
+            background: none; 
+            border: none; 
+            font-size: 24px; 
+            cursor: pointer; 
+            padding: 0; 
+            margin: 0; 
+            color: #ff2d55; 
+            width: auto; 
+        }
+
+        input, button { 
+            width: 100%; 
+            padding: 14px; 
+            margin: 8px 0; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            border: none; 
+            box-sizing: border-box; 
+        }
+
+        input { background: #2c2c2e; color: white; text-align: center; }
+        button { background: #34c759; color: white; font-weight: bold; cursor: pointer; }
+        .secondary-btn { background: #007bff; }
+        .danger-btn { background: #dc3545; color: white; font-weight: bold; margin-top: 15px; }
+
+        #toastBox { 
+            position: fixed; 
+            bottom: 50px; 
+            background: rgba(0,0,0,0.9); 
+            padding: 12px 24px; 
+            border-radius: 25px; 
+            color: white; 
+            z-index: 10000; 
+            font-size: 14px; 
+            display: none; 
+            border: 1px solid #48484a; 
+            text-align:center; 
+        }
+
+        #suggestionBox { 
+            background: #2c2c2e; 
+            border-radius: 10px; 
+            width: 100%; 
+            max-height: 200px; 
+            overflow-y: auto; 
+            text-align: left; 
+            display: none; 
+            margin-top: -5px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
+        }
+
+        .user-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 14px; 
+            border-bottom: 1px solid #3a3a3c; 
+        }
+
+        .call-action-btn { 
+            background: #007bff; 
+            width: 80px; 
+            padding: 8px; 
+            margin: 0; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            color: white; 
+            border: none; 
+        }
+
+        /* --- SCREENSHOT ACCURATE INCOMING SCREEN DESIGN --- */
+        #incomingPopup { 
+            position: fixed; 
+            top: 15px; 
+            width: 92%; 
+            max-width: 400px;
+            background: #2c2c2e; 
+            padding: 16px; 
+            border-radius: 24px; 
+            z-index: 9999; 
+            display: none; 
+            box-shadow: 0 12px 32px rgba(0,0,0,0.7); 
+            box-sizing: border-box; 
+            border: 1px solid #3a3a3c; 
+        }
+
+        .popup-body { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+        .popup-avatar { 
+            width: 56px; 
+            height: 56px; 
+            background: #8d6e63; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: white; 
+            text-transform: uppercase; 
+        }
+
+        .popup-info { display: flex; flex-direction: column; text-align: left; }
+        .popup-title { font-size: 20px; font-weight: bold; color: white; margin: 0; }
+        .popup-subtitle { font-size: 15px; color: #a1a1aa; margin: 2px 0 0 0; }
+        
+        .popup-btns { display: flex; gap: 12px; width: 100%; }
+        .popup-btns button { 
+            flex: 1; 
+            margin: 0; 
+            padding: 12px; 
+            border-radius: 25px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            border: none; 
+            color: white; 
+            cursor: pointer;
+        }
+        .decline-pill { background: #ff453a !important; }
+        .answer-pill { background: #30d158 !important; }
+
+        /* --- DIAL CALL SCREEN --- */
+        #callScreen { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: #1c1c1e; 
+            display: none; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 60px 20px; 
+            box-sizing: border-box; 
+            z-index: 9998; 
+        }
+
+        .profile-circle { 
+            width: 120px; 
+            height: 120px; 
+            background: #007bff; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 52px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            color: white; 
+            margin-bottom: 10px; 
+        }
+
+        .control-row { display: flex; gap: 20px; width: 100%; justify-content: center; margin-bottom: 30px; }
+        .circle-btn { 
+            width: 65px; 
+            height: 65px; 
+            border-radius: 50%; 
+            background: #2c2c2e; 
+            border: none; 
+            color: white; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer;
+        }
+
+        .circle-btn.active-mode { background: #ffffff; color: #1c1c1e; }
+        .hangup-btn { background: #dc3545 !important; width: 75px !important; height: 75px !important; border-radius: 50%; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="toastBox">Notification Message</div>
+
+    <!-- 1. POPUP CALL INCOMING DISPLAY SHEET -->
+    <div id="incomingPopup">
+        <div class="popup-body">
+            <div class="popup-avatar" id="popupLettCircle">-</div>
+            <div class="popup-info">
+                <div class="popup-title" id="popupCallerName">User</div>
+                <div class="popup-subtitle">Incoming call</div>
+            </div>
+        </div>
+        <div class="popup-btns">
+            <button class="decline-pill" onclick="rejectIncomingCall()">Decline</button>
+            <button class="answer-pill" onclick="liftCall()">Answer</button>
+        </div>
+    </div>
+
+    <!-- 2. SYSTEM ACCOUNT AUTHENTICATION ROUTINES PANEL -->
+    <div id="authPanel" class="view-panel active-panel">
+        <h2>Voice Gateway</h2>
+        <input type="text" id="authUsername" placeholder="Enter username">
+        <input type="password" id="authPassword" placeholder="Enter password">
+        <button onclick="handleLogin()">Login Account</button>
+        <button onclick="handleRegister()" class="secondary-btn">Create Account</button>
+    </div>
+
+    <!-- 3. CENTRAL USER HOME DASHBOARD PANEL -->
+    <div id="dashboardPanel" class="view-panel" style="justify-content: flex-start;">
+        <div class="header-bar">
+            <div class="love-container">
+                <span id="userHeadline">Username</span>
+                <button class="love-btn" onclick="toggleLove()">❤️</button>
+            </div>
+            <div class="profile-badge" onclick="showProfileInfo()" id="topRightProfile">Profile</div>
+        </div>
+        <input type="text" id="searchBar" oninput="executeSearchFilter()" placeholder="Search users...">
+        <div id="suggestionBox"></div>
+        <button onclick="handleLogout()" class="danger-btn">Logout Account</button>
+    </div>
+
+    <!-- 4. TELEPHONY IN-CALL OVERLAY LAYOUT -->
+    <div id="callScreen">
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top:40px;">
+            <div class="profile-circle" id="avatarCircle">-</div>
+            <div style="font-size:28px; font-weight:500; margin:10px 0;" id="remoteNameText">Target</div>
+            <div style="font-size:16px; color:#a1a1aa;" id="stateText">Ringing...</div>
+            <div style="font-size:22px; font-weight:bold; margin-top:10px;" id="callTimer">00:00</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+            <div class="control-row">
+                <button class="circle-btn" id="micBtn" onclick="toggleMic()">Mute</button>
+                <button class="circle-btn" id="speakerBtn" onclick="toggleSpeaker()">Speaker</button>
+            </div>
+            <button class="hangup-btn" onclick="hangupCall()">End</button>
+        </div>
+    </div>
+
+    <!-- Pipeline layer streams routing node -->
+    <audio id="remoteAudio" autoplay></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update, remove, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Verified Firebase configuration parameters
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+            authDomain: "useasnotes.firebaseapp.com",
+            databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
+            projectId: "useasnotes",
+            storageBucket: "useasnotes.firebasestorage.app",
+            messagingSenderId: "1066601715098",
+            appId: "1:1066601715098:web:880548e333297079d09623"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }], iceCandidatePoolSize: 10 };
+        
+        let peerConnection, localStream, myUsername = '', currentCallId = null, timerInterval;
+        let isMuted = false, isSpeakerOn = false;
+
+        function showToast(msg) {
+            const t = document.getElementById('toastBox');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        // AUTO SIGN-IN VALIDATION
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('saved_username');
+            if(savedUser) { enterAppDashboard(savedUser); }
+        });
+
+        window.handleRegister = function() {
+            const u = document.getElementById('authUsername').value.trim().toLowerCase();
+            const p = document.getElementById('authPassword').value.trim();
+            if(!u || !p) return showToast('Enter username and password');
+            
+            const accountRef = ref(db, 'accounts/' + u);
+            get(accountRef).then((snap) => {
+                if(snap.exists()) { showToast('The username is taken, try a new one'); }
+                else {
+                    set(accountRef, { username: u, password: p }).then(() => {
+                        showToast('Account successfully created!');
+                        localStorage.setItem('saved_username', u);
+                        enterAppDashboard(u);
+                    });
+                }
+            });
+        };
+
+        window.handleLogin = function() {
+            const u = document.getElementById('authUsername').value.trim().toLowerCase();
+            const p = document.getElementById('authPassword').value.trim();
+            if(!u || !p) return showToast('Fill all fields');
+            
+            get(child(ref(db), 'accounts/' + u)).then((snap) => {
+                if(snap.exists() && snap.val().password === p) {
+                    localStorage.setItem('saved_username', u);
+                    enterAppDashboard(u);
+                } else { showToast('Invalid credentials'); }
+            });
+        };
+
+        window.handleLogout = function() {
+            localStorage.removeItem('saved_username');
+            myUsername = '';
+            document.getElementById('dashboardPanel').classList.remove('active-panel');
+            document.getElementById('authPanel').classList.add('active-panel');
+            document.getElementById('authUsername').value = '';
+            document.getElementById('authPassword').value = '';
+            showToast('Logged out');
+        };
+
+        function enterAppDashboard(username) {
+            myUsername = username;
+            document.getElementById('userHeadline').innerText = myUsername;
+            document.getElementById('topRightProfile').innerText = myUsername.substring(0,2).toUpperCase();
+            document.getElementById('authPanel').classList.remove('active-panel');
+            document.getElementById('dashboardPanel').classList.add('active-panel');
+            
+            // Start targeted isolated path checking
+            listenForIncomingCalls();
+        }
+
+        window.showProfileInfo = function() { showToast('Profile account: ' + myUsername); };
+        window.toggleLove = function() { showToast('You sent love from your account!'); };
+
+        window.executeSearchFilter = function() {
+            const q = document.getElementById('searchBar').value.trim().toLowerCase();
+            const box = document.getElementById('suggestionBox');
+            box.innerHTML = '';
+            if(!q) { box.style.display = 'none'; return; }
+            
+            get(child(ref(db), 'accounts')).then((snap) => {
+                if(snap.exists()) {
+                    let count = 0;
+                    snap.forEach((childSnap) => {
+                        const userKey = childSnap.key;
+                        if(userKey.includes(q) && userKey !== myUsername) {
+                            count++;
+                            let row = document.createElement('div');
+                            row.className = 'user-row';
+                            row.innerHTML = `<span>${userKey}</span><button class="call-action-btn" id="btn_${userKey}">Call</button>`;
+                            box.appendChild(row);
+                            document.getElementById(`btn_${userKey}`).onclick = () => triggerVoiceCall(userKey);
+                        }
+                    });
+                    box.style.display = count > 0 ? 'block' : 'none';
+                }
+            });
+        };
+
+        async function setupMedia() {
+            peerConnection = new RTCPeerConnection(servers);
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            peerConnection.ontrack = e => { document.getElementById('remoteAudio').srcObject = e.streams[0]; };
+        }
+
+        // HOST CALL DISPATCH PIPELINE
+        window.triggerVoiceCall = async function(target) {
+            document.getElementById('suggestionBox').style.display = 'none';
+            loadCallingUI(target, 'Ringing...');
+            await setupMedia();
+            
+            currentCallId = `${myUsername}_to_${target}`;
+            const callRef = ref(db, 'calls/' + currentCallId);
+            const targetInboxRef = ref(db, 'incomingCall/' + target);
+
+            peerConnection.onicecandidate = e => {
+                if(e.candidate) set(ref(db, `calls/${currentCallId}/hostCandidates/${Date.now()}`), e.candidate.toJSON());
+            };
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            
+            // Post main handshake packet
+            await set(callRef, { host: myUsername, receiver: target, status: 'ringing', offer: { type: offer.type, sdp: offer.sdp } });
+            
+            // Set targeted notification alert to bypass massive snapshot indexing delays
+            await set(targetInboxRef, { activeCallId: currentCallId, host: myUsername });
+
+            // Monitor state modifications
+            onValue(callRef, async snapshot => {
+                const data = snapshot.val();
+                if(data) {
+                    if(data.status === 'connected' && !peerConnection.currentRemoteDescription) {
+                        document.getElementById('stateText').innerText = 'Connected';
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                        runTimer();
+                        onValue(ref(db, `calls/${currentCallId}/receiverCandidates`), s => {
+                            s.forEach(c => peerConnection.addIceCandidate(new RTCIceCandidate(c.val())));
+                        });
+                    }
+                    if(data.status === 'busy') {
+                        document.getElementById('stateText').innerText = 'Busy';
+                        setTimeout(() => resetCall(), 2500);
+                    }
+                    if(data.status === 'ended') resetCall();
+                }
+            });
+        };
+
+        // TARGETED PROFILE PATH SINGLE ENTRY LISTENER
+        function listenForIncomingCalls() {
+            const myInboxRef = ref(db, 'incomingCall/' + myUsername);
+            onValue(myInboxRef, snapshot => {
+                const callData = snapshot.val();
+                if(callData && callData.activeCallId) {
+                    currentCallId = callData.activeCallId;
+                    document.getElementById('popupCallerName').innerText = callData.host;
+                    document.getElementById('popupLettCircle').innerText = callData.host.charAt(0);
+                    document.getElementById('incomingPopup').style.display = 'block';
+
+                    // PUSH HOOK ROUTINE TO EMIT INITIATIONS DIRECTLY TO NATIVE SKETCHWARE APPLICATION
+                    if (window.AndroidAudio && window.AndroidAudio.triggerNativeNotification) {
+                        window.AndroidAudio.triggerNativeNotification(callData.host);
+                    }
+                } else {
+                    document.getElementById('incomingPopup').style.display = 'none';
+                }
+            });
+        }
+
+        // PULL/ANSWER MECHANICS
+        window.liftCall = async function() {
+            document.getElementById('incomingPopup').style.display = 'none';
+            loadCallingUI(document.getElementById('popupCallerName').innerText, 'Connecting...');
+            await setupMedia();
+            
+            const callRef = ref(db, 'calls/' + currentCallId);
+            onValue(callRef, async snapshot => {
+                const data = snapshot.val();
+                if(data && data.status === 'ringing' && !peerConnection.currentRemoteDescription) {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    
+                    await update(callRef, { answer: { type: answer.type, sdp: answer.sdp }, status: 'connected' });
+                    document.getElementById('stateText').innerText = 'Connected';
+                    runTimer();
+                    
+                    onValue(ref(db, `calls/${currentCallId}/hostCandidates`), s => {
+                        s.forEach(c => peerConnection.addIceCandidate(new RTCIceCandidate(c.val())));
+                    });
+                }
+                if(data && data.status === 'ended') resetCall();
+            }, { onlyOnce: false });
+
+            peerConnection.onicecandidate = e => {
+                if(e.candidate) set(ref(db, `calls/${currentCallId}/receiverCandidates/${Date.now()}`), e.candidate.toJSON());
+            };
+        };
+
+        window.rejectIncomingCall = async function() {
+            document.getElementById('incomingPopup').style.display = 'none';
+            if(currentCallId) { await update(ref(db, 'calls/' + currentCallId), { status: 'busy' }); }
+            await remove(ref(db, 'incomingCall/' + myUsername));
+            setTimeout(() => resetCall(), 1000);
+        };
+
+        function loadCallingUI(name, text) {
+            document.getElementById('remoteNameText').innerText = name;
+            document.getElementById('avatarCircle').innerText = name.charAt(0);
+            document.getElementById('stateText').innerText = text;
+            document.getElementById('callScreen').style.display = 'flex';
+        }
+
+        window.toggleMic = function() {
+            isMuted = !isMuted;
+            localStream.getAudioTracks()[0].enabled = !isMuted;
+            document.getElementById('micBtn').className = isMuted ? 'circle-btn active-mode' : 'circle-btn';
+            document.getElementById('micBtn').innerText = isMuted ? 'Muted' : 'Mute';
+            if(window.AndroidAudio) window.AndroidAudio.toggleMute(isMuted);
+        };
+
+        window.toggleSpeaker = function() {
+            isSpeakerOn = !isSpeakerOn;
+            document.getElementById('speakerBtn').className = isSpeakerOn ? 'circle-btn active-mode' : 'circle-btn';
+            if(window.AndroidAudio) window.AndroidAudio.toggleSpeaker(isSpeakerOn);
+        };
+
+        function runTimer() {
+            let s = 0; 
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                s++;
+                document.getElementById('callTimer').innerText = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+            }, 1000);
+        }
+
+        window.hangupCall = async function() {
+            if(currentCallId) {
+                await update(ref(db, 'calls/' + currentCallId), { status: "ended" });
+                const targetUser = document.getElementById('remoteNameText').innerText.trim().toLowerCase();
+                await remove(ref(db, 'incomingCall/' + targetUser));
+                setTimeout(() => remove(ref(db, 'calls/' + currentCallId)), 1000);
+            }
+            resetCall();
+        };
+
+        function resetCall() {
+            clearInterval(timerInterval);
+            document.getElementById('callTimer').innerText = '00:00';
+            document.getElementById('callScreen').style.display = 'none';
+            document.getElementById('incomingPopup').style.display = 'none';
+            isMuted = false; isSpeakerOn = false;
+            document.getElementById('micBtn').className = 'circle-btn';
+            document.getElementById('micBtn').innerText = 'Mute';
+            document.getElementById('speakerBtn').className = 'circle-btn';
+            
+            // Clean dynamic structures
+            remove(ref(db, 'incomingCall/' + myUsername));
+            
+            if(window.AndroidAudio) { window.AndroidAudio.toggleMute(false); window.AndroidAudio.toggleSpeaker(false); }
+            if(localStream) localStream.getTracks().forEach(t => t.stop());
+            if(peerConnection) peerConnection.close();
+            currentCallId = null;
+        }
+    </script>
+</body>
+</html>
