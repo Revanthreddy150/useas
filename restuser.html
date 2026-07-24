@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QHP AdminHQ Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+        body { background:#0f172a; color:#f8fafc; padding:30px; min-height: 100vh; }
+        
+        #admin-lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f172a; z-index: 10000; display: flex; justify-content: center; align-items: center;
+        }
+        .lock-card {
+            background: #1e293b; border: 1px solid #334155; padding: 40px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center;
+        }
+
+        .header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:20px; margin-bottom:30px; gap: 20px; }
+        .header-left h1 { color:#38bdf8; font-size: 26px; }
+        .header-left p { color:#94a3b8; font-size:14px; margin-top: 4px; }
+        
+        .admin-location-display {
+            display: flex; align-items: center; gap:8px; background: #1e293b; padding: 10px 18px; border-radius: 30px;
+            border: 1px solid #334155; font-size: 13px; font-weight: bold; color: #38bdf8; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .admin-location-display i { color: #ef4444; font-size: 14px; }
+        .admin-location-spinner {
+            display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(56,189,248,0.2);
+            border-top: 2px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+        .tabs { display:flex; gap:15px; margin-bottom:25px; border-bottom:1px solid #334155; padding-bottom:10px; overflow-x: auto; }
+        .tab-btn { background:none; border:none; color:#94a3b8; font-size:16px; font-weight:bold; cursor:pointer; padding:8px 16px; transition:.2s; white-space: nowrap; }
+        .tab-btn.active { color:#38bdf8; border-bottom:3px solid #38bdf8; }
+        .grid { display:grid; grid-template-columns: 1fr; gap:25px; }
+        .panel { background:#1e293b; padding:25px; border-radius:12px; border:1px solid #334155; box-shadow:0 10px 20px rgba(0,0,0,0.2); }
+        .panel h3 { color:#38bdf8; margin-bottom:20px; font-size:18px; }
+        
+        .hotline-control-row { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; background:#0f172a; padding:20px; border-radius:8px; border:1px solid #334155; }
+        .hotline-control-row label { font-size:14px; font-weight:bold; color:#f8fafc; }
+        .hotline-control-row input, .hotline-control-row select { background:#1e293b; border:1px solid #475569; padding:12px; border-radius:6px; color:#fff; font-size:14px; outline:none; }
+        .hotline-control-row input:focus { border-color:#38bdf8; }
+
+        .data-card { background:#0f172a; padding:15px; border-radius:8px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border:1px solid #334155; }
+        .info-block span { font-size:16px; font-weight:bold; color:#f1f5f9; }
+        .info-block p { font-size:13px; color:#94a3b8; margin-top:4px; }
+        
+        .btn { padding:10px 18px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:13px; transition:.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { background:#0284c7; color:#fff; }
+        .btn-primary:hover:not(:disabled) { background:#0369a1; }
+        .btn-approve { background:#16a34a; color:#fff; }
+        .btn-approve:hover { background:#15803d; }
+        .btn-reject { background:#dc2626; color:#fff; }
+        .btn-reject:hover { background:#b91c1c; }
+        .btn-inspect { background:#0284c7; color:#fff; }
+        
+        .btn-google {
+            background: #ffffff; color: #1e293b; width: 100%; padding: 14px; 
+            border-radius: 8px; font-size: 14px; justify-content: center;
+            border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-google:hover:not(:disabled) { background: #f1f5f9; }
+        .btn-google i { color: #ea4335; font-size: 16px; }
+
+        .status-tag { padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; text-transform:uppercase; }
+        .status-pending { background:#f59e0b; color:#7c2d12; }
+        .status-approved { background:#16a34a; color:#dcfce7; }
+        .status-rejected { background:#ef4444; color:#fee2e2; }
+        
+        .type-tag { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-left: 8px; display: inline-flex; align-items: center; gap: 4px; }
+        .type-food { background: #ff9800; color: #fff; }
+        .type-med { background: #2962ff; color: #fff; }
+        .type-parcel { background: #9c27b0; color: #fff; }
+
+        .modal { display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
+        .modal.show { display:flex; }
+        .modal-content { background:#1e293b; padding:30px; border-radius:12px; width:90%; max-width:600px; border:1px solid #334155; max-height:85vh; overflow-y:auto; }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #334155; padding-bottom:10px; }
+        .close { font-size:24px; color:#94a3b8; cursor:pointer; }
+
+        .view-layer { display:none; }
+        .view-layer.active-layer { display:block; }
+
+        /* Dynamic Item Builder Row */
+        .item-builder-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .item-builder-row input { flex: 1; background:#0f172a; border:1px solid #475569; padding:8px 12px; border-radius:6px; color:#fff; font-size:13px; }
+    </style>
+</head>
+<body>
+
+    <div id="admin-lock-screen">
+        <div class="lock-card">
+            <i class="fas fa-shield-halved" style="font-size: 48px; color: #38bdf8; margin-bottom: 15px;"></i>
+            <h2 style="color: #fff; margin-bottom: 8px;">Terminal Locked</h2>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 28px;">Identity validation required. Please log in using your corporate Google administrative account.</p>
+            <button id="btn-submit-lock" class="btn btn-google" onclick="executeAttemptAdminGoogleUnlock()">
+                <i class="fab fa-google"></i> Sign in with Google
+            </button>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>QHP Master Control Center</h1>
+            <p>Ecosystem Directory & Verification Board</p>
+        </div>
+        <div class="admin-location-display">
+            <i class="fas fa-location-dot"></i>
+            <span id="adminGeoSpinner" class="admin-location-spinner"></span>
+            <span id="adminAreaText">Tracking Terminal Geolocation...</span>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="nav-users" onclick="switchAdminTab('users')"><i class="fas fa-users"></i> Customers Roll</button>
+        <button class="tab-btn" id="nav-partners" onclick="switchAdminTab('partners')"><i class="fas fa-id-card-clip"></i> Fleet Partners</button>
+        <button class="tab-btn" id="nav-restaurants" onclick="switchAdminTab('restaurants')"><i class="fas fa-utensils"></i> Restaurants Hub</button>
+        <button class="tab-btn" id="nav-hotlines" onclick="switchAdminTab('hotlines')"><i class="fas fa-phone-square"></i> Hotline Matrix</button>
+        <button class="tab-btn" id="nav-upi" onclick="switchAdminTab('upi')"><i class="fas fa-qrcode"></i> Admin UPI Hub</button>
+    </div>
+
+    <div class="grid">
+        <div id="layer-users" class="panel view-layer active-layer">
+            <h3>Registered Users Matrix</h3>
+            <div id="admin-users-list"><p style="color:#94a3b8;">Syncing customers records...</p></div>
+        </div>
+        
+        <div id="layer-partners" class="panel view-layer">
+            <h3>Fleet Verification Registry</h3>
+            <div id="admin-partners-list"><p style="color:#94a3b8;">Syncing fleet profiles...</p></div>
+        </div>
+
+        <div id="layer-restaurants" class="panel view-layer">
+            <h3>Restaurant Management Portal</h3>
+            <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Add new restaurants and assign menu items mapped to targeted service cities.</p>
+
+            <div class="hotline-control-row">
+                <label><i class="fas fa-store" style="color:#ff9800;"></i> Restaurant Name</label>
+                <input type="text" id="adm-res-name" placeholder="e.g., Spice Palace">
+            </div>
+
+            <div class="hotline-control-row">
+                <label><i class="fas fa-city" style="color:#38bdf8;"></i> Target City / Region Coverage</label>
+                <input type="text" id="adm-res-city" placeholder="e.g., Rajahmundry (Covers nearby villages automatically)">
+            </div>
+
+            <div class="hotline-control-row">
+                <label><i class="fas fa-image" style="color:#16a34a;"></i> Banner Image URL</label>
+                <input type="text" id="adm-res-image" placeholder="https://images.unsplash.com/photo-...">
+            </div>
+
+            <div class="hotline-control-row">
+                <label><i class="fas fa-list-check" style="color:#eab308;"></i> Add Menu Items</label>
+                <div id="menu-items-builder-container">
+                    <div class="item-builder-row">
+                        <input type="text" class="item-name" placeholder="Item Name (e.g. Chicken Biryani)">
+                        <input type="number" class="item-price" placeholder="Price (₹)">
+                        <input type="text" class="item-img" placeholder="Item Image URL">
+                    </div>
+                </div>
+                <button class="btn btn-inspect" style="margin-top:10px; width: fit-content;" onclick="addMoreMenuItemRow()"><i class="fas fa-plus"></i> Add Item Row</button>
+            </div>
+
+            <button class="btn btn-primary" style="padding:12px 24px; background:#16a34a;" onclick="executeSaveNewRestaurant()"><i class="fas fa-plus-circle"></i> Save Restaurant & Items</button>
+
+            <h3 style="margin-top: 40px;">Active Listed Restaurants</h3>
+            <div id="admin-restaurants-list"><p style="color:#94a3b8;">Loading restaurants...</p></div>
+        </div>
+
+        <div id="layer-hotlines" class="panel view-layer">
+            <h3>System Hotline Service Controllers</h3>
+            <div class="hotline-control-row">
+                <label><i class="fas fa-utensils" style="color:#ff9800;"></i> Food Services Hotline Endpoint</label>
+                <input type="text" id="adm-hotline-food" placeholder="Provide number or leave empty to hide banner">
+            </div>
+            <div class="hotline-control-row">
+                <label><i class="fas fa-pills" style="color:#2962ff;"></i> Medicine Services Hotline Endpoint</label>
+                <input type="text" id="adm-hotline-medicine" placeholder="Provide number or leave empty to hide banner">
+            </div>
+            <div class="hotline-control-row">
+                <label><i class="fas fa-box" style="color:#9c27b0;"></i> Express Parcel Services Hotline Endpoint</label>
+                <input type="text" id="adm-hotline-parcel" placeholder="Provide number or leave empty to hide banner">
+            </div>
+            <button class="btn btn-primary" style="padding:12px 24px;" onclick="executeSaveHotlineMatrix()"><i class="fas fa-save"></i> Save Hotline Configurations</button>
+        </div>
+
+        <div id="layer-upi" class="panel view-layer">
+            <h3>Central UPI Route Gateway Configuration</h3>
+            <div class="hotline-control-row">
+                <label><i class="fas fa-qrcode" style="color:#38bdf8;"></i> Target Corporate UPI ID Address Reference</label>
+                <input type="text" id="adminHostedUpiInputField" placeholder="e.g., companyname@okaxis">
+            </div>
+            <button class="btn btn-primary" style="padding:12px 24px; background-color: #16a34a;" onclick="executeSaveCentralUPIGatewayLink()"><i class="fas fa-cloud-arrow-up"></i> Update Gateway UPI VPA</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+            authDomain: "studyhub-33164.firebaseapp.com",
+            databaseURL: "https://studyhub-33164-default-rtdb.firebaseio.com",
+            projectId: "studyhub-33164",
+            storageBucket: "studyhub-33164.firebasestorage.app",
+            messagingSenderId: "918352715015",
+            appId: "1:918352715015:web:f92d94cb0ac679d432b9a2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let adminLat = 12.9716, adminLng = 77.5946;
+
+        window.switchAdminTab = function(targetLayer) {
+            document.querySelectorAll('.view-layer').forEach(l => l.classList.remove('active-layer'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`layer-${targetLayer}`).classList.add('active-layer');
+            document.getElementById(`nav-${targetLayer}`).classList.add('active');
+        };
+
+        window.executeAttemptAdminGoogleUnlock = async function() {
+            const authBtn = document.getElementById('btn-submit-lock');
+            authBtn.disabled = true;
+            try {
+                const result = await signInWithPopup(auth, provider);
+                if (result.user.email && result.user.email.toLowerCase() === 'revanthreddy5292m@gmail.com') {
+                    document.getElementById('admin-lock-screen').style.display = "none";
+                    loadMainDatabaseStreams();
+                } else {
+                    await signOut(auth);
+                    authBtn.disabled = false;
+                    alert(`Access Denied: Account (${result.user.email}) unauthorized.`);
+                }
+            } catch (err) {
+                authBtn.disabled = false;
+                alert("Security handshake fault during Google popup setup.");
+            }
+        };
+
+        window.addMoreMenuItemRow = function() {
+            const container = document.getElementById('menu-items-builder-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'item-builder-row';
+            newRow.innerHTML = `
+                <input type="text" class="item-name" placeholder="Item Name">
+                <input type="number" class="item-price" placeholder="Price (₹)">
+                <input type="text" class="item-img" placeholder="Item Image URL">
+            `;
+            container.appendChild(newRow);
+        };
+
+        window.executeSaveNewRestaurant = function() {
+            const name = document.getElementById('adm-res-name').value.trim();
+            const city = document.getElementById('adm-res-city').value.trim();
+            const image = document.getElementById('adm-res-image').value.trim();
+
+            if(!name || !city) return alert("Please specify Restaurant Name and City!");
+
+            const itemRows = document.querySelectorAll('.item-builder-row');
+            let itemsArray = [];
+            itemRows.forEach(row => {
+                const iName = row.querySelector('.item-name').value.trim();
+                const iPrice = row.querySelector('.item-price').value.trim();
+                const iImg = row.querySelector('.item-img').value.trim();
+                if(iName && iPrice) {
+                    itemsArray.push({
+                        name: iName,
+                        price: parseFloat(iPrice),
+                        image: iImg || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
+                    });
+                }
+            });
+
+            const resId = "RES" + Date.now();
+            const payload = {
+                id: resId,
+                name: name,
+                city: city.toLowerCase(),
+                image: image || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
+                items: itemsArray
+            };
+
+            set(ref(db, `restaurants/${resId}`), payload).then(() => {
+                alert("Restaurant and Menu successfully saved!");
+                document.getElementById('adm-res-name').value = '';
+                document.getElementById('adm-res-city').value = '';
+                document.getElementById('adm-res-image').value = '';
+                document.getElementById('menu-items-builder-container').innerHTML = `
+                    <div class="item-builder-row">
+                        <input type="text" class="item-name" placeholder="Item Name">
+                        <input type="number" class="item-price" placeholder="Price (₹)">
+                        <input type="text" class="item-img" placeholder="Item Image URL">
+                    </div>`;
+            });
+        };
+
+        function loadMainDatabaseStreams() {
+            onValue(ref(db, 'restaurants'), snapshot => {
+                const container = document.getElementById('admin-restaurants-list');
+                let htmlStr = "";
+                snapshot.forEach(child => {
+                    const r = child.val();
+                    htmlStr += `
+                        <div class="data-card">
+                            <div class="info-block">
+                                <span style="color:#38bdf8;">${r.name} (${r.city.toUpperCase()})</span>
+                                <p style="color:#cbd5e1;">Items: ${r.items ? r.items.length : 0} dished offered</p>
+                            </div>
+                            <button class="btn btn-reject" onclick="deleteRestaurantRecord('${r.id}')"><i class="fas fa-trash"></i> Delete</button>
+                        </div>`;
+                });
+                container.innerHTML = htmlStr || `<p style="color:#94a3b8;">No restaurants registered.</p>`;
+            });
+
+            onValue(ref(db, 'users'), snapshot => {
+                const container = document.getElementById('admin-users-list');
+                let htmlStr = "";
+                snapshot.forEach(child => {
+                    const u = child.val();
+                    htmlStr += `<div class="data-card"><div class="info-block"><span>${u.fullName}</span><p>${u.email}</p></div></div>`;
+                });
+                container.innerHTML = htmlStr;
+            });
+        }
+
+        window.deleteRestaurantRecord = function(resId) {
+            if(confirm("Are you sure you want to delete this restaurant?")) {
+                remove(ref(db, `restaurants/${resId}`));
+            }
+        };
+    </script>
+</body>
+</html>
