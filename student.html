@@ -12,7 +12,7 @@
             color: #333;
         }
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: auto;
             background: white;
             padding: 25px;
@@ -22,57 +22,146 @@
         h2 {
             text-align: center;
             color: #1a73e8;
+            margin-bottom: 8px;
+        }
+        .count-info {
+            text-align: center;
             margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #666;
         }
         #searchInput {
             width: 100%;
             padding: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             border: 2px solid #dfe1e5;
             border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
         #searchInput:focus {
             border-color: #1a73e8;
             outline: none;
+            box-shadow: 0 0 8px rgba(26, 115, 232, 0.2);
         }
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 600px;
+
+        /* Card Grid Layout */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
+
+        /* Card with subtle lift & glow animation */
+        .student-card {
+            background: #ffffff;
+            border: 1px solid #ededed;
+            border-left: 5px solid #1a73e8;
+            border-radius: 8px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-left-color 0.25s ease;
+            animation: fadeIn 0.4s ease;
         }
-        th, td {
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid #ededed;
+
+        .student-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.1);
+            border-left-color: #1557b0;
         }
-        th {
-            background-color: #1a73e8;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 1;
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f2f5;
+            padding-bottom: 8px;
         }
-        tr:hover {
-            background-color: #f8f9fa;
+
+        .roll-badge {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            font-weight: 700;
+            font-size: 0.85em;
+            padding: 3px 10px;
+            border-radius: 4px;
         }
+
+        .hallticket-tag {
+            font-family: monospace;
+            background: #e6f4ea;
+            color: #137333;
+            font-weight: 700;
+            font-size: 0.9em;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .student-name {
+            font-size: 1.05em;
+            font-weight: 700;
+            color: #202124;
+            line-height: 1.35;
+            min-height: 42px;
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            word-break: break-word;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #777;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            color: #333;
+            text-align: right;
+        }
+
+        .detail-value a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .detail-value a:hover {
+            text-decoration: underline;
+        }
+
         .no-results {
             display: none;
             text-align: center;
             padding: 30px;
             color: #d93025;
             font-weight: bold;
+            grid-column: 1 / -1;
         }
-        .count-info {
-            margin-bottom: 10px;
-            font-size: 0.9em;
-            color: #666;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -81,103 +170,565 @@
 <div class="container">
     <h2>Class Student Directory</h2>
     <div class="count-info">Total Students: 41 (Roll 21 excluded)</div>
-    
-    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search by Roll No, Name, or Phone Number...">
 
-    <div class="table-wrapper">
-        <table id="studentTable">
-            <thead>
-                <tr>
-                    <th>Roll No</th>
-                    <th>SUC</th>
-                    <th>Student Name</th>
-                    <th>Email</th>
-                    <th>Phone No</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>1</td><td>2546640703</td><td>SAI GANESH LAVETI</td><td>siddhul7852@gmail.com</td><td>9133944606</td></tr>
-                <tr><td>2</td><td>2546640367</td><td>DANDI SIVA GANESH SIRIMALLA</td><td>siva2005@gmail.com</td><td>9347634739</td></tr>
-                <tr><td>3</td><td>2546640067</td><td>REVANTH SAI KUMAR REDDY MALLIDI</td><td>revanthreddy5292m@gmail.com</td><td>8247584384</td></tr>
-                <tr><td>4</td><td>2546640075</td><td>CHANDRAHASA VENKAT PITHAPURAPU</td><td>venkatachandra372@gmail.com</td><td>8328646158</td></tr>
-                <tr><td>5</td><td>2546640171</td><td>RISHITHA AMPOLU</td><td>rishithaampolu@gmail.com</td><td>9989089677</td></tr>
-                <tr><td>6</td><td>2546640172</td><td>ALEKHYA KATA</td><td>alekhyakata08@gmail.com</td><td>9848349430</td></tr>
-                <tr><td>7</td><td>2546640694</td><td>SANTHOSH MARUKURTHI</td><td>santhoshyadav1106@gmail.com</td><td>7207536909</td></tr>
-                <tr><td>8</td><td>2546640689</td><td>NAGA SURYA LAKSHMAN SAI RAM ROKKAM</td><td>sairamrokkam85@gmail.com</td><td>8790131156</td></tr>
-                <tr><td>9</td><td>2546640188</td><td>RAKSHITHA TILLAPUDI</td><td>rakshithatillapudi@gmail.com</td><td>9492469831</td></tr>
-                <tr><td>10</td><td>2546640204</td><td>YASWANTH SUNDHAR ANKAM</td><td>yaswanthsundharankam@gmail.com</td><td>9908438932</td></tr>
-                <tr><td>11</td><td>2546640210</td><td>MOUNIKA KOMATI</td><td>veerababukomati047@gmail.com</td><td>9949545629</td></tr>
-                <tr><td>12</td><td>2546640211</td><td>DIVYA SRI LANKA</td><td>dsri08506@gmail.com</td><td>8121526784</td></tr>
-                <tr><td>13</td><td>2546640218</td><td>JAYARAM DURGA PRADEEP KALLA</td><td>kallapradeep15@gmail.com</td><td>7981496595</td></tr>
-                <tr><td>14</td><td>2546640229</td><td>TARUN KUMAR JAGARAPU</td><td>jagaraputarunkumar9@gmail.com</td><td>9515587169</td></tr>
-                <tr><td>15</td><td>2546640232</td><td>BHAGAT RAJ SWAROOP MEDETI</td><td>bhagatarajswaroopm@gmail.com</td><td>9866993510</td></tr>
-                <tr><td>16</td><td>2546640242</td><td>VENKATA SAI SANTHOSH MUNGANDA</td><td>mungandasanthosh72@gmail.com</td><td>9949578747</td></tr>
-                <tr><td>17</td><td>2546640259</td><td>LAKSHMI SAI PRANUSHA PAALURI</td><td>paluri.pranusha@gmail.com</td><td>9490152855</td></tr>
-                <tr><td>18</td><td>2546640637</td><td>SIVA MEGHANA MANGALAGIRI</td><td>kumarmangalagiri02@gmail.com</td><td>6281011662</td></tr>
-                <tr><td>19</td><td>2546640292</td><td>BINDHU SAI SRI TUTI</td><td>bindhusaisree3@gmail.com</td><td>9912505506</td></tr>
-                <tr><td>20</td><td>2546640301</td><td>SAMUEL RAJU MAJJI</td><td>samisamul2164@gmail.com</td><td>9885358493</td></tr>
-                <tr><td>22</td><td>2546640307</td><td>SATYA VARA PRASAD GOLLA</td><td>gollav732@gmail.com</td><td>9121392876</td></tr>
-                <tr><td>23</td><td>2546640326</td><td>PHANENDRA BHASKAR KUMAR KOTTAPALLI</td><td>phanendrakottapalli40@gmail.com</td><td>9985446128</td></tr>
-                <tr><td>24</td><td>2546640596</td><td>SIMHADRI MYLAPILLI</td><td>mylapillisimhadri9@gmail.com</td><td>7672081367</td></tr>
-                <tr><td>25</td><td>2546640383</td><td>CHANDU SIVA RAM CHALLA</td><td>chandusivaram40@gmail.com</td><td>8886108864</td></tr>
-                <tr><td>26</td><td>2546640391</td><td>GANGA BHAVANI GEESALA</td><td>gangabhavani9958839@gmail.com</td><td>9392407337</td></tr>
-                <tr><td>27</td><td>2546640540</td><td>D V S D BALA RAMA KRISHNA ATHKOORI</td><td>avhprjy@gmail.com</td><td>8074774083</td></tr>
-                <tr><td>28</td><td>2546640419</td><td>DEEVEN KUMAR AKULA</td><td>deevenkumar143@gmail.com</td><td>8179706960</td></tr>
-                <tr><td>29</td><td>2546640438</td><td>DHANA SAI DEEPAK PARAMKUSAM</td><td>deepaknaidu92@gmail.com</td><td>8688087843</td></tr>
-                <tr><td>30</td><td>2546640440</td><td>RISHITHA NAVYA PENUGONDA</td><td>rishithanavyapenugonda@gmail.com</td><td>6304115514</td></tr>
-                <tr><td>31</td><td>2546640450</td><td>MOKSHAGNA YELLA</td><td>subramanyamyalla30@gmail.com</td><td>9866996533</td></tr>
-                <tr><td>32</td><td>2546640456</td><td>FARIDA SAYYED</td><td>sayyedfarida159@gmail.com</td><td>9701259158</td></tr>
-                <tr><td>33</td><td>2546640462</td><td>TARUN REDDY BADE</td><td>tarunreddybade@gmail.com</td><td>8790264299</td></tr>
-                <tr><td>34</td><td>2546640468</td><td>SHAJAHAN SHAIK</td><td>shajahanshaik7797@gmail.com</td><td>8099803312</td></tr>
-                <tr><td>35</td><td>2546640471</td><td>MEGHANA KATTA</td><td>meghanakatta6411@gmail.com</td><td>9347195760</td></tr>
-                <tr><td>36</td><td>2546640481</td><td>MANIKANTA KUKKALA</td><td>m9515456118@gmail.com</td><td>6300864122</td></tr>
-                <tr><td>37</td><td>2546640486</td><td>SAI GANESH RAMINETI</td><td>saiganeshramineti@gmail.com</td><td>9666756065</td></tr>
-                <tr><td>38</td><td>2546640491</td><td>CHITTU USHA DEVI KILLADA</td><td>ushalily2007@gmail.com</td><td>9966318293</td></tr>
-                <tr><td>39</td><td>2546640496</td><td>SAI SANDEEP REGULABANDA</td><td>saisandeepregulabandha@gmail.com</td><td>7285986781</td></tr>
-                <tr><td>40</td><td>2546640516</td><td>HARSHITH VIVEK MEDISETTI</td><td>mharshithvivek@gmail.com</td><td>8341162331</td></tr>
-                <tr><td>41</td><td>2546640524</td><td>V V SIVA SATYA ASHOK MADDALA</td><td>ashokmaddala720@gmail.com</td><td>7207550449</td></tr>
-                <tr><td>42</td><td>2546640535</td><td>ARUN SAI MANDA</td><td>arunsaimanda2222@gmail.com</td><td>8500797655</td></tr>
-            </tbody>
-        </table>
+    <input type="text" id="searchInput" onkeyup="searchCards()" placeholder="Search by Roll No, Hall Ticket No, Name, or Phone Number...">
+
+    <div class="card-grid" id="cardGrid">
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #1</span>
+                <span class="hallticket-tag">250807172298</span>
+            </div>
+            <div class="student-name">SAI GANESH LAVETI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640703</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:siddhul7852@gmail.com">siddhul7852@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9133944606">9133944606</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #2</span>
+                <span class="hallticket-tag">250807172318</span>
+            </div>
+            <div class="student-name">DANDI SIVA GANESH SIRIMALLA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640367</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:siva2005@gmail.com">siva2005@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9347634739">9347634739</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #3</span>
+                <span class="hallticket-tag">250807172301</span>
+            </div>
+            <div class="student-name">REVANTH SAI KUMAR REDDY MALLIDI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640067</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:revanthreddy5292m@gmail.com">revanthreddy5292m@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8247584384">8247584384</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #4</span>
+                <span class="hallticket-tag">250807172312</span>
+            </div>
+            <div class="student-name">CHANDRAHASA VENKAT PITHAPURAPU</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640075</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:venkatachandra372@gmail.com">venkatachandra372@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8328646158">8328646158</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #5</span>
+                <span class="hallticket-tag">250807172282</span>
+            </div>
+            <div class="student-name">RISHITHA AMPOLU</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640171</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:rishithaampolu@gmail.com">rishithaampolu@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9989089677">9989089677</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #6</span>
+                <span class="hallticket-tag">250807172291</span>
+            </div>
+            <div class="student-name">ALEKHYA KATA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640172</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:alekhyakata08@gmail.com">alekhyakata08@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9848349430">9848349430</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #7</span>
+                <span class="hallticket-tag">250807172304</span>
+            </div>
+            <div class="student-name">SANTHOSH MARUKURTHI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640694</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:santhoshyadav1106@gmail.com">santhoshyadav1106@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:7207536909">7207536909</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #8</span>
+                <span class="hallticket-tag">250807172315</span>
+            </div>
+            <div class="student-name">NAGA SURYA LAKSHMAN SAI RAM ROKKAM</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640689</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:sairamrokkam85@gmail.com">sairamrokkam85@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8790131156">8790131156</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #9</span>
+                <span class="hallticket-tag">250807172319</span>
+            </div>
+            <div class="student-name">RAKSHITHA TILLAPUDI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640188</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:rakshithatillapudi@gmail.com">rakshithatillapudi@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9492469831">9492469831</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #10</span>
+                <span class="hallticket-tag">250807172283</span>
+            </div>
+            <div class="student-name">YASWANTH SUNDHAR ANKAM</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640204</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:yaswanthsundharankam@gmail.com">yaswanthsundharankam@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9908438932">9908438932</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #11</span>
+                <span class="hallticket-tag">250807172294</span>
+            </div>
+            <div class="student-name">MOUNIKA KOMATI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640210</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:veerababukomati047@gmail.com">veerababukomati047@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9949545629">9949545629</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #12</span>
+                <span class="hallticket-tag">250807172297</span>
+            </div>
+            <div class="student-name">DIVYA SRI LANKA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640211</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:dsri08506@gmail.com">dsri08506@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8121526784">8121526784</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #13</span>
+                <span class="hallticket-tag">250807172290</span>
+            </div>
+            <div class="student-name">JAYARAM DURGA PRADEEP KALLA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640218</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:kallapradeep15@gmail.com">kallapradeep15@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:7981496595">7981496595</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #14</span>
+                <span class="hallticket-tag">250807172289</span>
+            </div>
+            <div class="student-name">TARUN KUMAR JAGARAPU</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640229</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:jagaraputarunkumar9@gmail.com">jagaraputarunkumar9@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9515587169">9515587169</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #15</span>
+                <span class="hallticket-tag">250807172305</span>
+            </div>
+            <div class="student-name">BHAGAT RAJ SWAROOP MEDETI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640232</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:bhagatarajswaroopm@gmail.com">bhagatarajswaroopm@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9866993510">9866993510</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #16</span>
+                <span class="hallticket-tag">250807172307</span>
+            </div>
+            <div class="student-name">VENKATA SAI SANTHOSH MUNGANDA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640242</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:mungandasanthosh72@gmail.com">mungandasanthosh72@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9949578747">9949578747</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #17</span>
+                <span class="hallticket-tag">250807172309</span>
+            </div>
+            <div class="student-name">LAKSHMI SAI PRANUSHA PAALURI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640259</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:paluri.pranusha@gmail.com">paluri.pranusha@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9490152855">9490152855</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #18</span>
+                <span class="hallticket-tag">250807172303</span>
+            </div>
+            <div class="student-name">SIVA MEGHANA MANGALAGIRI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640637</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:kumarmangalagiri02@gmail.com">kumarmangalagiri02@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:6281011662">6281011662</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #19</span>
+                <span class="hallticket-tag">250807172320</span>
+            </div>
+            <div class="student-name">BINDHU SAI SRI TUTI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640292</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:bindhusaisree3@gmail.com">bindhusaisree3@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9912505506">9912505506</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #20</span>
+                <span class="hallticket-tag">250807172300</span>
+            </div>
+            <div class="student-name">SAMUEL RAJU MAJJI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640301</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:samisamul2164@gmail.com">samisamul2164@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9885358493">9885358493</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #22</span>
+                <span class="hallticket-tag">250807172288</span>
+            </div>
+            <div class="student-name">SATYA VARA PRASAD GOLLA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640307</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:gollav732@gmail.com">gollav732@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9121392876">9121392876</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #23</span>
+                <span class="hallticket-tag">250807172295</span>
+            </div>
+            <div class="student-name">PHANENDRA BHASKAR KUMAR KOTTAPALLI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640326</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:phanendrakottapalli40@gmail.com">phanendrakottapalli40@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9985446128">9985446128</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #24</span>
+                <span class="hallticket-tag">250807172308</span>
+            </div>
+            <div class="student-name">SIMHADRI MYLAPILLI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640596</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:mylapillisimhadri9@gmail.com">mylapillisimhadri9@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:7672081367">7672081367</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #25</span>
+                <span class="hallticket-tag">250807172286</span>
+            </div>
+            <div class="student-name">CHANDU SIVA RAM CHALLA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640383</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:chandusivaram40@gmail.com">chandusivaram40@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8886108864">8886108864</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #26</span>
+                <span class="hallticket-tag">250807172287</span>
+            </div>
+            <div class="student-name">GANGA BHAVANI GEESALA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640391</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:gangabhavani9958839@gmail.com">gangabhavani9958839@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9392407337">9392407337</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #27</span>
+                <span class="hallticket-tag">250807172284</span>
+            </div>
+            <div class="student-name">D V S D BALA RAMA KRISHNA ATHKOORI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640540</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:avhprjy@gmail.com">avhprjy@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8074774083">8074774083</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #28</span>
+                <span class="hallticket-tag">250807172281</span>
+            </div>
+            <div class="student-name">DEEVEN KUMAR AKULA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640419</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:deevenkumar143@gmail.com">deevenkumar143@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8179706960">8179706960</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #29</span>
+                <span class="hallticket-tag">250807172310</span>
+            </div>
+            <div class="student-name">DHANA SAI DEEPAK PARAMKUSAM</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640438</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:deepaknaidu92@gmail.com">deepaknaidu92@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8688087843">8688087843</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #30</span>
+                <span class="hallticket-tag">250807172311</span>
+            </div>
+            <div class="student-name">RISHITHA NAVYA PENUGONDA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640440</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:rishithanavyapenugonda@gmail.com">rishithanavyapenugonda@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:6304115514">6304115514</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #31</span>
+                <span class="hallticket-tag">250807172321</span>
+            </div>
+            <div class="student-name">MOKSHAGNA YELLA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640450</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:subramanyamyalla30@gmail.com">subramanyamyalla30@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9866996533">9866996533</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #32</span>
+                <span class="hallticket-tag">250807172316</span>
+            </div>
+            <div class="student-name">FARIDA SAYYED</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640456</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:sayyedfarida159@gmail.com">sayyedfarida159@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9701259158">9701259158</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #33</span>
+                <span class="hallticket-tag">250807172285</span>
+            </div>
+            <div class="student-name">TARUN REDDY BADE</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640462</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:tarunreddybade@gmail.com">tarunreddybade@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8790264299">8790264299</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #34</span>
+                <span class="hallticket-tag">250807172317</span>
+            </div>
+            <div class="student-name">SHAJAHAN SHAIK</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640468</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:shajahanshaik7797@gmail.com">shajahanshaik7797@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8099803312">8099803312</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #35</span>
+                <span class="hallticket-tag">250807172292</span>
+            </div>
+            <div class="student-name">MEGHANA KATTA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640471</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:meghanakatta6411@gmail.com">meghanakatta6411@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9347195760">9347195760</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #36</span>
+                <span class="hallticket-tag">250807172296</span>
+            </div>
+            <div class="student-name">MANIKANTA KUKKALA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640481</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:m9515456118@gmail.com">m9515456118@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:6300864122">6300864122</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #37</span>
+                <span class="hallticket-tag">250807172313</span>
+            </div>
+            <div class="student-name">SAI GANESH RAMINETI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640486</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:saiganeshramineti@gmail.com">saiganeshramineti@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9666756065">9666756065</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #38</span>
+                <span class="hallticket-tag">250807172293</span>
+            </div>
+            <div class="student-name">CHITTU USHA DEVI KILLADA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640491</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:ushalily2007@gmail.com">ushalily2007@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:9966318293">9966318293</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #39</span>
+                <span class="hallticket-tag">250807172314</span>
+            </div>
+            <div class="student-name">SAI SANDEEP REGULABANDA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640496</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:saisandeepregulabandha@gmail.com">saisandeepregulabandha@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:7285986781">7285986781</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #40</span>
+                <span class="hallticket-tag">250807172306</span>
+            </div>
+            <div class="student-name">HARSHITH VIVEK MEDISETTI</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640516</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:mharshithvivek@gmail.com">mharshithvivek@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8341162331">8341162331</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #41</span>
+                <span class="hallticket-tag">250807172299</span>
+            </div>
+            <div class="student-name">V V SIVA SATYA ASHOK MADDALA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640524</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:ashokmaddala720@gmail.com">ashokmaddala720@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:7207550449">7207550449</a></span></div>
+            </div>
+        </div>
+
+        <div class="student-card">
+            <div class="card-top">
+                <span class="roll-badge">Roll #42</span>
+                <span class="hallticket-tag">250807172302</span>
+            </div>
+            <div class="student-name">ARUN SAI MANDA</div>
+            <div class="card-details">
+                <div class="detail-row"><span class="detail-label">SUC:</span><span class="detail-value">2546640535</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value"><a href="mailto:arunsaimanda2222@gmail.com">arunsaimanda2222@gmail.com</a></span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value"><a href="tel:8500797655">8500797655</a></span></div>
+            </div>
+        </div>
+
+        <div id="noResults" class="no-results">No matches found. Try searching a different Name or Roll No.</div>
     </div>
-    <div id="noResults" class="no-results">No matches found. Try searching a different Name or Roll No.</div>
 </div>
 
 <script>
-function searchTable() {
-    var input, filter, table, tr, td, i, j, txtValue, found;
-    input = document.getElementById("searchInput");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("studentTable");
-    tr = table.getElementsByTagName("tr");
+function searchCards() {
+    var input = document.getElementById("searchInput");
+    var filter = input.value.toUpperCase();
+    var cards = document.getElementsByClassName("student-card");
     var noResults = document.getElementById("noResults");
     var anyFound = false;
 
-    // Start loop from index 1 to skip table header
-    for (i = 1; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td");
-        found = false;
-        
-        // Loop through all cells in the row
-        for (j = 0; j < td.length; j++) {
-            if (td[j]) {
-                txtValue = td[j].textContent || td[j].innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    found = true;
-                    anyFound = true;
-                    break;
-                }
-            }
-        }
-        
-        if (found) {
-            tr[i].style.display = "";
+    for (var i = 0; i < cards.length; i++) {
+        var cardText = cards[i].textContent || cards[i].innerText;
+        if (cardText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "flex";
+            anyFound = true;
         } else {
-            tr[i].style.display = "none";
+            cards[i].style.display = "none";
         }
     }
-    
-    // Show "No Results" message if nothing matches
+
     noResults.style.display = anyFound ? "none" : "block";
 }
 </script>
