@@ -6,8 +6,8 @@
   <title>USEAS - Student Letter Templates</title>
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- PDF & Canvas Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Direct jsPDF Library for Sharp Vector Output -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;1,400&family=Great+Vibes&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
 
@@ -107,7 +107,7 @@
       opacity: 1;
     }
 
-    /* Smooth Rotating Light Line Border */
+    /* Rotating Light Line Border */
     .light-border-outer {
       position: relative;
       border-radius: 9999px;
@@ -142,12 +142,8 @@
     }
 
     @keyframes rotateLightBeam {
-      0% {
-        --angle: 0deg;
-      }
-      100% {
-        --angle: 360deg;
-      }
+      0% { --angle: 0deg; }
+      100% { --angle: 360deg; }
     }
 
     #searchInput {
@@ -165,35 +161,34 @@
       transition: background-color 5000s ease-in-out 0s;
     }
 
-    /* Fluid & Mobile-Responsive Paper Sheet */
+    /* Clear, readable letter canvas on mobile */
     #printableSheet {
       width: 100%;
       max-width: 794px;
       padding: 24px 20px;
       background: #ffffff;
       color: #0f172a;
-      box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
       box-sizing: border-box;
+      border-radius: 8px;
+    }
+
+    #documentCanvas {
+      font-size: 15px !important;
+      line-height: 1.8 !important;
+      color: #1e293b !important;
       word-break: break-word;
-      font-size: 14px;
-      line-height: 1.6;
     }
 
     @media (min-width: 768px) {
       #printableSheet {
         padding: 55px 65px;
-        font-size: 15px;
-        line-height: 1.75;
+        box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.15);
       }
-    }
-
-    /* Print/PDF Preparation Class */
-    .render-for-pdf {
-      width: 794px !important;
-      max-width: 794px !important;
-      padding: 55px 65px !important;
-      font-size: 15px !important;
-      line-height: 1.75 !important;
+      #documentCanvas {
+        font-size: 15px !important;
+        line-height: 1.85 !important;
+      }
     }
   </style>
 </head>
@@ -221,7 +216,7 @@
         Generate verified student letters in seconds. Fill your details, preview live, and download print-ready PDF or Word files.
       </p>
 
-      <!-- Smooth Animated Light Line Search Input -->
+      <!-- Search Input Container -->
       <div class="pt-2 sm:pt-3 max-w-xl mx-auto">
         <div class="light-border-outer">
           <div class="relative z-10 bg-white rounded-full flex items-center h-12 w-full px-1">
@@ -236,16 +231,16 @@
         </div>
       </div>
 
-      <!-- Categories Pills -->
+      <!-- Categories Filter Pills -->
       <div class="flex flex-wrap justify-center gap-1.5 pt-2 sm:pt-3 text-xs">
-        <button onclick="filterCategory('All')" class="category-pill active px-3 py-1.5 rounded-full bg-slate-900 text-white font-medium transition" data-cat="All">All Templates</button>
-        <button onclick="filterCategory('Medical')" class="category-pill px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Medical">Medical Leaves</button>
-        <button onclick="filterCategory('Leave')" class="category-pill px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Leave">General Absence</button>
-        <button onclick="filterCategory('Permission')" class="category-pill px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Permission">Permissions & OD</button>
-        <button onclick="filterCategory('Certificates')" class="category-pill px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Certificates">Certificates & NOC</button>
+        <button onclick="filterCategory('All')" class="category-pill active px-3.5 py-1.5 rounded-full bg-slate-900 text-white font-medium transition" data-cat="All">All Templates</button>
+        <button onclick="filterCategory('Medical')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Medical">Medical Leaves</button>
+        <button onclick="filterCategory('Leave')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Leave">General Absence</button>
+        <button onclick="filterCategory('Permission')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Permission">Permissions & OD</button>
+        <button onclick="filterCategory('Certificates')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Certificates">Certificates & NOC</button>
         <button onclick="filterCategory('Academics')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Academics">Exams & Dues</button>
-        <button onclick="filterCategory('Job')" class="category-pill px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Job">Jobs & Internships</button>
-        <button onclick="filterCategory('Hostel')" class="category-pill px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Hostel">Hostel Life</button>
+        <button onclick="filterCategory('Job')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Job">Jobs & Internships</button>
+        <button onclick="filterCategory('Hostel')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Hostel">Hostel Life</button>
       </div>
     </div>
   </section>
@@ -253,14 +248,13 @@
   <!-- Templates Grid Section -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex-1 w-full">
     
-    <!-- Dynamic Status Bar -->
     <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
       <div id="statusContainer" class="flex items-center gap-2">
         <span class="text-sm font-bold text-slate-700" id="templateCount">Showing all templates</span>
       </div>
     </div>
 
-    <!-- Scan Progress Overlay Holder -->
+    <!-- Scan Progress Overlay -->
     <div id="scanAnimationHolder" class="hidden py-16 sm:py-20 flex flex-col items-center justify-center text-center space-y-4">
       <div class="relative flex items-center justify-center">
         <div class="w-12 h-12 sm:w-14 sm:h-14 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
@@ -276,15 +270,15 @@
       </div>
     </div>
 
-    <!-- Grid -->
+    <!-- Cards Grid -->
     <div id="templatesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 sm:gap-6"></div>
   </main>
 
-  <!-- Responsive Studio Editor Modal -->
+  <!-- Studio Editor Modal -->
   <div id="editorModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-0 sm:p-4">
     <div class="bg-white sm:rounded-2xl shadow-2xl w-full max-w-6xl h-full sm:h-[94vh] flex flex-col overflow-hidden">
       
-      <!-- Modal Top Bar -->
+      <!-- Top Modal Bar -->
       <div class="px-4 sm:px-6 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
         <div class="flex items-center gap-2 sm:gap-3 overflow-hidden pr-2">
           <span id="modalCat" class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shrink-0">Leave</span>
@@ -294,9 +288,9 @@
           <button onclick="downloadWord()" class="px-2.5 sm:px-3 py-1.5 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg transition">
             Word
           </button>
-          <button onclick="downloadPDF()" id="pdfBtn" class="px-3 sm:px-4 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center gap-1 shadow-sm">
+          <button onclick="downloadDirectPDF()" id="pdfBtn" class="px-3.5 sm:px-4 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center gap-1.5 shadow-sm">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            PDF
+            Download PDF
           </button>
           <button onclick="closeModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition ml-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -304,30 +298,30 @@
         </div>
       </div>
 
-      <!-- Mobile Tab Switcher (Visible only on mobile screens) -->
+      <!-- Mobile Tab Navigation -->
       <div class="flex sm:hidden border-b border-slate-200 bg-white shrink-0 text-xs font-bold">
-        <button id="tabBtnEdit" onclick="switchMobileTab('edit')" class="flex-1 py-2.5 text-center text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40">
-          1. Edit Fields
+        <button id="tabBtnEdit" onclick="switchMobileTab('edit')" class="flex-1 py-3 text-center text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40">
+          1. Edit Details
         </button>
-        <button id="tabBtnPreview" onclick="switchMobileTab('preview')" class="flex-1 py-2.5 text-center text-slate-500 hover:text-slate-800">
+        <button id="tabBtnPreview" onclick="switchMobileTab('preview')" class="flex-1 py-3 text-center text-slate-500 hover:text-slate-800">
           2. View Letter
         </button>
       </div>
 
-      <!-- Editor Content Area -->
+      <!-- Content Panels -->
       <div class="flex-1 flex flex-col sm:flex-row overflow-hidden">
         
-        <!-- Input Form Panel -->
+        <!-- Inputs Form Panel -->
         <div id="panelInputs" class="w-full sm:w-80 sm:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0 h-full overflow-hidden">
           <div class="hidden sm:block p-3.5 border-b border-slate-200 bg-white">
             <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Edit Details</h4>
-            <p class="text-[11px] text-slate-400">Values replace placeholders in real time</p>
+            <p class="text-[11px] text-slate-400">Values update preview dynamically</p>
           </div>
           <div id="modalInputs" class="flex-1 overflow-y-auto p-4 space-y-3.5"></div>
         </div>
 
-        <!-- Document Canvas Preview Panel -->
-        <div id="panelPreview" class="hidden sm:flex flex-1 overflow-y-auto bg-slate-300/70 p-3 sm:p-10 justify-center items-start">
+        <!-- Document Preview Canvas -->
+        <div id="panelPreview" class="hidden sm:flex flex-1 overflow-y-auto bg-slate-200/80 p-3 sm:p-8 justify-center items-start">
           <div id="printableSheet" class="font-doc">
             <div id="documentCanvas" contenteditable="true" class="outline-none whitespace-pre-wrap"></div>
           </div>
@@ -338,7 +332,7 @@
     </div>
   </div>
 
-  <!-- Floating Scroll To Top Button -->
+  <!-- Scroll-To-Top Button -->
   <button id="scrollToTopBtn" onclick="scrollToTop()" class="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-white border border-indigo-100 text-indigo-600 shadow-xl shadow-indigo-500/15 hover:bg-indigo-600 hover:text-white hover:-translate-y-1 active:scale-95 transition-all duration-300 opacity-0 pointer-events-none">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 16V8a2 2 0 012-2h6m0 0l-3-3m3 3l-3 3"/>
@@ -771,10 +765,7 @@
       });
 
       updatePreview();
-      
-      // Default to Edit tab on small screens
       switchMobileTab('edit');
-      
       document.getElementById("editorModal").classList.remove("hidden");
     };
 
@@ -792,7 +783,6 @@
       document.getElementById("documentCanvas").innerText = text;
     }
 
-    // Mobile Modal Tabs Handler
     function switchMobileTab(tab) {
       const editBtn = document.getElementById("tabBtnEdit");
       const previewBtn = document.getElementById("tabBtnPreview");
@@ -800,54 +790,53 @@
       const panelPreview = document.getElementById("panelPreview");
 
       if (tab === 'edit') {
-        editBtn.className = "flex-1 py-2.5 text-center text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40";
-        previewBtn.className = "flex-1 py-2.5 text-center text-slate-500 hover:text-slate-800";
+        editBtn.className = "flex-1 py-3 text-center text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40";
+        previewBtn.className = "flex-1 py-3 text-center text-slate-500 hover:text-slate-800";
         panelInputs.classList.remove("hidden");
         panelPreview.classList.add("hidden");
       } else {
-        previewBtn.className = "flex-1 py-2.5 text-center text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40";
-        editBtn.className = "flex-1 py-2.5 text-center text-slate-500 hover:text-slate-800";
+        previewBtn.className = "flex-1 py-3 text-center text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40";
+        editBtn.className = "flex-1 py-3 text-center text-slate-500 hover:text-slate-800";
         panelInputs.classList.add("hidden");
         panelPreview.classList.remove("hidden");
       }
     }
 
-    // Mobile-Safe Exact 1-Page A4 PDF Export
-    window.downloadPDF = async function() {
+    // Direct Vector PDF Generation: Exactly 1 A4 Page on Both Mobile and Desktop
+    window.downloadDirectPDF = function() {
       const btn = document.getElementById("pdfBtn");
       const originalText = btn.innerHTML;
-      btn.innerText = "PDF...";
+      btn.innerText = "Generating...";
       btn.disabled = true;
 
-      const element = document.getElementById("printableSheet");
-
-      // Temporarily apply exact A4 desktop styling so mobile viewport doesn't shrink the output
-      element.classList.add("render-for-pdf");
-
-      const opt = {
-        margin: 0,
-        filename: `${(currentTemplate.title || 'letter').replace(/[\/\s]+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2, 
-          useCORS: true, 
-          logging: false,
-          scrollY: 0,
-          scrollX: 0,
-          backgroundColor: "#ffffff",
-          windowWidth: 1024
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: 'avoid-all' }
-      };
-
       try {
-        await html2pdf().set(opt).from(element).save();
-      } catch (e) {
-        console.error("PDF fallback triggered", e);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'p',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const letterText = document.getElementById("documentCanvas").innerText;
+
+        // A4 page dimensions: 210mm x 297mm
+        const marginX = 22;
+        const marginY = 25;
+        const usableWidth = 210 - (marginX * 2); // 166mm
+
+        doc.setFont("times", "normal");
+        doc.setFontSize(11.5);
+        doc.setTextColor(20, 24, 33);
+
+        const lines = doc.splitTextToSize(letterText, usableWidth);
+        doc.text(lines, marginX, marginY, { lineHeightFactor: 1.45 });
+
+        const filename = `${(currentTemplate.title || 'Official_Letter').replace(/[\/\s]+/g, '_')}.pdf`;
+        doc.save(filename);
+      } catch (err) {
+        console.error("PDF generation error:", err);
         window.print();
       } finally {
-        element.classList.remove("render-for-pdf");
         btn.innerHTML = originalText;
         btn.disabled = false;
       }
@@ -865,7 +854,6 @@
       document.body.removeChild(a);
     };
 
-    // Scroll To Top Logic
     const topBtn = document.getElementById("scrollToTopBtn");
     window.addEventListener("scroll", () => {
       if (window.scrollY > 320) {
@@ -884,7 +872,6 @@
       });
     }
 
-    // Dynamic Placeholder Typewriter Animation
     function startSearchTypewriter() {
       const input = document.getElementById("searchInput");
       if (!input) return;
