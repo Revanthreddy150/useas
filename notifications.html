@@ -588,7 +588,7 @@
             // Share functionality
             document.getElementById(`btn-share-${id}`).onclick = (e) => {
                 e.stopPropagation();
-                const shareUrl = `${window.location.origin}${window.location.pathname}?id=${id}`;
+                const shareUrl = `${window.location.origin}${window.location.pathname}?msgid=${id}`;
                 
                 qrcodeContainer.innerHTML = "";
                 new QRCode(qrcodeContainer, {
@@ -694,7 +694,7 @@
         };
 
         const urlParams = new URLSearchParams(window.location.search);
-        const autoId = urlParams.get('id');
+        const autoId = urlParams.get('msgid') || urlParams.get('id');
         if (autoId && data[autoId]) {
             window.openMsg(autoId);
         }
