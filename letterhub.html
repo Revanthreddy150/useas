@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USEAS - Student Letter Templates</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- PDF & Canvas Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;1,400&family=Great+Vibes&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- Firebase Realtime Database SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXVilX2kfr31h17TgGOUHUbwPG2JXxYr4",
+      authDomain: "tff-earns.firebaseapp.com",
+      databaseURL: "https://tff-earns-default-rtdb.firebaseio.com",
+      projectId: "tff-earns",
+      storageBucket: "tff-earns.firebasestorage.app",
+      messagingSenderId: "762695597074",
+      appId: "1:762695597074:web:e946b101745b4b11b26ccb",
+      measurementId: "G-8HYMSEW4L4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const lettersRef = ref(db, 'student_letters');
+    onValue(lettersRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const firebaseItems = [];
+        Object.keys(data).forEach(key => {
+          firebaseItems.push({
+            ...data[key],
+            firebaseKey: key
+          });
+        });
+
+        firebaseItems.forEach(newItem => {
+          const existingIdx = window.allTemplates.findIndex(t => t.id === newItem.id);
+          if (existingIdx !== -1) {
+            window.allTemplates[existingIdx] = newItem;
+          } else {
+            window.allTemplates.unshift(newItem);
+          }
+        });
+
+        if (window.triggerSearchFlow) {
+          window.triggerSearchFlow();
+        }
+      }
+    });
+  </script>
+
+  <style>
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+    }
+    .font-doc {
+      font-family: 'Merriweather', Georgia, serif;
+    }
+    .font-signature {
+      font-family: 'Great Vibes', cursive;
+    }
+
+    /* Template Cards */
+    .a4-preview-card {
+      aspect-ratio: 1 / 1.414;
+      background: #ffffff;
+      box-shadow: 0 4px 20px -3px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .a4-preview-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 30px -8px rgba(15, 23, 42, 0.16), 0 8px 12px -3px rgba(15, 23, 42, 0.08);
+    }
+    .mini-document-text {
+      font-size: 5.6px;
+      line-height: 1.45;
+      color: #334155;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 15;
+      -webkit-box-orient: vertical;
+    }
+    .hover-action-overlay {
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .a4-preview-card:hover .hover-action-overlay {
+      opacity: 1;
+    }
+
+    /* Smooth Rotating Light Line Border */
+    .light-border-outer {
+      position: relative;
+      border-radius: 9999px;
+      padding: 2.2px;
+      background: #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.12);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .light-border-outer:hover,
+    .light-border-outer:focus-within {
+      transform: scale(1.01);
+      box-shadow: 0 8px 30px -4px rgba(124, 58, 237, 0.25);
+    }
+
+    .light-border-outer::before {
+      content: '';
+      position: absolute;
+      inset: -150%;
+      background: conic-gradient(
+        from var(--angle),
+        transparent 0deg,
+        transparent 250deg,
+        rgba(168, 85, 247, 0.25) 280deg,
+        #8b5cf6 315deg,
+        #6366f1 345deg,
+        #a855f7 360deg
+      );
+      animation: rotateLightBeam 6s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes rotateLightBeam {
+      0% {
+        --angle: 0deg;
+      }
+      100% {
+        --angle: 360deg;
+      }
+    }
+
+    /* Clear Blue Autofill & Focus Outlines */
+    #searchInput {
+      background-color: transparent !important;
+      outline: none !important;
+      box-shadow: none !important;
+      -webkit-appearance: none;
+    }
+    #searchInput:-webkit-autofill,
+    #searchInput:-webkit-autofill:hover, 
+    #searchInput:-webkit-autofill:focus, 
+    #searchInput:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px white inset !important;
+      -webkit-text-fill-color: #0f172a !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Single-page A4 Canvas */
+    #printableSheet {
+      width: 794px;
+      padding: 55px 65px;
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.15);
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+  <!-- Centered Top Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 py-4 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center text-center">
+      <h1 class="font-black text-3xl sm:text-4xl tracking-tight bg-gradient-to-r from-[#6366f1] via-[#7c3aed] to-[#a855f7] bg-clip-text text-transparent select-none uppercase">
+        USEAS
+      </h1>
+      <span class="text-[10px] text-slate-400 font-bold tracking-[0.25em] uppercase mt-0.5">
+        STUDENT LETTER TEMPLATES
+      </span>
+    </div>
+  </header>
+
+  <!-- Hero Header & Animated Search -->
+  <section class="bg-white border-b border-slate-200 py-10 px-4">
+    <div class="max-w-3xl mx-auto text-center space-y-4">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        STUDENT LETTER TEMPLATES
+      </h2>
+      <p class="text-sm text-slate-500 max-w-xl mx-auto">
+        Generate verified student letters in seconds. Fill your details, preview live, and download print-ready PDF or Word files.
+      </p>
+
+      <!-- Smooth Animated Light Line Search Input -->
+      <div class="pt-3 max-w-xl mx-auto">
+        <div class="light-border-outer">
+          <div class="relative z-10 bg-white rounded-full flex items-center h-12 w-full px-1">
+            <!-- Search Icon -->
+            <div class="flex items-center justify-center pl-3.5 pr-2 pointer-events-none text-slate-400">
+              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <!-- Animated Typewriter Placeholder Input -->
+            <input type="text" id="searchInput" oninput="handleSearchInput()" autocomplete="off" spellcheck="false" placeholder="search your reason to get the template..." 
+              class="w-full pr-5 py-2 text-sm text-slate-800 placeholder:text-slate-400 font-medium border-0 focus:ring-0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories Pills -->
+      <div class="flex flex-wrap justify-center gap-1.5 pt-3 text-xs">
+        <button onclick="filterCategory('All')" class="category-pill active px-3.5 py-1.5 rounded-full bg-slate-900 text-white font-medium transition" data-cat="All">All Templates</button>
+        <button onclick="filterCategory('Medical')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Medical">Medical Leaves</button>
+        <button onclick="filterCategory('Leave')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Leave">General Absence</button>
+        <button onclick="filterCategory('Permission')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Permission">Permissions & OD</button>
+        <button onclick="filterCategory('Certificates')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Certificates">Certificates & NOC</button>
+        <button onclick="filterCategory('Academics')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Academics">Exams & Dues</button>
+        <button onclick="filterCategory('Job')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Job">Jobs & Internships</button>
+        <button onclick="filterCategory('Hostel')" class="category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition" data-cat="Hostel">Hostel Life</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Templates Grid Section -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
+    
+    <!-- Dynamic Status Bar -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
+      <div id="statusContainer" class="flex items-center gap-2">
+        <span class="text-sm font-bold text-slate-700" id="templateCount">Showing all templates</span>
+      </div>
+    </div>
+
+    <!-- Scan Progress Overlay Holder -->
+    <div id="scanAnimationHolder" class="hidden py-20 flex flex-col items-center justify-center text-center space-y-4">
+      <div class="relative flex items-center justify-center">
+        <div class="w-14 h-14 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <div class="absolute w-8 h-8 bg-indigo-50 rounded-full flex items-center justify-center">
+          <svg class="w-4 h-4 text-indigo-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="space-y-1">
+        <p class="text-sm font-bold text-slate-800 tracking-wide">Searching & Scanning Letter Database...</p>
+        <p class="text-xs text-slate-400">Locating verified student formats</p>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div id="templatesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div>
+  </main>
+
+  <!-- Studio Editor Modal -->
+  <div id="editorModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[94vh] flex flex-col overflow-hidden">
+      
+      <div class="px-6 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-3">
+          <span id="modalCat" class="px-2.5 py-0.5 rounded bg-blue-100 text-blue-800 text-[11px] font-bold uppercase tracking-wider">Leave</span>
+          <h3 id="modalTitle" class="font-bold text-slate-900 text-base truncate max-w-sm">Letter Title</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="downloadWord()" class="px-3 py-1.5 text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg transition">
+            Export Word (.doc)
+          </button>
+          <button onclick="downloadPDF()" id="pdfBtn" class="px-4 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center gap-1.5 shadow-sm">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Download PDF
+          </button>
+          <button onclick="closeModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition ml-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 flex overflow-hidden">
+        <div class="w-80 border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
+          <div class="p-3.5 border-b border-slate-200 bg-white">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Edit Details</h4>
+            <p class="text-[11px] text-slate-400">Values replace placeholders in real time</p>
+          </div>
+          <div id="modalInputs" class="flex-1 overflow-y-auto p-4 space-y-3.5"></div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto bg-slate-300/70 p-6 sm:p-10 flex justify-center items-start">
+          <div id="printableSheet" class="font-doc text-slate-900 leading-relaxed text-[15px]">
+            <div id="documentCanvas" contenteditable="true" class="outline-none whitespace-pre-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function getPreloadedTemplates() {
+      const list = [];
+      const medical = [
+        "Viral Fever", "Typhoid", "Malaria", "Dengue Fever", "Severe Migraine", "Food Poisoning",
+        "Asthma Episode", "Eye Conjunctivitis", "Dental Extraction Surgery", "Leg Fracture",
+        "Hand Ligament Injury", "Appendectomy Post-Surgery", "Chicken Pox Quarantine", "Jaundice Recovery",
+        "Kidney Stone Pain", "Acute Bronchitis", "Spinal Sprain", "Sinusitis", "Skin Allergy Reaction",
+        "ENT Throat Infection", "Inpatient Hospital Admission", "COVID-19 Home Isolation", "Orthopedic Rest",
+        "Tonsillitis", "General Dehydration", "Post-Surgical Rest", "Chronic Gastritis", "High Blood Pressure Rest",
+        "Cervical Neck Strain", "Ligament Tear Recovery", "Ear Surgery", "Rabies Vaccine Reaction",
+        "Heatstroke Exhaustion", "Blood Donation Recuperation", "Physiotherapy Rehabilitation Session"
+      ];
+
+      medical.forEach((m, idx) => {
+        list.push({
+          id: `med-${idx+1}`,
+          title: `Medical Leave - ${m}`,
+          subtitle: `Free Doctor Note & Leave Letter for ${m}`,
+          category: "Medical",
+          headerType: idx % 2 === 0 ? "medical-clinic" : "brand-bar",
+          brandName: "PINEBROOK HEALTH CLINIC",
+          brandTag: "Medical Certification Desk",
+          fields: ["Recipient_Title", "College_Name", "Student_Name", "Roll_No", "Department", "Start_Date", "End_Date", "Physician_Name"],
+          body: `To,\n{{Recipient_Title}},\n{{College_Name}}.\n\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nSubject: Medical leave application for ${m}\n\nRespected Sir/Madam,\n\nI am {{Student_Name}}, studying in {{Department}}, bearing Roll Number {{Roll_No}}.\n\nI am writing to formally request medical leave of absence as I have been diagnosed with ${m}. The consulting physician, Dr. {{Physician_Name}}, has advised me to observe complete bed rest from {{Start_Date}} to {{End_Date}} to prevent further complications and support recovery.\n\nI have attached my medical prescription and clinical fitness certificate for your evaluation. I will ensure all missed lectures, assignments, and practical record tasks are covered immediately upon resumption.\n\nI kindly request you to approve my leave request.\n\nThank you.\n\nYours obediently,\n\n{{Student_Name}}\nRoll No: {{Roll_No}}\n{{Department}}`
+        });
+      });
+
+      const personal = [
+        "Sister's Wedding", "Brother's Wedding", "Cousin's Marriage", "Hometown Village Festival",
+        "Grandparent Medical Emergency", "Parent Care Assistance", "House Warming Ceremony",
+        "Religious Pilgrimage", "Passport Verification Appointment", "Visa Interview",
+        "Family Bereavement / Funeral", "Annual Memorial Ceremony", "Family Relocation",
+        "Bank Educational Loan Paperwork", "Driving License Official Driving Test", "Naming Ceremony",
+        "Elder Medical Escort", "Legal Court Subpoena", "Voter ID Enrollment",
+        "Property Documentation", "Family Farming Assistance", "Sibling School Admission",
+        "Family Reunion", "Inaccessible Road Travel", "Transit Strike Interruption",
+        "Aadhaar Biometric Update", "Religious Fasting", "Village Panchayat Hearing",
+        "Local Flash Flood Delay", "Personal Health Reset"
+      ];
+
+      personal.forEach((p, idx) => {
+        list.push({
+          id: `leave-${idx+1}`,
+          title: `Leave: ${p}`,
+          subtitle: `Official Student Absence Request for ${p}`,
+          category: "Leave",
+          headerType: "brand-bar",
+          brandName: "STUDENT LEAVE DESK",
+          brandTag: "Formal Absence Request",
+          fields: ["Recipient_Title", "College_Name", "Student_Name", "Roll_No", "Department", "Start_Date", "End_Date"],
+          body: `To,\n{{Recipient_Title}},\n{{College_Name}}.\n\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nSubject: Leave application regarding ${p}\n\nRespected Sir/Madam,\n\nI am {{Student_Name}}, Roll Number {{Roll_No}}, studying in {{Department}}.\n\nI am writing to request a planned absence from {{Start_Date}} to {{End_Date}} due to ${p}. Because of immediate family commitments, my presence is essential during this period.\n\nI have collected lecture notes in advance and will submit all pending assignments immediately upon my return.\n\nKindly grant me leave for these specified days.\n\nThank you.\n\nYours obediently,\n\n{{Student_Name}}\nRoll No: {{Roll_No}}`
+        });
+      });
+
+      const permissions = [
+        "State Level Hackathon", "National Coding Contest", "Inter-College Robotics Expo", "Paper Presentation at IIT",
+        "Web Tech Project Expo", "AI & Data Science Workshop", "Cybersecurity CTF Competition",
+        "Inter-University Sports Meet", "District Badminton Tournament", "State Cricket Cup",
+        "Kabaddi Collegiate Cup", "Cultural Fest Dance Competition", "Youth Debating Championship",
+        "NCC Annual Training Camp (ATC)", "NSS Rural Camp", "Blood Donation Camp Volunteering",
+        "Campus Startup Pitch", "Industrial Visit to Tech Hub", "Cloud Computing Summit",
+        "Campus Media Coverage", "Science Day Live Demonstration", "Student Council Organizing Work",
+        "Department Fest Lead Coordinator", "TEDx Youth Volunteer Duty", "Model United Nations (MUN)",
+        "College Band Performance", "Quiz Bowl State Final Round", "Library Archives Research",
+        "Overnight Laboratory Server Setup", "Electronics Lab Hardware Testing", "Drone Flight Campus Testing",
+        "High-Performance Computing Setup", "Placement Drive Student Volunteer", "Alumni Meet Reception Committee",
+        "Disaster Relief Drive Coordination"
+      ];
+
+      permissions.forEach((perm, idx) => {
+        list.push({
+          id: `perm-${idx+1}`,
+          title: `Permission / OD: ${perm}`,
+          subtitle: `Application for On-Duty (OD) Attendance for ${perm}`,
+          category: "Permission",
+          headerType: "pill-badge",
+          brandName: "ACADEMIC PERMISSION DESK",
+          fields: ["HOD_Name", "Department", "College_Name", "Student_Name", "Roll_No", "Event_Dates", "Host_Venue"],
+          body: `To,\nThe Head of the Department,\nDepartment of {{Department}},\n{{College_Name}}.\n\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nSubject: Request for On-Duty (OD) Permission for ${perm}\n\nRespected Sir/Madam,\n\nI am {{Student_Name}}, Roll Number {{Roll_No}}, from the Department of {{Department}}.\n\nI have been selected to participate in ${perm}, held at {{Host_Venue}} on {{Event_Dates}}. Representing our department in this forum provides substantial practical experience.\n\nI kindly request you to approve On-Duty (OD) attendance for the specified duration. The official invitation and registration slips are attached.\n\nThank you.\n\nYours obediently,\n\n{{Student_Name}}\nRoll No: {{Roll_No}}`
+        });
+      });
+
+      const certs = [
+        "Bonafide Certificate for Scholarship", "Bonafide for Student Bank Account", "Bonafide for Passport Application",
+        "Study & Conduct Certificate", "Medium of Instruction in English Letter", "College Bus Transit Pass Concession",
+        "Railway Monthly Season Ticket Concession", "Transfer Certificate (TC) Application", "Migration Certificate Application",
+        "Provisional Degree Certificate", "Consolidated Marks Memo Issuance", "Duplicate Hall Ticket for Semester Exams",
+        "Lost Student ID Card Replacement", "Library No-Dues Clearance", "Laboratory Caution Deposit Refund",
+        "Character & Moral Conduct Certificate", "Internship No Objection Certificate (NOC)", "Higher Education NOC for Masters",
+        "Course Completion Formal Attestation", "Rank / Merit Certificate Endorsement", "Tuition Fee Paid Receipt Duplicate",
+        "Custodian Certificate for Original Certificates", "Gap Year Justification Letter", "Parent Guardian Address Change Request",
+        "Spelling Correction in Name Records", "Date of Birth Correction in Portal", "Official Transcripts in Sealed Envelope",
+        "College Recommendation for Visa Stamping", "Sponsorship Letter for Conference", "Sports Quota Endorsement Letter"
+      ];
+
+      certs.forEach((c, idx) => {
+        list.push({
+          id: `cert-${idx+1}`,
+          title: `Certificate: ${c}`,
+          subtitle: `Formal Application for Issuance of ${c}`,
+          category: "Certificates",
+          headerType: "logo-box",
+          brandName: "ADMINISTRATIVE CELL",
+          fields: ["Principal_Or_Dean", "College_Name", "Student_Name", "Roll_No", "Department", "Requirement_Reason"],
+          body: `To,\nThe Principal / Administrative Officer,\n{{College_Name}}.\n\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nSubject: Application for ${c}\n\nRespected Sir/Madam,\n\nI am {{Student_Name}}, a student of {{Department}}, bearing Roll Number {{Roll_No}}.\n\nI am writing to formally request the administrative department to issue my ${c} for the purpose of {{Requirement_Reason}}. All institutional records and term fees are clear.\n\nKindly expedite the processing and issue the document.\n\nThank you.\n\nYours obediently,\n\n{{Student_Name}}\nRoll No: {{Roll_No}}`
+        });
+      });
+
+      const academics = [
+        "Semester Exam Paper Re-Evaluation", "Answer Script Recounting Application", "Internal Mid-Exam Retest Request",
+        "Condonation for Shortage of Attendance", "Tuition Fee Installment Payment Request", "Exemption from Late Fee Penalty",
+        "Tuition Fee Concession Application", "Hostel Fee Concession Due to Hardship", "Change of Elective Subject Request",
+        "Change of Lab Batch Timings", "Special Practical Exam Re-Scheduling", "Semester Break Course Re-Registration",
+        "Supplementary Examination Application", "Academic Transcript Verification", "Grade Dispute in Continuous Assessment",
+        "Project Guide / Mentor Change Request", "Capstone Project Topic Approval", "Attendance Correction after Medical Leave",
+        "Exemption from Uniform / Formal Dress", "Classroom Projector Repair Complaint", "Lab PC Technical Malfunction Report",
+        "Internet & Wi-Fi Access in Library", "Academic Leave for Government Competitive Exam", "Civil Services Prelims Attendance Exemption",
+        "GATE Exam Preparation Leave", "Defense NDA / CDS Interview Exemption", "Banking PO Exam Absence",
+        "State PSC Group Exam Absence", "University Sports Team Exam Reschedule", "Remedial Class Extra Session",
+        "System Access in Programming Lab", "Permission to Write Exam with Scribe", "Extra Time Allowance in Exam",
+        "Cancellation of Admission with Refund", "Course Withdrawal Request"
+      ];
+
+      academics.forEach((a, idx) => {
+        list.push({
+          id: `acad-${idx+1}`,
+          title: `Academics: ${a}`,
+          subtitle: `Official Academic Application Regarding ${a}`,
+          category: "Academics",
+          headerType: "logo-box",
+          brandName: "EXAMINATION CELL",
+          fields: ["Academic_Head", "College_Name", "Student_Name", "Roll_No", "Semester_Batch", "Detailed_Reason"],
+          body: `To,\n{{Academic_Head}},\n{{College_Name}}.\n\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nSubject: Application regarding ${a}\n\nRespected Sir/Madam,\n\nI am {{Student_Name}}, Roll Number {{Roll_No}}, enrolled in Semester {{Semester_Batch}}.\n\nI am submitting this formal application to request your consideration for ${a} due to {{Detailed_Reason}}. I have maintained a consistent academic track record.\n\nI request you to kindly grant approval for this request.\n\nThank you.\n\nYours respectfully,\n\n{{Student_Name}}\nRoll No: {{Roll_No}}`
+        });
+      });
+
+      const careers = [
+        "Frontend Web Developer Intern", "Backend PHP / Python Intern", "Full Stack Developer Trainee", "Data Science Intern",
+        "Android App Developer Intern", "Machine Learning Trainee", "UI/UX Designer Intern", "Cloud & DevOps Intern",
+        "Cybersecurity Analyst Trainee", "Database Administrator Intern", "Quality Assurance Software Tester",
+        "Embedded Systems / IoT Intern", "AI Engineer Fresher", "Technical Support Associate", "Junior Systems Engineer",
+        "Digital Marketing Associate", "Flutter Developer Intern", "React Developer Intern",
+        "Business Development Executive Trainee", "Research Assistant in Lab", "Graphic Designer for College",
+        "NOC for 6-Month Off-Campus Internship", "Internship Completion Letter Request", "Campus Placement NOC Letter",
+        "Offer Acceptance Confirmation"
+      ];
+
+      careers.forEach((cr, idx) => {
+        list.push({
+          id: `job-${idx+1}`,
+          title: `Career: ${cr}`,
+          subtitle: `Professional Student Cover Letter & Application for ${cr}`,
+          category: "Job",
+          headerType: idx % 2 === 0 ? "pill-badge" : "brand-bar",
+          brandName: "YOUR NAME",
+          brandTag: "Career Portfolio",
+          fields: ["Hiring_Manager", "Company_Name", "Applicant_Name", "Degree_Discipline", "Key_Technologies", "Relevant_Project"],
+          body: `To,\n{{Hiring_Manager}},\n{{Company_Name}}.\n\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nSubject: Application for ${cr} - {{Applicant_Name}}\n\nDear Hiring Team,\n\nI am writing to express my strong interest in the ${cr} position at {{Company_Name}}. I am pursuing my {{Degree_Discipline}}, focusing on practical software engineering and robust application architecture.\n\nMy skillset includes hands-on proficiency in {{Key_Technologies}}. Recently, I designed {{Relevant_Project}}, where I built clean backend structures and reliable interfaces.\n\n{{Company_Name}}'s engineering standard makes this an ideal environment for me to contribute real code. I look forward to discussing my background during an interview.\n\nSincerely,\n\n{{Applicant_Name}}`
+        });
+      });
+
+      const hostel = [
+        "Hostel Room Transfer Request", "Night Out / Weekend Leave to Home", "Hostel Mess Food Quality Complaint",
+        "Wi-Fi Connectivity Issue in Room", "Electrical Plugs & Fan Repair Request", "Plumbing & Hot Water Complaint",
+        "Hostel Room Cooler / Appliance Permission", "Late Night Study Room Access", "Permission to Keep Laptop & Electronics",
+        "Change of Roommate Due to Incompatibility", "Hostel Gate Late Entry Permission", "Medical Diet Exemption in Mess",
+        "Hostel Gym Facility Registration", "Hostel Caution Deposit Return on Vacating", "Emergency Room Key Replacement",
+        "Hostel Study Table Replacement", "Complaint Regarding Noise Disturbance", "Visitor / Parents Overnight Stay Permission",
+        "Pest Control Treatment Request in Room", "Permission for Bike Parking inside Hostel"
+      ];
+
+      hostel.forEach((h, idx) => {
+        list.push({
+          id: `hostel-${idx+1}`,
+          title: `Hostel: ${h}`,
+          subtitle: `Official Hostel Administration Application for ${h}`,
+          category: "Hostel",
+          headerType: "logo-box",
+          brandName: "HOSTEL WARDEN OFFICE",
+          fields: ["Chief_Warden", "Hostel_Name", "Student_Name", "Room_Number", "Contact_Number", "Specific_Reason"],
+          body: `To,\nThe Chief Warden,\n{{Hostel_Name}}.\n\nDate: ${new Date().toLocaleDateString('en-GB')}\n\nSubject: Application regarding ${h}\n\nRespected Sir/Madam,\n\nI am {{Student_Name}}, a resident of Room Number {{Room_Number}} in {{Hostel_Name}}.\n\nI am writing to formally submit a request regarding ${h}. Because of {{Specific_Reason}}, I require your prompt administrative intervention.\n\nI kindly request you to look into this issue and resolve it at your earliest convenience.\n\nThank you.\n\nYours obediently,\n\n{{Student_Name}}\nRoom No: {{Room_Number}}\nContact: {{Contact_Number}}`
+        });
+      });
+
+      return list;
+    }
+
+    window.allTemplates = getPreloadedTemplates();
+    let currentTemplate = window.allTemplates[0];
+    let formValues = {};
+    let activeCategory = "All";
+    let searchDebounce = null;
+
+    function buildA4Miniature(t) {
+      let headerHTML = '';
+
+      if (t.headerType === 'brand-bar') {
+        headerHTML = `
+          <div class="flex justify-between items-center pb-1 border-b border-slate-100">
+            <div>
+              <div class="font-extrabold text-[8.5px] tracking-tight text-slate-800">${t.brandName}</div>
+              <div class="text-[5.5px] text-slate-400">${t.brandTag || 'Official Form'}</div>
+            </div>
+            <div class="h-3.5 w-3.5 rounded bg-[#6366f1] text-white font-bold text-[7px] flex items-center justify-center">U.</div>
+          </div>
+          <div class="h-[1.5px] w-full mt-1 mb-1.5 bg-[#6366f1]"></div>
+        `;
+      } else if (t.headerType === 'logo-box') {
+        headerHTML = `
+          <div class="flex flex-col items-center justify-center pb-1 border-b border-slate-100 mb-1.5">
+            <div class="border border-slate-300 px-2 py-0.5 rounded text-[6.5px] font-bold tracking-wider text-slate-700 flex items-center gap-1">
+              <span class="text-[4px] text-blue-600">❖</span> ${t.brandName}
+            </div>
+            <div class="text-[4.5px] text-slate-400 mt-0.5">[USEAS STUDENT DESK]</div>
+          </div>
+        `;
+      } else if (t.headerType === 'pill-badge') {
+        headerHTML = `
+          <div class="flex flex-col items-center mb-1.5">
+            <div class="border border-slate-200 px-1 py-0.2 rounded text-[5px] font-bold text-slate-400 mb-0.5">${t.brandName}</div>
+            <div class="bg-[#4338ca] text-white px-2.5 py-0.5 rounded-full text-[5.5px] font-bold tracking-wider uppercase">
+              Official Correspondence
+            </div>
+          </div>
+        `;
+      } else if (t.headerType === 'medical-clinic') {
+        headerHTML = `
+          <div class="flex justify-between items-start border-b border-slate-200 pb-1 mb-1.5">
+            <div>
+              <div class="font-extrabold text-[7.5px] text-slate-800 tracking-tight">PINEBROOK CLINIC</div>
+              <div class="text-[4.5px] text-slate-400">240 Oakwood Ave • (555) 019-2831</div>
+            </div>
+            <div class="text-sky-600 text-[8.5px]">⚕</div>
+          </div>
+        `;
+      } else {
+        headerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-100 pb-1 mb-1.5">
+            <div class="text-[7.5px] font-bold text-slate-800">${t.brandName || 'USEAS LETTER'}</div>
+            <div class="h-3.5 w-3.5 rounded bg-[#6366f1] text-white font-bold text-[7px] flex items-center justify-center">U.</div>
+          </div>
+          <div class="h-[1.5px] w-full mt-1 mb-1.5 bg-[#6366f1]"></div>
+        `;
+      }
+
+      const sampleBody = (t.body || '')
+        .replace(/\{\{.*?\}\}/g, '_____')
+        .split('\n')
+        .filter(line => line.trim().length > 0)
+        .slice(0, 9)
+        .join('<br>');
+
+      return `
+        <div class="w-full h-full bg-white p-3.5 flex flex-col justify-between select-none relative overflow-hidden rounded-[4px]">
+          <div>
+            ${headerHTML}
+            <div class="text-center font-bold text-[7.5px] text-slate-800 tracking-tight mb-1.5 leading-snug">
+              ${t.title}
+            </div>
+            <div class="mini-document-text font-serif">
+              ${sampleBody}
+            </div>
+          </div>
+
+          <div class="pt-1.5 border-t border-slate-100 flex justify-between items-end">
+            <div>
+              <div class="font-signature text-[12px] text-slate-600 leading-none">useas online</div>
+              <div class="text-[5px] text-slate-400 uppercase tracking-wider">AUTHORIZED SIGNATORY</div>
+            </div>
+            <div class="text-[5px] text-slate-300 font-mono">USEAS.ONLINE</div>
+          </div>
+
+          <div class="hover-action-overlay absolute inset-0 flex items-center justify-center p-4">
+            <button onclick="openEditor('${t.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg transform transition active:scale-95">
+              Use Template
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGrid(list) {
+      const grid = document.getElementById("templatesGrid");
+      grid.innerHTML = "";
+
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 text-sm">No letters matched your query.</div>`;
+        return;
+      }
+
+      list.forEach(item => {
+        const wrap = document.createElement("div");
+        wrap.className = "flex flex-col";
+        wrap.innerHTML = `
+          <div class="a4-preview-card border border-slate-200/90 rounded-md bg-white overflow-hidden cursor-pointer" onclick="openEditor('${item.id}')">
+            ${buildA4Miniature(item)}
+          </div>
+          <div class="mt-2.5 px-0.5">
+            <p class="text-xs font-semibold text-slate-700 leading-snug line-clamp-1 hover:text-indigo-600 cursor-pointer" onclick="openEditor('${item.id}')">${item.subtitle || item.title}</p>
+          </div>
+        `;
+        grid.appendChild(wrap);
+      });
+    }
+
+    function handleSearchInput() {
+      clearTimeout(searchDebounce);
+
+      const q = (document.getElementById("searchInput").value || "").trim();
+      const grid = document.getElementById("templatesGrid");
+      const scanHolder = document.getElementById("scanAnimationHolder");
+      const statusContainer = document.getElementById("statusContainer");
+
+      if (q === "") {
+        scanHolder.classList.add("hidden");
+        grid.classList.remove("hidden");
+        triggerSearchFlow(false);
+        return;
+      }
+
+      grid.classList.add("hidden");
+      scanHolder.classList.remove("hidden");
+      statusContainer.innerHTML = `
+        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md animate-pulse">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span> Scanning Letter Database...
+        </span>
+      `;
+
+      searchDebounce = setTimeout(() => {
+        triggerSearchFlow(true);
+      }, 480);
+    }
+
+    function triggerSearchFlow(showFoundNotice = false) {
+      const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+      const grid = document.getElementById("templatesGrid");
+      const scanHolder = document.getElementById("scanAnimationHolder");
+      const statusContainer = document.getElementById("statusContainer");
+
+      const filtered = window.allTemplates.filter(t => {
+        const titleText = (t.title || "").toLowerCase();
+        const subText = (t.subtitle || "").toLowerCase();
+        const bodyText = (t.body || "").toLowerCase();
+        const categoryText = (t.category || "").toLowerCase();
+
+        const matchesCategory = 
+          activeCategory === "All" || 
+          categoryText === activeCategory.toLowerCase() ||
+          (activeCategory === "Leave" && categoryText.includes("leave")) ||
+          (activeCategory === "Medical" && (categoryText.includes("med") || titleText.includes("sick")));
+
+        const matchesSearch = 
+          q === "" || 
+          titleText.includes(q) || 
+          subText.includes(q) || 
+          bodyText.includes(q) ||
+          categoryText.includes(q);
+
+        return matchesCategory && matchesSearch;
+      });
+
+      scanHolder.classList.add("hidden");
+      grid.classList.remove("hidden");
+      renderGrid(filtered);
+
+      if (q !== "" && showFoundNotice) {
+        statusContainer.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-100/80 border border-emerald-200 px-3 py-1 rounded-md animate-in fade-in zoom-in-95 duration-200">
+            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            Found ${filtered.length} Letter Templates
+          </span>
+        `;
+      } else {
+        statusContainer.innerHTML = `<span class="text-sm font-bold text-slate-700">Showing ${filtered.length} Student Letter Templates</span>`;
+      }
+    }
+
+    window.filterCategory = function(cat) {
+      activeCategory = cat;
+      document.querySelectorAll(".category-pill").forEach(pill => {
+        if (pill.dataset.cat === cat) {
+          pill.className = "category-pill active px-3.5 py-1.5 rounded-full bg-slate-900 text-white font-medium transition";
+        } else {
+          pill.className = "category-pill px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium transition";
+        }
+      });
+      triggerSearchFlow(false);
+    };
+
+    window.openEditor = function(id) {
+      currentTemplate = window.allTemplates.find(t => t.id === id) || window.allTemplates[0];
+      formValues = {};
+
+      document.getElementById("modalTitle").innerText = currentTemplate.title;
+      document.getElementById("modalCat").innerText = currentTemplate.category;
+
+      const container = document.getElementById("modalInputs");
+      container.innerHTML = "";
+
+      const fieldList = currentTemplate.fields || ["Student_Name", "Roll_No", "Date", "Reason"];
+
+      fieldList.forEach(field => {
+        const div = document.createElement("div");
+        div.className = "space-y-1";
+
+        const label = document.createElement("label");
+        label.className = "block text-[11px] font-bold text-slate-600 uppercase tracking-wide";
+        label.innerText = field.replace(/_/g, " ");
+
+        const input = document.createElement("input");
+        input.type = field.toLowerCase().includes("date") ? "date" : "text";
+        input.className = "w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm";
+        input.placeholder = `Enter ${field.replace(/_/g, " ")}`;
+
+        input.oninput = (e) => {
+          formValues[field] = e.target.value;
+          updatePreview();
+        };
+
+        div.appendChild(label);
+        div.appendChild(input);
+        container.appendChild(div);
+      });
+
+      updatePreview();
+      document.getElementById("editorModal").classList.remove("hidden");
+    };
+
+    window.closeModal = function() {
+      document.getElementById("editorModal").classList.add("hidden");
+    };
+
+    function updatePreview() {
+      let text = currentTemplate.body;
+      const fieldList = currentTemplate.fields || [];
+      fieldList.forEach(f => {
+        const val = formValues[f] && formValues[f].trim() !== "" ? formValues[f] : `[${f.replace(/_/g, " ")}]`;
+        text = text.split(`{{${f}}}`).join(val);
+      });
+      document.getElementById("documentCanvas").innerText = text;
+    }
+
+    // Exact 1-Page A4 PDF Export
+    window.downloadPDF = async function() {
+      const btn = document.getElementById("pdfBtn");
+      const originalText = btn.innerHTML;
+      btn.innerText = "Generating PDF...";
+      btn.disabled = true;
+
+      const element = document.getElementById("printableSheet");
+
+      const opt = {
+        margin: 0,
+        filename: `${(currentTemplate.title || 'letter').replace(/[\/\s]+/g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true, 
+          logging: false,
+          scrollY: 0,
+          scrollX: 0,
+          backgroundColor: "#ffffff"
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: 'avoid-all' }
+      };
+
+      try {
+        await html2pdf().set(opt).from(element).save();
+      } catch (e) {
+        console.error("PDF fallback triggered", e);
+        window.print();
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    };
+
+    window.downloadWord = function() {
+      const content = document.getElementById("documentCanvas").innerText;
+      const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(currentTemplate.title || 'letter').replace(/[\/\s]+/g, '_')}.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    // Dynamic Placeholder Typewriter Animation
+    function startSearchTypewriter() {
+      const input = document.getElementById("searchInput");
+      if (!input) return;
+
+      const hints = [
+        "search your reason to get the template...",
+        "search 'sick leave' or 'fever'...",
+        "search 'bonafide certificate'...",
+        "search 'internship noc'...",
+        "search 'exam re-evaluation'...",
+        "search 'hackathon permission'...",
+        "search 'hostel room change'..."
+      ];
+
+      let hintIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+
+      function type() {
+        if (document.activeElement === input && input.value.length > 0) {
+          setTimeout(type, 1000);
+          return;
+        }
+
+        const currentHint = hints[hintIndex];
+
+        if (isDeleting) {
+          input.setAttribute("placeholder", currentHint.substring(0, charIndex - 1));
+          charIndex--;
+        } else {
+          input.setAttribute("placeholder", currentHint.substring(0, charIndex + 1));
+          charIndex++;
+        }
+
+        let speed = isDeleting ? 30 : 65;
+
+        if (!isDeleting && charIndex === currentHint.length) {
+          speed = 2200;
+          isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          hintIndex = (hintIndex + 1) % hints.length;
+          speed = 400;
+        }
+
+        setTimeout(type, speed);
+      }
+
+      type();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderGrid(window.allTemplates);
+      startSearchTypewriter();
+    });
+  </script>
+</body>
+</html>
