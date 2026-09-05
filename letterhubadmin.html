@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USEAS Admin - Letter Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase Modular SDK for Realtime Database -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXVilX2kfr31h17TgGOUHUbwPG2JXxYr4",
+      authDomain: "tff-earns.firebaseapp.com",
+      databaseURL: "https://tff-earns-default-rtdb.firebaseio.com",
+      projectId: "tff-earns",
+      storageBucket: "tff-earns.firebasestorage.app",
+      messagingSenderId: "762695597074",
+      appId: "1:762695597074:web:e946b101745b4b11b26ccb",
+      measurementId: "G-8HYMSEW4L4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.rtdb = db;
+    window.rtdbTools = { ref, push, set, onValue, remove };
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800">
+
+  <!-- Navbar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 bg-slate-900 text-white rounded-lg flex items-center justify-center font-bold text-lg">
+          U.
+        </div>
+        <div class="flex flex-col">
+          <span class="font-extrabold text-base text-slate-900 leading-none">USEAS ADMIN</span>
+          <span class="text-[10px] text-blue-600 font-bold uppercase tracking-wider mt-0.5">Realtime Database Sync</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg border border-slate-300 bg-white transition">
+          View Live Website
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Admin Body -->
+  <main class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Left Column: Add Template Form -->
+    <div class="lg:col-span-5 space-y-6">
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+        <h2 class="text-base font-bold text-slate-900 mb-1">Create New Letter Template</h2>
+        <p class="text-xs text-slate-400 mb-4">Saves directly to Firebase Realtime Database path: <code class="text-blue-600 font-mono">/student_letters</code></p>
+
+        <form onsubmit="handleNewTemplate(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Letter Title</label>
+            <input type="text" id="title" required placeholder="e.g. Leave for Blood Donation Camp" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Category</label>
+              <select id="category" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="Leave">Leave Requests</option>
+                <option value="Medical">Medical Leaves</option>
+                <option value="Permission">Permissions & OD</option>
+                <option value="Certificates">Certificates & NOC</option>
+                <option value="Academics">Academics & Exams</option>
+                <option value="Job">Job & Internships</option>
+                <option value="Hostel">Hostel Life</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Card Header Design</label>
+              <select id="headerType" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="brand-bar">Brand Bar</option>
+                <option value="logo-box">Emblem Box</option>
+                <option value="pill-badge">Pill Badge</option>
+                <option value="medical-clinic">Medical Clinic</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Dynamic Field Keys (Comma Separated)</label>
+            <input type="text" id="fields" required placeholder="Student_Name, Roll_No, Date, Reason" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <span class="text-[10px] text-slate-400">Comma-separated keys matching {{key_name}} in your letter body.</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Letter Body Text</label>
+            <textarea id="body" required rows="9" placeholder="To,\nThe Principal...\n\nI am {{Student_Name}} (Roll No: {{Roll_No}})...\n\nThank you." class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono"></textarea>
+          </div>
+
+          <button type="submit" id="saveBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">
+            Save Template to Realtime Database
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Column: Realtime Database Letters List -->
+    <div class="lg:col-span-7 space-y-4">
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col h-[720px]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Custom Letters in Realtime Database</h2>
+            <p class="text-xs text-slate-400" id="dbStatus">Connecting to Firebase...</p>
+          </div>
+          <span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md">
+            Live Listener Active
+          </span>
+        </div>
+
+        <div id="templatesList" class="flex-1 overflow-y-auto divide-y divide-slate-100 pt-2">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    window.addEventListener('firebase-ready', () => {
+      document.getElementById('dbStatus').innerText = "Connected to Realtime Database path: /student_letters";
+      listenToDatabase();
+    });
+
+    // Real-time listener: auto-updates whenever items are added or deleted
+    function listenToDatabase() {
+      const { ref, onValue } = window.rtdbTools;
+      const lettersRef = ref(window.rtdb, 'student_letters');
+
+      onValue(lettersRef, (snapshot) => {
+        const container = document.getElementById("templatesList");
+        const data = snapshot.val();
+
+        if (!data) {
+          container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">No custom templates in Realtime Database yet. Create one using the form on the left!</div>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        Object.keys(data).forEach(key => {
+          const item = data[key];
+          const div = document.createElement("div");
+          div.className = "py-3.5 flex items-center justify-between gap-4";
+          div.innerHTML = `
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-50 text-blue-700">${item.category}</span>
+                <h4 class="font-bold text-xs text-slate-900">${item.title}</h4>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1 line-clamp-1">${item.body.replace(/\n/g, ' ')}</p>
+            </div>
+            <button onclick="deleteTemplate('${key}')" class="px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition shrink-0">
+              Delete
+            </button>
+          `;
+          container.appendChild(div);
+        });
+      }, (error) => {
+        document.getElementById("templatesList").innerHTML = `<div class="p-6 text-center text-xs text-rose-500">Database error: ${error.message}</div>`;
+      });
+    }
+
+    async function handleNewTemplate(e) {
+      e.preventDefault();
+      const btn = document.getElementById("saveBtn");
+      btn.innerText = "Saving to Realtime Database...";
+      btn.disabled = true;
+
+      const title = document.getElementById("title").value;
+      const category = document.getElementById("category").value;
+      const headerType = document.getElementById("headerType").value;
+      const rawFields = document.getElementById("fields").value;
+      const fields = rawFields.split(",").map(f => f.trim().replace(/\s+/g, '_')).filter(Boolean);
+      const body = document.getElementById("body").value;
+
+      const newLetter = {
+        id: `custom-${Date.now()}`,
+        title: title,
+        subtitle: `Free ${title} Template`,
+        category: category,
+        headerType: headerType,
+        brandName: "USEAS LETTER PORTAL",
+        fields: fields,
+        body: body,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        const { ref, push, set } = window.rtdbTools;
+        const lettersRef = ref(window.rtdb, 'student_letters');
+        const newRef = push(lettersRef);
+        await set(newRef, newLetter);
+
+        alert("Template saved successfully to Realtime Database!");
+        e.target.reset();
+      } catch (err) {
+        alert("Error saving: " + err.message);
+      } finally {
+        btn.innerText = "Save Template to Realtime Database";
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteTemplate(key) {
+      if (!confirm("Are you sure you want to delete this template?")) return;
+      try {
+        const { ref, remove } = window.rtdbTools;
+        await remove(ref(window.rtdb, `student_letters/${key}`));
+      } catch (err) {
+        alert("Failed to delete: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
