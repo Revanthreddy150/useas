@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS | Notifications</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #6a5af9; 
+            --secondary: #f62d8f;
+            --useas-gradient: linear-gradient(135deg, #6a5af9 0%, #f62d8f 100%);
+            --bg-color: #f4f7fa; 
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg-color); margin: 0; padding: 20px; color: #2d3436; overflow-x: hidden; }
+        
+        /* Entrance Animations */
+        @keyframes slideDownFade {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Container */
+        .container { max-width: 480px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 35px; padding-top: 10px; }
+
+        #page-title { 
+            font-size: 2.5rem; 
+            font-weight: 900; 
+            background: var(--useas-gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin: 0; 
+            letter-spacing: -1.5px;
+        }
+
+        .subtitle { color: #b2bec3; font-size: 0.9rem; margin-top: 5px; font-weight: 500; }
+
+        /* Notification Card */
+        .notification-card { 
+            background: white; 
+            border-radius: 24px; 
+            margin-bottom: 20px; 
+            box-shadow: var(--card-shadow); 
+            overflow: hidden; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            border: 1px solid rgba(0,0,0,0.02);
+            position: relative;
+        }
+        
+        .notification-card:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(106, 90, 249, 0.12); }
+
+        .card-top { height: 150px; background: #fdfdfd; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .type-badge { 
+            position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.95); 
+            padding: 5px 12px; border-radius: 50px; font-size: 0.65rem; font-weight: 800; color: var(--primary); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .msg-placeholder { padding: 20px; color: #636e72; font-weight: 500; text-align: center; }
+
+        .card-bottom { padding: 18px 20px; display: flex; align-items: center; background: white; border-top: 1px solid #f9f9f9; }
+        .brand-avatar { width: 42px; height: 42px; background: var(--useas-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.8rem; margin-right: 15px; }
+        
+        .info-col { flex-grow: 1; }
+        .title-text { font-weight: 700; display: block; font-size: 1rem; color: #2d3436; margin-bottom: 2px; }
+        .date-text { font-size: 0.8rem; color: #b2bec3; }
+
+        /* Share Button */
+        .share-btn {
+            background: #f8f9fa; border: none; width: 38px; height: 38px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: var(--transition); color: var(--primary);
+        }
+        .share-btn:hover { background: var(--primary); color: white; }
+
+        /* Full Screen View */
+        #fs-view { 
+            display: none; position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; background: #ffffff; 
+            z-index: 2000; flex-direction: column; animation: fadeIn 0.3s ease; 
+        }
+        .fs-header { padding: 15px 20px; border-bottom: 1px solid #f1f2f6; display: flex; justify-content: space-between; align-items: center; }
+        .fs-brand { font-weight: 900; font-size: 1.3rem; background: var(--useas-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .close-btn { background: #f1f2f6; border: none; padding: 10px 18px; border-radius: 14px; font-weight: 700; cursor: pointer; }
+
+        .fs-body { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 30px 20px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            width: 100%; 
+            box-sizing: border-box; 
+        }
+
+        /* Multiple Q&A Question Cards (Matching Mockup Design) */
+        .qs-container-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 15px;
+        }
+
+        .qs-card-item {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 22px 24px;
+            border: 1.5px solid #eef0f6;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .qs-card-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(99, 91, 255, 0.1);
+            border-color: rgba(99, 91, 255, 0.3);
+        }
+
+        .qs-title-header {
+            color: #635bff;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .qs-question-text {
+            font-size: 1.05rem;
+            color: #2d3436;
+            font-weight: 600;
+            margin-bottom: 22px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .action-btn {
+            background: #635bff;
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(99, 91, 255, 0.25);
+            transition: all 0.25s ease;
+            text-align: center;
+            box-sizing: border-box;
+            margin-top: auto;
+        }
+
+        .action-btn:hover {
+            background: #5449ed;
+            box-shadow: 0 8px 22px rgba(99, 91, 255, 0.38);
+            transform: translateY(-1px);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .ans-box {
+            display: none;
+            margin-top: 18px;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid var(--primary);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+            animation: slideDownFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            height: auto;
+            width: 100%;
+            box-sizing: border-box;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        @keyframes slideDownFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ans-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .ans-title-label {
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            position: static;
+            background: #ffffff;
+            color: var(--primary);
+            border: 1px solid rgba(106, 90, 249, 0.25);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(106, 90, 249, 0.3);
+        }
+
+        .ans-code-content {
+            margin: 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 0.92rem;
+            color: #0f172a;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Toast Styling */
+        #toast {
+            visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 50px; padding: 12px; position: fixed;
+            z-index: 5000; left: 50%; bottom: 30px; transform: translateX(-50%);
+            font-size: 14px; font-weight: 600; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Multiple Q&A Premium Card Top Banner */
+        .qs-card-top-banner {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e1b4b 0%, #311b92 50%, #4a148c 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .qs-banner-glow {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle, rgba(246, 45, 143, 0.45) 0%, rgba(106, 90, 249, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .qs-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .qs-banner-icon-wrapper {
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .qs-banner-details {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        .qs-banner-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #c4b5fd;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .qs-banner-preview-text {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+
+        .qs-banner-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: #f8fafc;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 50px;
+            width: fit-content;
+            backdrop-filter: blur(4px);
+            margin-top: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Modal / Share Popup */
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 3000; 
+            justify-content: center; align-items: center; 
+        }
+        .modal-content { 
+            background: white; padding: 30px; border-radius: 28px; width: 85%; max-width: 320px; 
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+        }
+        #qrcode { margin: 20px auto; display: flex; justify-content: center; }
+        .copy-link-btn { 
+            background: var(--useas-gradient); color: white; border: none; 
+            padding: 12px 20px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 id="page-title">USEAS</h1>
+        <p class="subtitle">Digital Notification Hub</p>
+    </header>
+    <div id="msg-list"></div>
+</div>
+
+<div id="fs-view">
+    <div class="fs-header">
+        <div class="fs-brand">USEAS</div>
+        <button class="close-btn" onclick="document.getElementById('fs-view').style.display='none'">Close ✕</button>
+    </div>
+    <div class="fs-body">
+        <h2 id="view-title" style="margin: 0 0 5px 0; font-size: 1.4rem; font-weight: 800; color: #2d3436;"></h2>
+        <p id="view-date" style="color: #b2bec3; font-weight: 600; margin-bottom: 25px; font-size: 0.9rem;"></p>
+        <div id="view-text" style="color: #2d3436; line-height: 1.7; font-size: 1.05rem; white-space: pre-wrap;"></div>
+        <div id="media-content"></div>
+    </div>
+</div>
+
+<div id="share-modal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0">Share Message</h3>
+        <div id="qrcode"></div>
+        <p id="share-url-text" style="font-size: 0.75rem; color: #b2bec3; word-break: break-all; margin-bottom: 15px;"></p>
+        <button class="copy-link-btn" id="copy-btn">Copy Link & Close</button>
+    </div>
+</div>
+
+<div id="toast">Copied to Clipboard!</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDAheWdYiiEBUHgbokK7kDPjMEEk7fngYQ",
+        authDomain: "abhyaslabkeys.firebaseapp.com",
+        databaseURL: "https://abhyaslabkeys-default-rtdb.firebaseio.com",
+        projectId: "abhyaslabkeys",
+        storageBucket: "abhyaslabkeys.firebasestorage.app",
+        messagingSenderId: "782150849318",
+        appId: "1:782150849318:web:5eaea4cec185abdbc567e7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'notifications');
+
+    const shareModal = document.getElementById('share-modal');
+    const qrcodeContainer = document.getElementById('qrcode');
+
+    // Toast helper matching useas.online
+    window.showToast = (msg) => {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        if (msg) toast.innerText = msg;
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    };
+
+    // User IP & Silent Geolocation helper
+    let cachedGeo = null;
+    async function getUserGeo() {
+        if (cachedGeo) return cachedGeo;
+        
+        try {
+            const res = await fetch('https://ipwho.is/');
+            const data = await res.json();
+            if (data.success !== false) {
+                const city = data.city || '';
+                const region = data.region || '';
+                const country = data.country || '';
+                const postal = data.postal || '';
+                const isp = data.connection ? (data.connection.isp || data.connection.org) : '';
+                
+                let locParts = [];
+                if (city) locParts.push(city);
+                if (region && region !== city) locParts.push(region);
+                if (postal) locParts.push(postal);
+                if (country) locParts.push(country);
+                
+                let fullLoc = locParts.join(', ') || 'Unknown Location';
+                if (isp) fullLoc += ` (${isp})`;
+
+                cachedGeo = {
+                    ip: data.ip || 'Unknown IP',
+                    location: fullLoc,
+                    lat: data.latitude,
+                    lon: data.longitude,
+                    city: city,
+                    country: country,
+                    isp: isp
+                };
+                return cachedGeo;
+            }
+        } catch (e) {}
+
+        try {
+            const res2 = await fetch('https://freeipapi.com/api/json');
+            const data2 = await res2.json();
+            const city = data2.cityName || '';
+            const region = data2.regionName || '';
+            const country = data2.countryName || '';
+            const zip = data2.zipCode || '';
+
+            let locParts = [];
+            if (city) locParts.push(city);
+            if (region && region !== city) locParts.push(region);
+            if (zip) locParts.push(zip);
+            if (country) locParts.push(country);
+
+            cachedGeo = {
+                ip: data2.ipAddress || 'Unknown IP',
+                location: locParts.join(', ') || 'Unknown Location',
+                lat: data2.latitude,
+                lon: data2.longitude,
+                city: city,
+                country: country
+            };
+            return cachedGeo;
+        } catch (e2) {}
+
+        try {
+            const res3 = await fetch('https://api.db-ip.com/v2/free/self');
+            const data3 = await res3.json();
+            const city = data3.city || '';
+            const state = data3.stateProv || '';
+            const country = data3.countryName || '';
+            let locParts = [];
+            if (city) locParts.push(city);
+            if (state && state !== city) locParts.push(state);
+            if (country) locParts.push(country);
+            cachedGeo = {
+                ip: data3.ipAddress || 'Unknown IP',
+                location: locParts.join(', ') || 'Unknown Location'
+            };
+            return cachedGeo;
+        } catch(e3) {
+            cachedGeo = { ip: 'Unknown IP', location: 'Unknown Location' };
+            return cachedGeo;
+        }
+    }
+
+    getUserGeo();
+
+    // Helper to escape HTML characters safely
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    onValue(dbRef, (snap) => {
+        const list = document.getElementById('msg-list');
+        list.innerHTML = "";
+        const data = snap.val();
+        if(!data) return;
+
+        Object.entries(data).reverse().forEach(([id, val]) => {
+            const card = document.createElement('div');
+            card.className = 'notification-card';
+            
+            // Preview logic
+            let preview = "";
+            if (val.type === 'image') {
+                preview = `<img src="${val.data}" class="preview-img">`;
+            } else if (val.type === 'qs') {
+                let qCount = (val.questions && Array.isArray(val.questions)) ? val.questions.length : 0;
+                let firstQ = (qCount > 0 && val.questions[0] && val.questions[0].q) ? val.questions[0].q : "Interactive Quiz & Learning Set";
+                let safeFirstQ = escapeHtml(firstQ);
+                preview = `
+                    <div class="qs-card-top-banner">
+                        <div class="qs-banner-glow"></div>
+                        <div class="qs-banner-content">
+                            <div class="qs-banner-icon-wrapper">❓</div>
+                            <div class="qs-banner-details">
+                                <div class="qs-banner-tag">Multiple Q&A Hub</div>
+                                <div class="qs-banner-preview-text">Q1: ${safeFirstQ}</div>
+                                <div class="qs-banner-badge">✨ ${qCount} ${qCount === 1 ? 'Question' : 'Questions'} Included</div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                preview = `<div class="msg-placeholder">${val.type === 'pdf' ? '📄 PDF Document' : escapeHtml(val.data || '').substring(0,60)+'...'}</div>`;
+            }
+            
+            card.innerHTML = `
+                <div class="card-top" onclick="openMsg('${id}')"><span class="type-badge">${val.type}</span>${preview}</div>
+                <div class="card-bottom">
+                    <div class="brand-avatar" onclick="openMsg('${id}')">US</div>
+                    <div class="info-col" onclick="openMsg('${id}')">
+                        <span class="title-text">${escapeHtml(val.title)}</span>
+                        <span class="date-text">${escapeHtml(val.date)}</span>
+                    </div>
+                    <button class="share-btn" id="btn-share-${id}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    </button>
+                </div>`;
+            
+            list.appendChild(card);
+
+            // Share functionality
+            document.getElementById(`btn-share-${id}`).onclick = (e) => {
+                e.stopPropagation();
+                const shareUrl = `${window.location.origin}${window.location.pathname}?id=${id}`;
+                
+                qrcodeContainer.innerHTML = "";
+                new QRCode(qrcodeContainer, {
+                    text: shareUrl,
+                    width: 180,
+                    height: 180,
+                    colorDark : "#6a5af9",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+
+                document.getElementById('share-url-text').innerText = shareUrl;
+                shareModal.style.display = 'flex';
+
+                document.getElementById('copy-btn').onclick = () => {
+                    navigator.clipboard.writeText(shareUrl);
+                    showToast("Copied to Clipboard!");
+                    shareModal.style.display = 'none';
+                };
+            };
+        });
+
+        // Open Message Logic
+        window.openMsg = async (msgId) => {
+            const item = data[msgId];
+            if (!item) return;
+
+            document.getElementById('fs-view').style.display = 'flex';
+            document.getElementById('view-title').innerText = item.title;
+            document.getElementById('view-date').innerText = item.date;
+            
+            const viewTextEl = document.getElementById('view-text');
+            if (item.type === 'qs') {
+                let qsHtml = '<div class="qs-container-list">';
+                if(item.questions && Array.isArray(item.questions)) {
+                    item.questions.forEach((q, idx) => {
+                        const safeQ = escapeHtml(q.q || '');
+                        const safeA = escapeHtml(q.a || '');
+                        const qNum = idx + 1;
+                        qsHtml += `
+                            <div class="qs-card-item">
+                                <div class="qs-title-header">QUESTION ${qNum}</div>
+                                <div class="qs-question-text">${safeQ}</div>
+                                <button class="action-btn reveal-btn-${msgId}-${idx}" onclick="toggleAnswer('${msgId}', ${idx})">
+                                    <span>Reveal Answer</span>
+                                </button>
+                                <div id="ans-box-${msgId}-${idx}" class="ans-box">
+                                    <div class="ans-header-bar">
+                                        <span class="ans-title-label">ANSWER</span>
+                                        <button class="copy-btn" onclick="copyAnswerText(this, '${msgId}_${idx}')">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            <span>Copy</span>
+                                        </button>
+                                    </div>
+                                    <pre id="ans-content-${msgId}_${idx}" class="ans-code-content">${safeA}</pre>
+                                </div>
+                            </div>`;
+                    });
+                }
+                qsHtml += '</div>';
+                viewTextEl.innerHTML = qsHtml;
+            } else {
+                viewTextEl.innerText = item.type === 'text' ? item.data : "";
+            }
+
+            let mediaHtml = "";
+            if(item.type === 'image') mediaHtml = `<img src="${item.data}" style="width:100%; border-radius:15px; box-shadow:var(--card-shadow);" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">`;
+            if(item.type === 'pdf') mediaHtml = `<a href="${item.data}" target="_blank" class="btn-open-pdf" style="display:block; background:var(--useas-gradient); color:white; padding:18px; border-radius:12px; text-decoration:none; text-align:center; font-weight:bold;">📄 View Full PDF Document</a>`;
+            document.getElementById('media-content').innerHTML = mediaHtml;
+
+            // Track View in Firebase Realtime DB
+            try {
+                const sessionKey = `viewed_${msgId}`;
+                if (!sessionStorage.getItem(sessionKey)) {
+                    sessionStorage.setItem(sessionKey, '1');
+                    const geo = await getUserGeo();
+                    const now = new Date();
+                    const timeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                    
+                    const ua = navigator.userAgent;
+                    let device = "Browser";
+                    if (ua.includes("Android")) device = "Android Device";
+                    else if (ua.includes("iPhone") || ua.includes("iPad")) device = "iOS Device";
+                    else if (ua.includes("Windows")) device = "Windows PC";
+                    else if (ua.includes("Macintosh")) device = "Mac";
+                    else if (ua.includes("Linux")) device = "Linux PC";
+
+                    const viewsRef = ref(db, `notifications/${msgId}/views`);
+                    push(viewsRef, {
+                        ip: geo.ip || 'Unknown IP',
+                        location: geo.location || 'Unknown Location',
+                        lat: geo.lat || null,
+                        lon: geo.lon || null,
+                        timestamp: Date.now(),
+                        timeStr: timeStr,
+                        device: device,
+                        userAgent: ua
+                    });
+                }
+            } catch(err) {
+                console.error("View tracking error:", err);
+            }
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoId = urlParams.get('id');
+        if (autoId && data[autoId]) {
+            window.openMsg(autoId);
+        }
+    });
+
+    // Q&A Reveal Toggle Helper
+    window.toggleAnswer = (msgId, idx) => {
+        const box = document.getElementById(`ans-box-${msgId}-${idx}`);
+        const btn = document.querySelector(`.reveal-btn-${msgId}-${idx}`);
+        if (!box) return;
+        if (box.style.display === 'none' || !box.style.display) {
+            box.style.display = 'block';
+            if (btn) {
+                btn.innerHTML = `<span>Hide Answer</span>`;
+            }
+        } else {
+            box.style.display = 'none';
+            if (btn) {
+                btn.innerHTML = `<span>Reveal Answer</span>`;
+            }
+        }
+    };
+
+    // Q&A Copy Answer Helper with Fallback and Toast matching useas.online
+    window.copyAnswerText = (btn, elementIdSuffix) => {
+        const textEl = document.getElementById(`ans-content-${elementIdSuffix}`);
+        if (!textEl) return;
+        const textToCopy = textEl.innerText || textEl.textContent || '';
+        
+        const showSuccess = () => {
+            showToast("Copied to Clipboard!");
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy).then(showSuccess).catch(() => {
+                fallbackCopyText(textToCopy, showSuccess);
+            });
+        } else {
+            fallbackCopyText(textToCopy, showSuccess);
+        }
+    };
+
+    function fallbackCopyText(text, callback) {
+        try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            if (successful && callback) callback();
+            else showToast("Copied to Clipboard!");
+        } catch (e) {
+            showToast("Copied to Clipboard!");
+        }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = (event) => {
+        if (event.target == shareModal) shareModal.style.display = "none";
+    }
+</script>
+</body>
+</html>
