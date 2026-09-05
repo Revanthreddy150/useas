@@ -410,9 +410,9 @@
 
 <div id="toast">Copied to Clipboard!</div>
 
-<script type="module">
+<script type="module">    
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDAheWdYiiEBUHgbokK7kDPjMEEk7fngYQ",
@@ -430,6 +430,23 @@
 
     const shareModal = document.getElementById('share-modal');
     const qrcodeContainer = document.getElementById('qrcode');
+
+    // Helper to parse msgId from URL query string or hash
+    function getMsgIdFromUrl() {
+        try {
+            const searchParams = new URLSearchParams(window.location.search);
+            let id = searchParams.get('msgId') || searchParams.get('msgid') || searchParams.get('id');
+            if (id) return id.trim();
+
+            if (window.location.hash) {
+                const hashStr = window.location.hash.replace(/^#\/?/, '');
+                const hashParams = new URLSearchParams(hashStr.includes('?') ? hashStr.split('?')[1] : hashStr);
+                id = hashParams.get('msgId') || hashParams.get('msgid') || hashParams.get('id');
+                if (id) return id.trim();
+            }
+        } catch (e) {}
+        return null;
+    }
 
     // Toast helper matching useas.online
     window.showToast = (msg) => {
@@ -536,11 +553,119 @@
             .replace(/'/g, "&#039;");
     }
 
+    let allNotificationsData = {};
+    let hasAutoOpened = false;
+
+    // Open Message Logic (Accessible globally and fetches directly if needed)
+    window.openMsg = async (msgId, directItem = null) => {
+        if (!msgId) return;
+
+        let item = directItem || allNotificationsData[msgId];
+        
+        if (!item) {
+            try {
+                const singleRef = ref(db, `notifications/${msgId}`);
+                const snap = await get(singleRef);
+                if (snap.exists()) {
+                    item = snap.val();
+                }
+            } catch(err) {
+                console.error("Single msg fetch error:", err);
+            }
+        }
+
+        if (!item) return;
+
+        document.getElementById('fs-view').style.display = 'flex';
+        document.getElementById('view-title').innerText = item.title || '';
+        document.getElementById('view-date').innerText = item.date || '';
+        
+        const viewTextEl = document.getElementById('view-text');
+        if (item.type === 'qs') {
+            let qsHtml = '<div class="qs-container-list">';
+            if(item.questions && Array.isArray(item.questions)) {
+                item.questions.forEach((q, idx) => {
+                    const safeQ = escapeHtml(q.q || '');
+                    const safeA = escapeHtml(q.a || '');
+                    const qNum = idx + 1;
+                    qsHtml += `
+                        <div class="qs-card-item">
+                            <div class="qs-title-header">QUESTION ${qNum}</div>
+                            <div class="qs-question-text">${safeQ}</div>
+                            <button class="action-btn reveal-btn-${msgId}-${idx}" onclick="toggleAnswer('${msgId}', ${idx})">
+                                <span>Reveal Answer</span>
+                            </button>
+                            <div id="ans-box-${msgId}-${idx}" class="ans-box">
+                                <div class="ans-header-bar">
+                                    <span class="ans-title-label">ANSWER</span>
+                                    <button class="copy-btn" onclick="copyAnswerText(this, '${msgId}_${idx}')">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                        <span>Copy</span>
+                                    </button>
+                                </div>
+                                <pre id="ans-content-${msgId}_${idx}" class="ans-code-content">${safeA}</pre>
+                            </div>
+                        </div>`;
+                });
+            }
+            qsHtml += '</div>';
+            viewTextEl.innerHTML = qsHtml;
+        } else {
+            viewTextEl.innerText = item.type === 'text' ? (item.data || '') : "";
+        }
+
+        let mediaHtml = "";
+        if(item.type === 'image') mediaHtml = `<img src="${item.data}" style="width:100%; border-radius:15px; box-shadow:var(--card-shadow);" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">`;
+        if(item.type === 'pdf') mediaHtml = `<a href="${item.data}" target="_blank" class="btn-open-pdf" style="display:block; background:var(--useas-gradient); color:white; padding:18px; border-radius:12px; text-decoration:none; text-align:center; font-weight:bold;">📄 View Full PDF Document</a>`;
+        document.getElementById('media-content').innerHTML = mediaHtml;
+
+        // Track View in Firebase Realtime DB
+        try {
+            const sessionKey = `viewed_${msgId}`;
+            if (!sessionStorage.getItem(sessionKey)) {
+                sessionStorage.setItem(sessionKey, '1');
+                const geo = await getUserGeo();
+                const now = new Date();
+                const timeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                
+                const ua = navigator.userAgent;
+                let device = "Browser";
+                if (ua.includes("Android")) device = "Android Device";
+                else if (ua.includes("iPhone") || ua.includes("iPad")) device = "iOS Device";
+                else if (ua.includes("Windows")) device = "Windows PC";
+                else if (ua.includes("Macintosh")) device = "Mac";
+                else if (ua.includes("Linux")) device = "Linux PC";
+
+                const viewsRef = ref(db, `notifications/${msgId}/views`);
+                push(viewsRef, {
+                    ip: geo.ip || 'Unknown IP',
+                    location: geo.location || 'Unknown Location',
+                    lat: geo.lat || null,
+                    lon: geo.lon || null,
+                    timestamp: Date.now(),
+                    timeStr: timeStr,
+                    device: device,
+                    userAgent: ua
+                });
+            }
+        } catch(err) {
+            console.error("View tracking error:", err);
+        }
+    };
+
+    // Immediate check on page load if URL has msgId
+    const initialTargetId = getMsgIdFromUrl();
+    if (initialTargetId) {
+        hasAutoOpened = true;
+        window.openMsg(initialTargetId);
+    }
+
     onValue(dbRef, (snap) => {
         const list = document.getElementById('msg-list');
         list.innerHTML = "";
         const data = snap.val();
         if(!data) return;
+        allNotificationsData = data;
 
         Object.entries(data).reverse().forEach(([id, val]) => {
             const card = document.createElement('div');
@@ -579,7 +704,7 @@
                         <span class="date-text">${escapeHtml(val.date)}</span>
                     </div>
                     <button class="share-btn" id="btn-share-${id}">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
                     </button>
                 </div>`;
             
@@ -588,7 +713,7 @@
             // Share functionality
             document.getElementById(`btn-share-${id}`).onclick = (e) => {
                 e.stopPropagation();
-                const shareUrl = `${window.location.origin}${window.location.pathname}?msgid=${id}`;
+                const shareUrl = `${window.location.origin}${window.location.pathname}?msgId=${id}`;
                 
                 qrcodeContainer.innerHTML = "";
                 new QRCode(qrcodeContainer, {
@@ -611,92 +736,12 @@
             };
         });
 
-        // Open Message Logic
-        window.openMsg = async (msgId) => {
-            const item = data[msgId];
-            if (!item) return;
-
-            document.getElementById('fs-view').style.display = 'flex';
-            document.getElementById('view-title').innerText = item.title;
-            document.getElementById('view-date').innerText = item.date;
-            
-            const viewTextEl = document.getElementById('view-text');
-            if (item.type === 'qs') {
-                let qsHtml = '<div class="qs-container-list">';
-                if(item.questions && Array.isArray(item.questions)) {
-                    item.questions.forEach((q, idx) => {
-                        const safeQ = escapeHtml(q.q || '');
-                        const safeA = escapeHtml(q.a || '');
-                        const qNum = idx + 1;
-                        qsHtml += `
-                            <div class="qs-card-item">
-                                <div class="qs-title-header">QUESTION ${qNum}</div>
-                                <div class="qs-question-text">${safeQ}</div>
-                                <button class="action-btn reveal-btn-${msgId}-${idx}" onclick="toggleAnswer('${msgId}', ${idx})">
-                                    <span>Reveal Answer</span>
-                                </button>
-                                <div id="ans-box-${msgId}-${idx}" class="ans-box">
-                                    <div class="ans-header-bar">
-                                        <span class="ans-title-label">ANSWER</span>
-                                        <button class="copy-btn" onclick="copyAnswerText(this, '${msgId}_${idx}')">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                            <span>Copy</span>
-                                        </button>
-                                    </div>
-                                    <pre id="ans-content-${msgId}_${idx}" class="ans-code-content">${safeA}</pre>
-                                </div>
-                            </div>`;
-                    });
-                }
-                qsHtml += '</div>';
-                viewTextEl.innerHTML = qsHtml;
-            } else {
-                viewTextEl.innerText = item.type === 'text' ? item.data : "";
+        if (!hasAutoOpened) {
+            const targetId = getMsgIdFromUrl();
+            if (targetId && data[targetId]) {
+                hasAutoOpened = true;
+                window.openMsg(targetId, data[targetId]);
             }
-
-            let mediaHtml = "";
-            if(item.type === 'image') mediaHtml = `<img src="${item.data}" style="width:100%; border-radius:15px; box-shadow:var(--card-shadow);" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">`;
-            if(item.type === 'pdf') mediaHtml = `<a href="${item.data}" target="_blank" class="btn-open-pdf" style="display:block; background:var(--useas-gradient); color:white; padding:18px; border-radius:12px; text-decoration:none; text-align:center; font-weight:bold;">📄 View Full PDF Document</a>`;
-            document.getElementById('media-content').innerHTML = mediaHtml;
-
-            // Track View in Firebase Realtime DB
-            try {
-                const sessionKey = `viewed_${msgId}`;
-                if (!sessionStorage.getItem(sessionKey)) {
-                    sessionStorage.setItem(sessionKey, '1');
-                    const geo = await getUserGeo();
-                    const now = new Date();
-                    const timeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-                    
-                    const ua = navigator.userAgent;
-                    let device = "Browser";
-                    if (ua.includes("Android")) device = "Android Device";
-                    else if (ua.includes("iPhone") || ua.includes("iPad")) device = "iOS Device";
-                    else if (ua.includes("Windows")) device = "Windows PC";
-                    else if (ua.includes("Macintosh")) device = "Mac";
-                    else if (ua.includes("Linux")) device = "Linux PC";
-
-                    const viewsRef = ref(db, `notifications/${msgId}/views`);
-                    push(viewsRef, {
-                        ip: geo.ip || 'Unknown IP',
-                        location: geo.location || 'Unknown Location',
-                        lat: geo.lat || null,
-                        lon: geo.lon || null,
-                        timestamp: Date.now(),
-                        timeStr: timeStr,
-                        device: device,
-                        userAgent: ua
-                    });
-                }
-            } catch(err) {
-                console.error("View tracking error:", err);
-            }
-        };
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const autoId = urlParams.get('msgid') || urlParams.get('id');
-        if (autoId && data[autoId]) {
-            window.openMsg(autoId);
         }
     });
 
