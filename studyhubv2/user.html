@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Hub | Student Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #6c5ce7; 
+            --primary-gradient: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            --blue-accent: #2980b9; 
+            --bg: #f4f7f6; 
+            --card-bg: #ffffff; 
+            --text-main: #2d3436; 
+            --text-muted: #636e72; 
+            --border: rgba(0, 0, 0, 0.08); 
+            --neon-green: #2ecc71; 
+            --yt-red: #FF0000;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        body { background: var(--bg); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+        
+        /* Toast Notification */
+        #toast { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            background: #2d3436; color: var(--neon-green); padding: 14px 28px; 
+            border-radius: 50px; font-weight: 600; display: none; z-index: 11000; 
+            border: 1px solid var(--neon-green); 
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+            animation: toastPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes toastPop {
+            0% { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
+            100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+
+        /* Floating Support Button */
+        #help-btn { 
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; 
+            background: var(--primary-gradient); color: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; 
+            cursor: pointer; z-index: 1000; 
+            animation: sonarWave 2.5s infinite; 
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4); 
+        }
+        #help-btn:hover {
+            transform: scale(1.12) rotate(10deg);
+            box-shadow: 0 12px 30px rgba(108, 92, 231, 0.6);
+        }
+        @keyframes sonarWave { 
+            0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); } 
+            70% { box-shadow: 0 0 0 18px rgba(108, 92, 231, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); } 
+        }
+
+        /* Floating Visitor Counter */
+        #visitor-counter { 
+            position: fixed; background: var(--primary-gradient); color: white; 
+            padding: 9px 18px; border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+            z-index: 1000; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 8px; 
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.35);
+            animation: floatBadge 4s ease-in-out infinite;
+        }
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Logo Shimmer & Glow Effect */
+        .header { text-align: center; padding: 40px 20px 10px; }
+        .logo { 
+            font-family: 'Orbitron', sans-serif; font-size: 2.3rem; 
+            background: linear-gradient(90deg, #6c5ce7, #a29bfe, #6c5ce7);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 6px; font-weight: 800; text-transform: uppercase; 
+            animation: shimmerLogo 6s linear infinite;
+        }
+        @keyframes shimmerLogo {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* Search Bar */
+        .search-container { max-width: 600px; margin: 20px auto; padding: 0 20px; position: relative; }
+        .search-bar { 
+            width: 100%; padding: 13px 20px 13px 48px; border-radius: 50px; 
+            border: 1px solid var(--border); background: var(--card-bg); outline: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04); font-size: 0.95rem;
+        }
+        .search-bar:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 25px rgba(108, 92, 231, 0.25);
+            transform: scale(1.01);
+        }
+        .search-icon { position: absolute; left: 36px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Breadcrumb Bar */
+        .bc-box { 
+            padding: 14px 25px; background: var(--card-bg); border-radius: 14px; 
+            font-size: 0.88rem; border: 1px solid var(--border); margin-bottom: 22px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .bc-link { color: var(--primary); cursor: pointer; font-weight: 600; }
+        .bc-link:hover { text-decoration: underline; color: #5142cb; }
+
+        /* Grid & Dynamic Card Animations */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; padding-bottom: 40px; }
+        .card { 
+            background: var(--card-bg); border: 1px solid var(--border); padding: 50px 20px; 
+            border-radius: 24px; text-align: center; cursor: pointer; position: relative; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+            animation: cardEntrance 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+        }
+        .card:hover { 
+            transform: translateY(-8px) scale(1.02); 
+            border-color: var(--primary); 
+            box-shadow: 0 15px 30px rgba(108, 92, 231, 0.18); 
+        }
+        .card i { transition: transform 0.3s ease; }
+        .card:hover i { transform: scale(1.15) rotate(-5deg); color: #5142cb; }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Unit Row Card */
+        .unit-item { 
+            background: var(--card-bg); border: 1px solid var(--border); margin: 12px 0; 
+            padding: 18px 24px; border-radius: 16px; display: flex; 
+            justify-content: space-between; align-items: center; cursor: pointer; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+            animation: unitSlideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+        }
+        .unit-item:hover { 
+            border-color: var(--primary); 
+            background: #fcfbff; 
+            transform: translateX(6px);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.1);
+        }
+        @keyframes unitSlideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Action Buttons */
+        .action-btns { display: flex; align-items: center; gap: 12px; }
+        .icon-action-btn { 
+            background: transparent; border: 1px solid var(--border); color: var(--primary); 
+            width: 38px; height: 38px; border-radius: 10px; display: flex; 
+            align-items: center; justify-content: center; cursor: pointer; transition: 0.25s; 
+        }
+        .icon-action-btn:hover { 
+            background: #f0eeff; border-color: var(--primary); transform: scale(1.15); 
+        }
+
+        /* Spinner & Loader */
+        #v2-loader { 
+            display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); 
+            z-index: 10001; flex-direction: column; align-items: center; justify-content: center; 
+            backdrop-filter: blur(5px);
+        }
+        .spinner { 
+            width: 44px; height: 44px; border: 4px solid #f3f3f3; 
+            border-top: 4px solid var(--primary); border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Modals & Backdrop Blur */
+        #video-viewer, #help-panel { 
+            display: none; position: fixed; inset: 0; z-index: 9999; 
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); flex-direction: column; 
+        }
+        .v-header { background: var(--card-bg); padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        iframe { width: 100%; height: 100%; border: none; }
+        #help-panel { justify-content: center; align-items: center; }
+        .help-card { 
+            width: 90%; max-width: 460px; background: #fff; border-radius: 32px; 
+            overflow: hidden; animation: modalBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        }
+        @keyframes modalBounce { 
+            from { transform: translateY(60px) scale(0.9); opacity: 0; } 
+            to { transform: translateY(0) scale(1); opacity: 1; } 
+        }
+        .help-top { background: var(--primary-gradient); padding: 32px; text-align: center; color: white; position: relative; }
+        .msg-input { width: 100%; height: 130px; padding: 16px; border: 2px solid #eee; border-radius: 16px; margin-bottom: 20px; resize: none; outline: none; font-size: 0.92rem; }
+        .msg-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(108, 92, 231, 0.2); }
+        .submit-help-btn { width: 100%; padding: 16px; background: var(--primary-gradient); color: white; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 6px 18px rgba(108, 92, 231, 0.35); }
+        .submit-help-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(108, 92, 231, 0.5); }
+        
+        footer { padding: 60px 20px; text-align: center; color: var(--text-muted); opacity: 0.75; font-size: 0.8rem; letter-spacing: 1px; }
+        .back-btn { background: var(--blue-accent); color: white; border: none; padding: 9px 18px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3); }
+        .back-btn:hover { transform: translateY(-2px); background: #217dbb; }
+    </style>
+</head>
+<body>
+
+<div id="toast"><i class="fa-solid fa-check" style="margin-right:8px;"></i> Link copied to clipboard!</div>
+<div id="v2-loader">
+    <div class="spinner"></div>
+    <p style="margin-top:16px; font-weight: 600; color: var(--primary);">Accessing Resource & Redirecting...</p>
+</div>
+<div id="visitor-counter"><i class="fa-solid fa-eye"></i> <span id="view-count">1,380</span></div>
+<div id="help-btn" onclick="openHelp()"><i class="fa-solid fa-headset"></i></div>
+
+<div class="header">
+    <h1 class="logo">STUDY HUB</h1>
+</div>
+
+<div class="search-container">
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <input type="text" id="searchInput" class="search-bar" placeholder="Search subjects or topics...">
+</div>
+
+<div class="container">
+    <div class="bc-box" id="bc">Home</div>
+    
+    <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 id="viewTitle" style="font-size: 1.1rem; color: var(--primary); font-family: 'Orbitron'; text-transform: uppercase;"></h2>
+        <button id="globalBackBtn" class="back-btn" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i> BACK</button>
+    </div>
+
+    <div class="grid" id="mainGrid"></div>
+
+    <div id="notesArea" style="display:none;">
+        <div id="unitList"></div>
+    </div>
+</div>
+
+<!-- Support Modal -->
+<div id="help-panel">
+    <div class="help-card">
+        <div class="help-top">
+            <i class="fa-solid fa-circle-question" style="font-size:3rem; margin-bottom: 10px; display: block;"></i>
+            <h2>SUPPORT CENTER</h2>
+            <div id="closeHelpX" onclick="closeHelp()" style="position:absolute; top:15px; right:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="help-body" style="padding:30px;">
+            <textarea id="helpMsg" class="msg-input" placeholder="Is a link broken? Notes missing? Describe the issue here..."></textarea>
+            <button class="submit-help-btn" id="sendReportBtn" onclick="sendReport()">SEND REPORT</button>
+        </div>
+    </div>
+</div>
+
+<!-- YouTube Player Modal -->
+<div id="video-viewer">
+    <div class="v-header">
+        <span id="v-video-name" style="font-weight: 600; color: var(--primary);"></span>
+        <button id="closeVideoBtn" onclick="closeVideo()" style="background:#e74c3c; color:white; border:none; padding:8px 20px; border-radius:8px; cursor: pointer; font-weight: 600;">CLOSE</button>
+    </div>
+    <div style="flex:1; background:#000; display:flex; align-items:center; justify-content:center;">
+        <iframe id="video-frame" allowfullscreen style="max-width:1000px; aspect-ratio:16/9; width:95%;"></iframe>
+    </div>
+</div>
+
+<footer>&copy; 2026 STUDY HUB PORTAL • ACADEMIC RESOURCE NETWORK</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { liveRepositoriesData } from "./src/live_repositories.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+        authDomain: "studyhub-33164.firebaseapp.com",
+        databaseURL: "https://studyhub-33164-default-rtdb.firebaseio.com",
+        projectId: "studyhub-33164",
+        storageBucket: "studyhub-33164.firebasestorage.app",
+        messagingSenderId: "918352715015",
+        appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2",
+        measurementId: "G-HDPLBSL0BN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dataRef = ref(db, "portal_tree_data");
+    const countRef = ref(db, "visitor_count");
+    const msgRef = ref(db, "messages");
+
+    let core = liveRepositoriesData;
+    let path = [];
+    let searchTerm = "";
+
+    // Increment visitor count
+    try {
+      runTransaction(countRef, (cur) => (cur === null || cur === undefined ? 1380 : cur + 1));
+    } catch(e){}
+
+    onValue(countRef, (snap) => {
+      if(snap.exists()) {
+        const el = document.getElementById('view-count');
+        if (el) el.innerText = Number(snap.val()).toLocaleString();
+      }
+    });
+
+    // Subscribe to Firebase Realtime Database
+    onValue(dataRef, (snap) => {
+        if(snap.exists() && snap.val() && Object.keys(snap.val()).length > 0) {
+            core = snap.val();
+        } else {
+            core = liveRepositoriesData;
+            set(dataRef, liveRepositoriesData);
+        }
+        checkDeepLinkRedirect();
+        render();
+    });
+
+    // Deep Link Check & Auto-Redirect
+    function checkDeepLinkRedirect() {
+      const hash = window.location.hash;
+      if (!hash || !hash.startsWith('#/')) return;
+
+      let cleanHash = hash.replace(/^#\//, '');
+      if (cleanHash.startsWith('Home/')) cleanHash = cleanHash.replace(/^Home\//, '');
+
+      const parts = cleanHash.split('/').map(decodeURIComponent).filter(Boolean);
+      if (parts.length > 0) {
+        const targetUnit = parts[parts.length - 1].trim().toLowerCase();
+        const folderPath = parts.slice(0, -1);
+
+        let target = core;
+        for (let k of folderPath) {
+          if (target && target[k]) target = target[k];
+          else break;
+        }
+
+        let foundUrl = null;
+        if (target && target._type === 'subject') {
+          const units = target.units || [];
+          const links = target.links || [];
+          const idx = units.findIndex(u => (u||'').trim().toLowerCase() === targetUnit);
+          if (idx !== -1 && links[idx] && links[idx] !== '#') foundUrl = links[idx];
+        }
+
+        if (!foundUrl) {
+          // Global search fallback
+          const searchGlobally = (node) => {
+            if (!node) return null;
+            if (node._type === 'subject') {
+              const units = node.units || [];
+              const links = node.links || [];
+              const idx = units.findIndex(u => (u||'').trim().toLowerCase() === targetUnit);
+              if (idx !== -1 && links[idx] && links[idx] !== '#') return links[idx];
+            } else {
+              const keys = Object.keys(node).filter(k => !k.startsWith('_'));
+              for (let k of keys) {
+                const res = searchGlobally(node[k]);
+                if (res) return res;
+              }
+            }
+            return null;
+          };
+          foundUrl = searchGlobally(core);
+        }
+
+        if (foundUrl) {
+          const loader = document.getElementById('v2-loader');
+          if (loader) loader.style.display = 'flex';
+          setTimeout(() => {
+            window.location.replace(foundUrl);
+          }, 400);
+        }
+      }
+    }
+
+    // Render Engine
+    window.render = () => {
+        const grid = document.getElementById('mainGrid');
+        const notesArea = document.getElementById('notesArea');
+        const unitList = document.getElementById('unitList');
+        const navHeader = document.getElementById('navHeader');
+        const viewTitle = document.getElementById('viewTitle');
+        
+        if (!grid || !unitList) return;
+
+        // Guaranteed Fallback Guard if core is uninitialized or empty
+        if (!core || typeof core !== 'object' || Object.keys(core).filter(k => !k.startsWith('_')).length === 0) {
+          core = liveRepositoriesData;
+        }
+
+        grid.innerHTML = '';
+        unitList.innerHTML = '';
+
+        // Breadcrumbs
+        let bcHtml = `<span class="bc-link" onclick="jumpTo(-1)">Home</span>`;
+        path.forEach((p, i) => { bcHtml += ` > <span class="bc-link" onclick="jumpTo(${i})">${p}</span>`; });
+        const bc = document.getElementById('bc');
+        if (bc) bc.innerHTML = bcHtml;
+        
+        if(path.length > 0) {
+          if (navHeader) navHeader.style.display = 'flex';
+          if (viewTitle) viewTitle.innerText = path[path.length - 1];
+        } else {
+          if (navHeader) navHeader.style.display = 'none';
+        }
+
+        // Live Search Filter
+        if (searchTerm.trim() !== '') {
+          grid.style.display = 'none';
+          if (notesArea) notesArea.style.display = 'block';
+          if (navHeader) navHeader.style.display = 'none';
+
+          const matches = [];
+          const findMatches = (node, currentPath = []) => {
+            if (!node) return;
+            if (node._type === 'subject') {
+              (node.units || []).forEach((u, i) => {
+                if (u && u.toLowerCase().includes(searchTerm.toLowerCase())) {
+                  matches.push({
+                    type: 'unit',
+                    name: u,
+                    link: (node.links || [])[i] || '#',
+                    vid: (node.vids || [])[i] || '',
+                    path: currentPath
+                  });
+                }
+              });
+            } else {
+              Object.keys(node).filter(k => !k.startsWith('_')).forEach(k => {
+                if (k.toLowerCase().includes(searchTerm.toLowerCase())) {
+                  matches.push({ type: 'folder', name: k, path: [...currentPath, k] });
+                }
+                findMatches(node[k], [...currentPath, k]);
+              });
+            }
+          };
+
+          findMatches(core);
+
+          if (matches.length === 0) {
+            unitList.innerHTML = '<div style="text-align:center; padding:40px; color:#888;">No results found</div>';
+          } else {
+            matches.forEach((m, idx) => {
+              const animDelay = (idx * 0.05).toFixed(2);
+              if (m.type === 'unit') {
+                unitList.innerHTML += `
+                  <div class="unit-item" style="animation-delay: ${animDelay}s" onclick="openPdf('${m.link}')">
+                    <span><i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-right:10px;"></i> ${m.name}</span>
+                    <div class="action-btns" onclick="event.stopPropagation()">
+                      <button class="icon-action-btn" onclick="shareUnit('${m.path.join('/')}', '${m.name}')" title="Share Link"><i class="fa-solid fa-share-nodes" style="color:#2ecc71;"></i></button>
+                      ${m.vid ? `<button class="icon-action-btn" onclick="openVideo('${m.vid}', '${m.name}')" title="Watch Video"><i class="fa-brands fa-youtube" style="color:#ff0000;"></i></button>` : ''}
+                      <button class="icon-action-btn" onclick="openPdf('${m.link}')" title="Open Full Page PDF"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                    </div>
+                  </div>`;
+              } else {
+                unitList.innerHTML += `
+                  <div class="unit-item" style="animation-delay: ${animDelay}s" onclick="jumpToPath('${m.path.join('/')}')">
+                    <span><i class="fa-solid fa-folder-open" style="color:var(--primary); margin-right:10px;"></i> ${m.name}</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </div>`;
+              }
+            });
+          }
+          return;
+        }
+
+        // Normal Level Navigation
+        let target = core;
+        path.forEach(p => { if(target) target = target[p]; });
+
+        if(!target) { path = []; render(); return; }
+
+        if(target._type === 'subject') {
+            grid.style.display = 'none';
+            if (notesArea) notesArea.style.display = 'block';
+            (target.units || []).forEach((u, i) => {
+                const pdfLink = (target.links || [])[i] || '#';
+                const vidLink = (target.vids || [])[i] || '';
+                const animDelay = (i * 0.05).toFixed(2);
+
+                unitList.innerHTML += `
+                    <div class="unit-item" style="animation-delay: ${animDelay}s" onclick="openPdf('${pdfLink}')">
+                        <span><i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-right:10px;"></i> ${u}</span>
+                        <div class="action-btns" onclick="event.stopPropagation()">
+                          <button class="icon-action-btn" onclick="shareUnit('${path.join('/')}', '${u}')" title="Share Link"><i class="fa-solid fa-share-nodes" style="color:#2ecc71;"></i></button>
+                          ${vidLink ? `<button class="icon-action-btn" onclick="openVideo('${vidLink}', '${u}')" title="Watch Video"><i class="fa-brands fa-youtube" style="color:#ff0000;"></i></button>` : ''}
+                          <button class="icon-action-btn" onclick="openPdf('${pdfLink}')" title="Open Full Page PDF"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                        </div>
+                    </div>`;
+            });
+        } else {
+            grid.style.display = 'grid';
+            if (notesArea) notesArea.style.display = 'none';
+
+            const keys = Object.keys(target).filter(k => !k.startsWith('_')).sort((a,b) => (target[a]._rank || 99) - (target[b]._rank || 99));
+            
+            keys.forEach((k, idx) => {
+                const animDelay = (idx * 0.06).toFixed(2);
+                grid.innerHTML += `
+                    <div class="card" style="animation-delay: ${animDelay}s" onclick="moveIn('${k}')">
+                        <i class="fa-solid ${path.length === 0 ? 'fa-graduation-cap' : 'fa-book-open'}" style="font-size:2.5rem; color:var(--primary); margin-bottom:15px;"></i>
+                        <h3 style="font-size:1rem;">${k}</h3>
+                    </div>`;
+            });
+        }
+    };
+
+    // Navigation & Actions
+    window.moveIn = (key) => { path.push(key); render(); };
+    window.goBack = () => { path.pop(); render(); };
+    window.jumpTo = (idx) => { path = path.slice(0, idx + 1); render(); };
+    window.jumpToPath = (pathStr) => { path = pathStr.split('/'); render(); };
+
+    window.openPdf = (url) => {
+      if (url && url !== '#') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    };
+
+    window.openVideo = (url, name) => {
+      const el = document.getElementById('v-video-name');
+      if (el) el.innerText = name;
+      let vidId = '';
+      if(url.includes('v=')) vidId = url.split('v=')[1].split('&')[0];
+      else if(url.includes('youtu.be/')) vidId = url.split('youtu.be/')[1].split('?')[0];
+      const frame = document.getElementById('video-frame');
+      if (frame) frame.src = vidId ? `https://www.youtube.com/embed/${vidId}?autoplay=1` : url;
+      const viewer = document.getElementById('video-viewer');
+      if (viewer) viewer.style.display = 'flex';
+    };
+
+    window.closeVideo = () => {
+      const frame = document.getElementById('video-frame');
+      if (frame) frame.src = '';
+      const viewer = document.getElementById('video-viewer');
+      if (viewer) viewer.style.display = 'none';
+    };
+
+    window.shareUnit = (pathStr, name) => {
+      const parts = pathStr.split('/').filter(Boolean).map(encodeURIComponent);
+      const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
+      const shareUrl = `${baseUrl}/#/Home/${parts.join('/')}/${encodeURIComponent(name)}`;
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl);
+      }
+      
+      const toast = document.getElementById('toast');
+      if (toast) {
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2500);
+      }
+
+      if (navigator.share) {
+        try {
+          navigator.share({ title: name, text: `Study Hub notes for ${name}`, url: shareUrl });
+        } catch(e){}
+      }
+    };
+
+    // Support Form Actions
+    window.openHelp = () => { const el = document.getElementById('help-panel'); if (el) el.style.display = 'flex'; };
+    window.closeHelp = () => { const el = document.getElementById('help-panel'); if (el) el.style.display = 'none'; };
+    window.sendReport = () => {
+      const msgEl = document.getElementById('helpMsg');
+      const msg = msgEl ? msgEl.value : '';
+      if (msg.trim()) {
+        onValue(msgRef, (snap) => {
+          const currentInbox = (snap.exists() && snap.val().inbox) ? snap.val().inbox : [];
+          currentInbox.push({ text: msg.trim(), time: new Date().toLocaleString() });
+          set(msgRef, { inbox: currentInbox });
+        }, { onlyOnce: true });
+        alert("Report sent to Study Hub support!");
+        if (msgEl) msgEl.value = '';
+        window.closeHelp();
+      }
+    };
+
+    // Search Input Event
+    const sInput = document.getElementById('searchInput');
+    if (sInput) {
+      sInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        render();
+      });
+    }
+
+    // Force initial render immediately
+    render();
+</script>
+</body>
+</html>
