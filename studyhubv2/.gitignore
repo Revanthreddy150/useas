@@ -1,0 +1,11 @@
+# Logs & dependencies
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+
+# Environment variables (Keeps Firebase credentials hidden from GitHub repo)
+.env
+.env.local
+.env.production

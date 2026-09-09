@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Study Hub Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #6c5ce7; --bg: #f4f7f6; --dark: #2d3436; 
+            --accent: #2ecc71; --error: #e74c3c; --blue: #3498db;
+            --purple: #8e44ad; --teal: #16a085;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+        body { background: var(--bg); color: var(--dark); padding-bottom: 50px; }
+
+        /* Navigation Bar */
+        #admin-bar { 
+            background: var(--dark); padding: 15px; position: sticky; top: 0; 
+            z-index: 2000; border-bottom: 3px solid var(--accent); 
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .admin-btn { 
+            background: var(--accent); color: white; border: none; padding: 10px 18px; 
+            border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;
+            display: flex; align-items: center; gap: 8px; transition: 0.2s;
+        }
+        .admin-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        .container { max-width: 1100px; margin: 20px auto; padding: 0 20px; }
+        
+        /* Breadcrumbs */
+        .breadcrumb-nav { 
+            background: white; padding: 15px 25px; border-radius: 12px; 
+            margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.08);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        #bc-container { font-size: 0.9rem; font-weight: 600; color: var(--primary); }
+        .bc-link { cursor: pointer; text-decoration: none; color: var(--primary); }
+        .bc-link:hover { text-decoration: underline; }
+
+        /* Grid & Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { 
+            background: white; padding: 30px 20px; border-radius: 15px; text-align: center; 
+            position: relative; border: 1px solid #ddd; cursor: pointer; transition: 0.2s;
+        }
+        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        
+        /* List View for Units */
+        .unit-item { 
+            background: white; padding: 15px 20px; margin-bottom: 10px; border-radius: 10px; 
+            border-left: 5px solid var(--primary); display: flex; 
+            justify-content: space-between; align-items: center; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .unit-item:hover { background: #fdfdff; }
+
+        /* Editing Panel */
+        #editPanel { 
+            background: white; padding: 25px; border-radius: 15px; 
+            border: 2px solid var(--primary); margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(108, 92, 231, 0.2); }
+
+        /* Inbox Panel */
+        #message-panel { 
+            position: fixed; inset: 0; background: white; z-index: 3000; 
+            display: none; flex-direction: column; padding: 30px; 
+        }
+        .msg-card { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--blue); }
+        
+        .badge { background: #eee; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; position: absolute; top: 10px; left: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="admin-bar">
+    <button class="admin-btn" onclick="addNewNode()"><i class="fa-solid fa-folder-plus"></i> New Folder/Subject</button>
+    <button class="admin-btn" id="v2-btn" onclick="toggleV2()">V2: OFF</button>
+    <button class="admin-btn" style="background:var(--purple);" onclick="exportRepositories()"><i class="fa-solid fa-file-export"></i> Export JSON</button>
+    <button class="admin-btn" style="background:var(--teal);" onclick="syncLiveRepositories()"><i class="fa-solid fa-cloud-arrow-down"></i> Sync from Web</button>
+    <button class="admin-btn" style="background:var(--blue);" onclick="openInbox()"><i class="fa-solid fa-envelope"></i> Reports</button>
+    <button class="admin-btn" style="background:var(--error);" onclick="location.href='/'">View Portal</button>
+</div>
+
+<div class="container">
+    <div class="breadcrumb-nav">
+        <div id="bc-container">Home</div>
+        <button class="admin-btn" id="back-btn" style="background:var(--dark); display:none;" onclick="goBack()">Back</button>
+    </div>
+
+    <div id="mainGrid" class="grid"></div>
+
+    <div id="subjectView" style="display:none;">
+        <div id="unitList"></div>
+        <button class="admin-btn" style="width:100%; background:var(--primary); margin-top:10px;" onclick="addUnit()">+ Add New Resource</button>
+        
+        <div id="editPanel" style="display:none;">
+            <h3 style="margin-bottom:15px; color:var(--primary);">Edit Resource</h3>
+            <label>Title</label>
+            <input type="text" id="editName">
+            <label>PDF Link</label>
+            <input type="text" id="editPdf">
+            <label>YouTube Link (Optional)</label>
+            <input type="text" id="editVid">
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="admin-btn" style="flex:1" onclick="saveEdit()">Update</button>
+                <button class="admin-btn" style="background:var(--error); flex:1" onclick="deleteUnit()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="message-panel">
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <h2>Student Reports</h2>
+        <button class="admin-btn" onclick="document.getElementById('message-panel').style.display='none'">Close</button>
+    </div>
+    <div id="inbox-list" style="overflow-y:auto; flex:1;"></div>
+    <button class="admin-btn" style="background:var(--error); margin-top:15px;" onclick="clearMsg()">Clear All</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { liveRepositoriesData } from "./src/live_repositories.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+        authDomain: "studyhub-33164.firebaseapp.com",
+        databaseURL: "https://studyhub-33164-default-rtdb.firebaseio.com",
+        projectId: "studyhub-33164",
+        storageBucket: "studyhub-33164.firebasestorage.app",
+        messagingSenderId: "918352715015",
+        appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2",
+        measurementId: "G-HDPLBSL0BN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dataRef = ref(db, "portal_tree_data");
+    const settingsRef = ref(db, "app_settings");
+    const msgRef = ref(db, "messages");
+
+    let core = {}; 
+    let path = []; 
+    let selectedUnitIdx = null;
+    let v2Enabled = false;
+
+    // Real-Time Listener
+    onValue(dataRef, (snap) => {
+        if(snap.exists()) {
+            core = snap.val();
+        } else {
+            core = liveRepositoriesData;
+            set(dataRef, liveRepositoriesData);
+        }
+        render();
+    });
+
+    onValue(settingsRef, (snap) => {
+        if(snap.exists()) {
+            v2Enabled = snap.val().v2Enabled;
+            const btn = document.getElementById('v2-btn');
+            btn.innerText = `V2: ${v2Enabled ? 'ON' : 'OFF'}`;
+            btn.style.background = v2Enabled ? 'var(--accent)' : '#f39c12';
+        }
+    });
+
+    // --- EXPORT & SYNC ---
+    window.exportRepositories = () => {
+        const jsonStr = JSON.stringify(core, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `studyhub_repositories_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    window.syncLiveRepositories = async () => {
+        if (confirm("Sync full live repository structure from useas.online/studyhub into Firebase?")) {
+            await set(dataRef, liveRepositoriesData);
+            alert("Live repositories imported successfully!");
+        }
+    };
+
+    // --- RENDER ENGINE ---
+    window.render = () => {
+        const grid = document.getElementById('mainGrid');
+        const subjectView = document.getElementById('subjectView');
+        const unitList = document.getElementById('unitList');
+        const backBtn = document.getElementById('back-btn');
+        
+        grid.innerHTML = '';
+        unitList.innerHTML = '';
+        
+        // Update Breadcrumbs
+        let bcHtml = `<span class="bc-link" onclick="jumpTo(-1)">Home</span>`;
+        path.forEach((p, i) => { bcHtml += ` > <span class="bc-link" onclick="jumpTo(${i})">${p}</span>`; });
+        document.getElementById('bc-container').innerHTML = bcHtml;
+        backBtn.style.display = path.length > 0 ? 'block' : 'none';
+
+        // Get Current Level
+        let target = core;
+        path.forEach(p => { if(target) target = target[p]; });
+
+        if(!target) { 
+            path = []; 
+            render(); 
+            return; 
+        }
+
+        // Check if current target is a Subject (has units) or a Folder
+        if(target._type === 'subject') {
+            grid.style.display = 'none';
+            subjectView.style.display = 'block';
+            (target.units || []).forEach((u, i) => {
+                unitList.innerHTML += `
+                    <div class="unit-item" onclick="openEdit(${i})">
+                        <span><i class="fa-solid fa-file-pdf" style="color:#ef4444; margin-right:8px;"></i> ${u}</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>`;
+            });
+        } else {
+            grid.style.display = 'grid';
+            subjectView.style.display = 'none';
+            document.getElementById('editPanel').style.display = 'none';
+
+            const keys = Object.keys(target).filter(k => !k.startsWith('_')).sort((a,b) => (target[a]._rank || 99) - (target[b]._rank || 99));
+            
+            keys.forEach(k => {
+                grid.innerHTML += `
+                    <div class="card" onclick="moveIn('${k}')">
+                        <div class="badge">Order: ${target[k]._rank || '99'}</div>
+                        <i class="fa-solid ${path.length === 0 ? 'fa-graduation-cap' : 'fa-folder-open'}" style="font-size:2.5rem; color:var(--primary); margin-bottom:15px;"></i>
+                        <h3 style="font-size:1rem;">${k}</h3>
+                        <div style="margin-top:20px; display:flex; justify-content:center; gap:20px; color:#aaa;">
+                            <i class="fa-solid fa-pen-to-square" style="color:var(--blue); cursor:pointer;" onclick="event.stopPropagation(); renameNode('${k}')" title="Edit Repository / Folder Name"></i>
+                            <i class="fa-solid fa-sort" style="cursor:pointer;" onclick="event.stopPropagation(); setRank('${k}')" title="Sort Order"></i>
+                            <i class="fa-solid fa-trash" style="color:var(--error); cursor:pointer;" onclick="event.stopPropagation(); deleteNode('${k}')" title="Delete"></i>
+                        </div>
+                    </div>`;
+            });
+        }
+    };
+
+    // --- NAVIGATION ---
+    window.moveIn = (key) => { path.push(key); render(); };
+    window.goBack = () => { path.pop(); render(); };
+    window.jumpTo = (idx) => { path = path.slice(0, idx + 1); render(); };
+
+    // --- ACTION FUNCTIONS ---
+    window.addNewNode = async () => {
+        const name = prompt("Enter Name (Subject or Folder):");
+        if(!name) return;
+        let t = core;
+        path.forEach(p => t = t[p]);
+        
+        t[name] = path.length >= 1 ? { _type:'subject', units:[], links:[], vids:[], _rank: 99 } : { _rank: 99 };
+        await set(dataRef, core);
+    };
+
+    window.renameNode = async (oldName) => {
+        const newName = prompt(`Edit name for "${oldName}":`, oldName);
+        if(!newName || newName.trim() === '' || newName.trim() === oldName) return;
+        
+        const trimmed = newName.trim();
+        if(trimmed.startsWith('_')) {
+            alert("Names starting with '_' are reserved.");
+            return;
+        }
+
+        let t = core;
+        path.forEach(p => t = t[p]);
+
+        if(t[trimmed]) {
+            alert(`An item named "${trimmed}" already exists here.`);
+            return;
+        }
+
+        // Copy tree under new name & delete old key
+        t[trimmed] = t[oldName];
+        delete t[oldName];
+
+        await set(dataRef, core);
+    };
+
+    window.deleteNode = async (key) => {
+        if(confirm(`Delete "${key}" and everything inside it?`)) {
+            let t = core;
+            path.forEach(p => t = t[p]);
+            delete t[key];
+            await set(dataRef, core);
+        }
+    };
+
+    window.setRank = async (key) => {
+        let t = core;
+        path.forEach(p => t = t[p]);
+        const r = prompt("Enter Sort Order (1, 2, 3...):", t[key]._rank || "99");
+        if(r) {
+            t[key]._rank = parseInt(r);
+            await set(dataRef, core);
+        }
+    };
+
+    window.openEdit = (idx) => {
+        selectedUnitIdx = idx;
+        let t = core; path.forEach(p => t = t[p]);
+        document.getElementById('editPanel').style.display = 'block';
+        document.getElementById('editName').value = t.units[idx];
+        document.getElementById('editPdf').value = t.links[idx];
+        document.getElementById('editVid').value = (t.vids && t.vids[idx]) ? t.vids[idx] : '';
+    };
+
+    window.saveEdit = async () => {
+        let t = core; path.forEach(p => t = t[p]);
+        t.units[selectedUnitIdx] = document.getElementById('editName').value;
+        t.links[selectedUnitIdx] = document.getElementById('editPdf').value;
+        if(!t.vids) t.vids = [];
+        t.vids[selectedUnitIdx] = document.getElementById('editVid').value;
+        await set(dataRef, core);
+        document.getElementById('editPanel').style.display = 'none';
+        alert("Updated!");
+    };
+
+    window.addUnit = async () => {
+        let t = core; path.forEach(p => t = t[p]);
+        t.units.push("New Unit Name");
+        t.links.push("#");
+        if(!t.vids) t.vids = [];
+        t.vids.push("");
+        await set(dataRef, core);
+    };
+
+    window.deleteUnit = async () => {
+        if(confirm("Delete this unit?")) {
+            let t = core; path.forEach(p => t = t[p]);
+            t.units.splice(selectedUnitIdx, 1);
+            t.links.splice(selectedUnitIdx, 1);
+            if(t.vids) t.vids.splice(selectedUnitIdx, 1);
+            await set(dataRef, core);
+            document.getElementById('editPanel').style.display = 'none';
+        }
+    };
+
+    window.toggleV2 = async () => {
+        await set(settingsRef, { v2Enabled: !v2Enabled });
+    };
+
+    window.openInbox = async () => {
+        const l = document.getElementById('inbox-list');
+        l.innerHTML = '';
+        onValue(msgRef, (snap) => {
+            if(snap.exists() && snap.val().inbox) {
+                const inbox = snap.val().inbox;
+                l.innerHTML = '';
+                inbox.slice().reverse().forEach(m => {
+                    l.innerHTML += `<div class="msg-card"><strong>${m.time || ''}</strong><p>${m.text}</p></div>`;
+                });
+            } else {
+                l.innerHTML = '<p style="color:#888;">No reports received.</p>';
+            }
+        }, { onlyOnce: true });
+        document.getElementById('message-panel').style.display = 'flex';
+    };
+
+    window.clearMsg = async () => { if(confirm("Clear messages?")) await set(msgRef, { inbox: [] }); };
+
+</script>
+</body>
+</html>
