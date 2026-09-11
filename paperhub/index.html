@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Hub - Digital Academic Repository</title>
+    <meta name="description" content="A premium academic paper repository and digital document management system.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase Compatibility Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <!-- Dynamic Background Elements -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Header Section -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand-group">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="brand-details">
+                    <h1 class="header-title">PAPER HUB</h1>
+                    <p class="header-subtitle">Digital Academic Repository & Study Resources</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div id="adminActiveBadge" class="admin-badge hidden">
+                    <i class="fa-solid fa-shield-halved"></i> Admin Active
+                    <button id="lockAdminBtn" title="Lock Admin Mode" class="lock-icon-btn"><i class="fa-solid fa-lock"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Container -->
+    <main class="main-content">
+        
+        <!-- Admin Tools Panel -->
+        <section id="admin-panel" class="admin-panel-card hidden">
+            <div class="admin-card-header">
+                <div class="admin-title-wrap">
+                    <div class="admin-icon-box">
+                        <i class="fa-solid fa-shield-cat"></i>
+                    </div>
+                    <div>
+                        <h2>Administrator Control Panel</h2>
+                        <p>Upload, update, or remove academic papers in real-time</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="paperForm" onsubmit="return false;" class="admin-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-grid-3">
+                    <div class="form-field">
+                        <label for="paper-title"><i class="fa-solid fa-heading"></i> Document Title</label>
+                        <input type="text" id="paper-title" class="admin-input" placeholder="e.g. Computer Science Midterm Exam Solutions 2026" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="paper-subject"><i class="fa-solid fa-book-bookmark"></i> Subject / Topic</label>
+                        <input type="text" id="paper-subject" class="admin-input" placeholder="e.g. Computer Science, Mathematics, Physics">
+                    </div>
+                    <div class="form-field full-row">
+                        <label for="paper-link"><i class="fa-solid fa-link"></i> PDF or Image Link</label>
+                        <input type="text" id="paper-link" class="admin-input" placeholder="Direct link to PDF, Image, or Google Drive URL" required>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" id="save-btn" class="btn btn-save">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span id="saveBtnText">Save to Cloud</span>
+                    </button>
+                    <button type="button" id="cancel-edit-btn" class="btn btn-cancel hidden">
+                        <i class="fa-solid fa-xmark"></i> Cancel Edit
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Search & Control Bar -->
+        <section class="controls-section">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="mSearch" placeholder="Search papers, exam notes, or document links..." autocomplete="off">
+                <button id="clearSearchBtn" class="clear-btn hidden" title="Clear Search"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="toolbar-controls">
+                <div class="toolbar-left">
+                    <h2 class="section-heading"><i class="fa-solid fa-book-open"></i> All Papers</h2>
+                </div>
+
+                <div class="layout-toggle">
+                    <button id="gridViewBtn" class="toggle-btn active" title="Grid Layout"><i class="fa-solid fa-grip"></i></button>
+                    <button id="listViewBtn" class="toggle-btn" title="List Layout"><i class="fa-solid fa-list-ul"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Papers Container Grid -->
+        <section id="papers-container" class="papers-grid">
+            <!-- Skeleton cards will be loaded here initially -->
+        </section>
+    </main>
+
+    <!-- FULL PAGE DOCUMENT READER VIEW -->
+    <div id="fullPageReader" class="full-page-reader hidden">
+        <div class="reader-header">
+            <div class="reader-header-left">
+                <button id="readerBackBtn" class="reader-btn back-btn" title="Back to Papers">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Back to Papers</span>
+                </button>
+                <div class="reader-title-group">
+                    <span id="readerSubjectBadge" class="reader-subject-tag"><i class="fa-solid fa-book-bookmark"></i> Subject</span>
+                    <h2 id="readerTitle" class="reader-title">Document Title</h2>
+                </div>
+            </div>
+
+            <div class="reader-header-right">
+                <button id="readerShareBtn" class="reader-btn share-btn" title="Share Paper Link">
+                    <i class="fa-solid fa-share-nodes"></i> <span>Share Link</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="readerBody" class="reader-body">
+            <!-- Full page iframe or image loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Secret Access Modal -->
+    <div id="overlay" class="modal-overlay hidden">
+        <div id="secretModal" class="secret-card">
+            <div class="secret-badge-icon">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h2 id="modalHeading">PAPER HUB</h2>
+            <p class="secret-desc">System Verification Required</p>
+            
+            <div id="secretInputGroup" class="secret-form hidden">
+                <input type="password" id="secretPassInput" class="admin-input" placeholder="Enter System Password">
+                <button id="secretSubmitBtn" class="btn btn-save" style="width:100%; margin-top:12px;">
+                    <i class="fa-solid fa-key"></i> Authenticate
+                </button>
+            </div>
+            <p id="secretTip" class="secret-tip">Tap the title 5 times to enter password.</p>
+            
+            <button class="corner-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+
+    <!-- Toast Notification Popup Container -->
+    <div id="toastContainer" class="toast-wrapper"></div>
+
+    <!-- Footer -->
+    <footer id="footerTrigger" class="app-footer">
+        <p>© 2026 Paper Hub • Academic Document Management System</p>
+    </footer>
+
+    <!-- App JavaScript Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
