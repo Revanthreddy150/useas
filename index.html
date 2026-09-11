@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -1002,7 +1001,6 @@
                     }
 
                     function ensureLetterTemplatesCard() {
-                        removeShortNotesCard();
                         if (document.getElementById('letter-templates-card')) return;
                         const letterCard = document.createElement('div');
                         letterCard.className = 'feature-card';
@@ -1026,6 +1024,31 @@
                         }
                     }
 
+                    function updatePrevPapersCard() {
+                        const paperHubCard = document.getElementById('paper-hub-card');
+                        if (paperHubCard) paperHubCard.remove();
+
+                        const cards = document.querySelectorAll('.feature-card, .menu-link');
+                        cards.forEach(card => {
+                            const text = (card.textContent || '').trim().toLowerCase();
+                            if (
+                                text.includes('prev paper') ||
+                                text.includes('previous paper') ||
+                                text.includes('paper hub') ||
+                                text.includes('paperhub') ||
+                                text === 'papers'
+                            ) {
+                                card.setAttribute('onclick', "window.open('https://www.useas.online/paperhub/', '_blank')");
+                            }
+                        });
+                    }
+
+                    function ensureCustomCards() {
+                        removeShortNotesCard();
+                        ensureLetterTemplatesCard();
+                        updatePrevPapersCard();
+                    }
+
                     try {
                         const cached = localStorage.getItem('useas_study_essentials_cache');
                         if (cached && cached.trim().length > 10) {
@@ -1033,13 +1056,11 @@
                         }
                     } catch (e) { }
 
-                    removeShortNotesCard();
-                    ensureLetterTemplatesCard();
+                    ensureCustomCards();
 
                     const observer = new MutationObserver(function () {
                         if (grid.children.length > 0) {
-                            removeShortNotesCard();
-                            ensureLetterTemplatesCard();
+                            ensureCustomCards();
                             try {
                                 localStorage.setItem('useas_study_essentials_cache', grid.innerHTML);
                             } catch (e) { }
@@ -1074,9 +1095,14 @@
     <script>
         (function () {
             const NOTES_URL = 'https://revanthreddy150.github.io/studyhubv2';
+            const PAPERHUB_URL = 'https://www.useas.online/paperhub/';
 
             function openNotesTab() {
                 window.open(NOTES_URL, '_blank', 'noopener,noreferrer');
+            }
+
+            function openPaperHubTab() {
+                window.open(PAPERHUB_URL, '_blank', 'noopener,noreferrer');
             }
 
             let _originalTrigger = window.triggerDirectPortalView;
@@ -1085,6 +1111,15 @@
                     return function (url) {
                         if (url && (url.includes('studyhubv2') || url.toLowerCase().includes('notes'))) {
                             openNotesTab();
+                            return;
+                        }
+                        if (url && (
+                            url.includes('paperhub') ||
+                            url.toLowerCase().includes('paper') ||
+                            url.toLowerCase().includes('prev paper') ||
+                            url.toLowerCase().includes('previous paper')
+                        )) {
+                            openPaperHubTab();
                             return;
                         }
                         if (typeof _originalTrigger === 'function') {
@@ -1105,6 +1140,20 @@
                     const text = (target.textContent || '').trim().toLowerCase();
                     const onclickAttr = target.getAttribute('onclick') || '';
                     const hrefAttr = target.getAttribute('href') || '';
+                    if (
+                        text.includes('prev paper') ||
+                        text.includes('previous paper') ||
+                        text.includes('paper hub') ||
+                        text.includes('paperhub') ||
+                        onclickAttr.includes('paperhub') ||
+                        onclickAttr.includes('paper') ||
+                        hrefAttr.includes('paperhub')
+                    ) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openPaperHubTab();
+                        return;
+                    }
                     if (
                         text.includes('notes') ||
                         onclickAttr.includes('studyhubv2') ||
