@@ -36,6 +36,20 @@
             100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
         }
 
+        /* Top-Right Floating Holiday Calendar Button */
+        #calendar-btn {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--primary-gradient); color: white;
+            padding: 10px 18px; border-radius: 30px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            z-index: 1000; box-shadow: 0 6px 16px rgba(108, 92, 231, 0.35);
+        }
+        #calendar-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 22px rgba(108, 92, 231, 0.5);
+        }
+
         /* Floating Support Button */
         #help-btn { 
             position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; 
@@ -69,7 +83,7 @@
         }
 
         /* Logo Shimmer & Glow Effect */
-        .header { text-align: center; padding: 40px 20px 10px; }
+        .header { text-align: center; padding: 50px 20px 10px; }
         .logo { 
             font-family: 'Orbitron', sans-serif; font-size: 2.3rem; 
             background: linear-gradient(90deg, #6c5ce7, #a29bfe, #6c5ce7);
@@ -174,7 +188,7 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* Modals & Backdrop Blur */
-        #video-viewer, #help-panel { 
+        #video-viewer, #calendar-viewer, #help-panel { 
             display: none; position: fixed; inset: 0; z-index: 9999; 
             background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); flex-direction: column; 
         }
@@ -199,6 +213,14 @@
         footer { padding: 60px 20px; text-align: center; color: var(--text-muted); opacity: 0.75; font-size: 0.8rem; letter-spacing: 1px; }
         .back-btn { background: var(--blue-accent); color: white; border: none; padding: 9px 18px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3); }
         .back-btn:hover { transform: translateY(-2px); background: #217dbb; }
+
+        /* Responsive Tweaks */
+        @media (max-width: 600px) {
+            #calendar-btn span { display: none; }
+            #calendar-btn { padding: 10px 12px; border-radius: 50%; }
+            .logo { font-size: 1.8rem; letter-spacing: 3px; }
+            .header { padding-top: 60px; }
+        }
     </style>
 </head>
 <body>
@@ -209,6 +231,13 @@
     <p style="margin-top:16px; font-weight: 600; color: var(--primary);">Accessing Resource & Redirecting...</p>
 </div>
 <div id="visitor-counter"><i class="fa-solid fa-eye"></i> <span id="view-count">1,380</span></div>
+
+<!-- Top-Right Holiday Calendar Button -->
+<div id="calendar-btn" onclick="openCalendar()">
+    <i class="fa-solid fa-calendar-days"></i>
+    <span>Holiday Calendar</span>
+</div>
+
 <div id="help-btn" onclick="openHelp()"><i class="fa-solid fa-headset"></i></div>
 
 <div class="header">
@@ -258,6 +287,17 @@
     </div>
     <div style="flex:1; background:#000; display:flex; align-items:center; justify-content:center;">
         <iframe id="video-frame" allowfullscreen style="max-width:1000px; aspect-ratio:16/9; width:95%;"></iframe>
+    </div>
+</div>
+
+<!-- Holiday Calendar Modal -->
+<div id="calendar-viewer">
+    <div class="v-header">
+        <span style="font-weight: 600; color: var(--primary);"><i class="fa-solid fa-calendar-days" style="margin-right:8px;"></i> Aditya University - Holiday Calendar</span>
+        <button onclick="closeCalendar()" style="background:#e74c3c; color:white; border:none; padding:8px 20px; border-radius:8px; cursor: pointer; font-weight: 600;">CLOSE</button>
+    </div>
+    <div style="flex:1; background:#fff; width:100%;">
+        <iframe id="calendar-frame" style="width:100%; height:100%; border:none;"></iframe>
     </div>
 </div>
 
@@ -531,6 +571,21 @@
       const frame = document.getElementById('video-frame');
       if (frame) frame.src = '';
       const viewer = document.getElementById('video-viewer');
+      if (viewer) viewer.style.display = 'none';
+    };
+
+    // Holiday Calendar Modal Actions
+    window.openCalendar = () => {
+      const frame = document.getElementById('calendar-frame');
+      if (frame) frame.src = 'https://www.adityauniversity.in/holiday';
+      const viewer = document.getElementById('calendar-viewer');
+      if (viewer) viewer.style.display = 'flex';
+    };
+
+    window.closeCalendar = () => {
+      const frame = document.getElementById('calendar-frame');
+      if (frame) frame.src = '';
+      const viewer = document.getElementById('calendar-viewer');
       if (viewer) viewer.style.display = 'none';
     };
 
