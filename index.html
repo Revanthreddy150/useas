@@ -1051,6 +1051,26 @@
                         }
                     }
 
+                    function ensureCrtExamsCard() {
+                        if (document.getElementById('crt-exams-card')) return;
+                        const crtCard = document.createElement('div');
+                        crtCard.className = 'feature-card';
+                        crtCard.id = 'crt-exams-card';
+                        crtCard.setAttribute('onclick', "window.open('https://www.useas.online/crtexams', '_blank')");
+                        crtCard.innerHTML = `
+                            <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <h4>CRT Exams</h4>
+                            <p>Practice & Test</p>
+                        `;
+                        const cards = Array.from(grid.querySelectorAll('.feature-card'));
+                        const letterCard = cards.find(card => card.id === 'letter-templates-card');
+                        if (letterCard) {
+                            letterCard.after(crtCard);
+                        } else {
+                            grid.appendChild(crtCard);
+                        }
+                    }
+
                     function updatePrevPapersCard() {
                         const paperHubCard = document.getElementById('paper-hub-card');
                         if (paperHubCard) paperHubCard.remove();
@@ -1073,6 +1093,7 @@
                     function ensureCustomCards() {
                         removeShortNotesCard();
                         ensureLetterTemplatesCard();
+                        ensureCrtExamsCard();
                         updatePrevPapersCard();
                     }
 
@@ -1123,6 +1144,7 @@
         (function () {
             const NOTES_URL = 'https://www.useas.online/studyhubv2/';
             const PAPERHUB_URL = 'https://www.useas.online/paperhub/';
+            const CRT_EXAMS_URL = 'https://www.useas.online/crtexams';
 
             function openNotesTab() {
                 window.open(NOTES_URL, '_blank', 'noopener,noreferrer');
@@ -1130,6 +1152,10 @@
 
             function openPaperHubTab() {
                 window.open(PAPERHUB_URL, '_blank', 'noopener,noreferrer');
+            }
+
+            function openCrtExamsTab() {
+                window.open(CRT_EXAMS_URL, '_blank', 'noopener,noreferrer');
             }
 
             let _originalTrigger = window.triggerDirectPortalView;
@@ -1147,6 +1173,14 @@
                             url.toLowerCase().includes('previous paper')
                         )) {
                             openPaperHubTab();
+                            return;
+                        }
+                        if (url && (
+                            url.includes('crtexams') ||
+                            url.toLowerCase().includes('crt exam') ||
+                            url.toLowerCase().includes('crt exams')
+                        )) {
+                            openCrtExamsTab();
                             return;
                         }
                         if (typeof _originalTrigger === 'function') {
@@ -1167,6 +1201,17 @@
                     const text = (target.textContent || '').trim().toLowerCase();
                     const onclickAttr = target.getAttribute('onclick') || '';
                     const hrefAttr = target.getAttribute('href') || '';
+                    if (
+                        text.includes('crt exam') ||
+                        text.includes('crt exams') ||
+                        onclickAttr.includes('crtexams') ||
+                        hrefAttr.includes('crtexams')
+                    ) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openCrtExamsTab();
+                        return;
+                    }
                     if (
                         text.includes('prev paper') ||
                         text.includes('previous paper') ||
