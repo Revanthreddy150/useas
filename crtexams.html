@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>USEAS - Assessment Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #007bff;
+      --primary-blue-hover: #0069d9;
+      --card-bg-blue: #cfe2ff;
+      --card-border-blue: #b6d4fe;
+      --bg-page: #f8fafc;
+      --text-dark: #212529;
+      --text-muted: #6c757d;
+      
+      /* Exact Touchstone Palette Colors */
+      --color-not-visited-bg: #ffffff;
+      --color-not-visited-border: #d2dae5;
+      --color-not-visited-text: #273b56;
+      --color-not-answered: #dc3545;
+      --color-answered: #28a745;
+      --color-review: #fd7e14;
+      --color-answered-review: #0dcaf0;
+    }
+
+    * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+    body { background-color: var(--bg-page); color: var(--text-dark); min-height: 100vh; }
+
+    /* Top Nav */
+    nav {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .brand-group { display: flex; align-items: center; gap: 12px; }
+    .brand-title {
+      font-weight: 800;
+      font-size: 20px;
+      color: #4f46e5;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+    .auth-btn {
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .auth-btn:hover { background: #4338ca; }
+    .logged-user {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e1b4b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+
+    /* 1. Test Selection List */
+    .test-strip-card {
+      background-color: #dbeafe;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      transition: box-shadow 0.2s;
+    }
+    .test-strip-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+    }
+    .strip-left { display: flex; align-items: center; gap: 18px; }
+    .strip-icon { font-size: 32px; line-height: 1; }
+    .strip-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0c4a6e;
+      margin-bottom: 4px;
+    }
+    .strip-subtitle {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0284c7;
+      text-transform: uppercase;
+    }
+    .btn-start-test {
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-start-test:hover { background-color: #0069d9; }
+
+    /* 2. Instructions Screen */
+    .instruction-wrapper {
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .header-bar-inst {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 18px;
+    }
+    .inst-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+    .inst-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    .inst-table th, .inst-table td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .inst-table th {
+      background: #f8fafc;
+      font-weight: 700;
+    }
+    .palette-legend-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .palette-legend-table td {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      vertical-align: middle;
+    }
+    .legend-badge {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .badge-grey { background-color: #6c757d; }
+    .badge-red { background-color: var(--color-not-answered); }
+    .badge-green { background-color: var(--color-answered); }
+    .badge-orange { background-color: var(--color-review); }
+    .badge-blue { background-color: var(--color-answered-review); }
+
+    .user-details-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .user-detail-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 9999px;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #495057;
+      font-weight: 600;
+    }
+    .detail-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      color: #64748b;
+      flex-shrink: 0;
+    }
+    .btn-launch-exam {
+      width: 100%;
+      background: #f59e0b;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 9999px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn-launch-exam:hover { background: #d97706; }
+
+    /* 3. Touchstone Exam Workspace */
+    .workspace-wrapper {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      min-height: calc(100vh - 65px);
+      background: #ffffff;
+    }
+    .sidebar-left {
+      border-right: 1px solid #e5e9f0;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #ffffff;
+    }
+    .sidebar-header {
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 18px;
+      color: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* EXACT QUESTION PALETTE STYLING FROM IMAGE */
+    .q-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-height: calc(100vh - 240px);
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 20px;
+    }
+    .q-grid-btn {
+      aspect-ratio: 1;
+      width: 100%;
+      border-radius: 6px;
+      background: var(--color-not-visited-bg);
+      border: 1px solid var(--color-not-visited-border);
+      color: var(--color-not-visited-text);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s ease-in-out;
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+    .q-grid-btn:hover {
+      border-color: #94a3b8;
+    }
+    /* Not Visited (Clean White with Grey border) */
+    .q-grid-btn.not-visited {
+      background: #ffffff;
+      border: 1px solid var(--color-not-visited-border);
+      color: var(--color-not-visited-text);
+    }
+    /* Red (Not Answered) */
+    .q-grid-btn.not-answered {
+      background: var(--color-not-answered) !important;
+      color: #ffffff !important;
+      border-color: var(--color-not-answered) !important;
+    }
+    /* Green (Answered) */
+    .q-grid-btn.answered {
+      background: var(--color-answered) !important;
+      color: #ffffff !important;
+      border-color: var(--color-answered) !important;
+    }
+    /* Orange (Review) */
+    .q-grid-btn.review {
+      background: var(--color-review) !important;
+      color: #ffffff !important;
+      border-color: var(--color-review) !important;
+    }
+    /* Blue (Answered + Review) */
+    .q-grid-btn.answered-review {
+      background: var(--color-answered-review) !important;
+      color: #ffffff !important;
+      border-color: var(--color-answered-review) !important;
+    }
+    /* Current Selected Question: Exact 2.5px Solid Black Border as in image! */
+    .q-grid-btn.current {
+      border: 2.5px solid #000000 !important;
+      transform: scale(1.02);
+      z-index: 2;
+    }
+
+    .bottom-legend {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.15); }
+
+    /* Main Area Right */
+    .exam-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .top-exam-bar {
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-profile-tag {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timer-text {
+      color: #dc3545;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .exam-content-area {
+      padding: 24px 34px;
+      flex: 1;
+    }
+    .sa-badge {
+      background: #0ea5e9;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 3px;
+      float: right;
+    }
+    .question-title {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      clear: both;
+    }
+    .question-title img {
+      max-width: 100%;
+      margin-top: 10px;
+      display: block;
+    }
+
+    /* Option Strip Style */
+    .options-container-strip {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .option-row:hover { background: #e9ecef; }
+    .option-row.selected {
+      background: #e7f1ff;
+      border-color: #86b7fe;
+    }
+    .option-check-box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #adb5bd;
+      border-radius: 4px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .option-row.selected .option-check-box {
+      background: #0d6efd;
+      border-color: #0d6efd;
+      color: #fff;
+    }
+    .option-text-desc {
+      font-size: 14px;
+      color: #212529;
+      font-weight: 500;
+    }
+
+    /* Footer Action Controls */
+    .exam-footer-controls {
+      background: #ffffff;
+      border-top: 1px solid #e2e8f0;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-action {
+      padding: 8px 22px;
+      border-radius: 16px;
+      border: none;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      color: #fff;
+      transition: opacity 0.2s;
+    }
+    .btn-action:hover { opacity: 0.9; }
+    .btn-prev-act { background: #f59e0b; }
+    .btn-clear-act { background: #6c757d; }
+    .btn-submit-act { background: #198754; font-size: 14px; padding: 10px 28px; }
+    .btn-review-act { background: #0dcaf0; }
+    .btn-next-act { background: #fd7e14; }
+
+    /* Login Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      position: relative;
+    }
+    .modal-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1e1b4b;
+      margin-bottom: 8px;
+    }
+    .modal-card p {
+      color: #6c757d;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .close-modal-btn {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #6c757d;
+    }
+    .suc-input {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 2px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .btn-verify {
+      width: 100%;
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* Result Modal */
+    .result-overlay {
+      position: fixed;
+      top:0; left:0; width:100%; height:100%;
+      background: #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="topNav">
+    <div class="brand-group">
+      <a href="#" class="brand-title" onclick="location.href = window.location.pathname">USEAS</a>
+    </div>
+    <div>
+      <button id="loginTriggerBtn" class="auth-btn" onclick="openLoginModal()">Login</button>
+      <div id="userProfileDisplay" class="logged-user" style="display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span id="navUserName">Student</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Screen 1: Test Selection List -->
+  <div id="screenTestList" class="container">
+    <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: #1e293b;">Active Exams</h2>
+    <div id="testsContainer">Loading assessments...</div>
+  </div>
+
+  <!-- Screen 2: Instructions Screen -->
+  <div id="screenInstructions" class="container" style="display:none;">
+    <div class="instruction-wrapper">
+      <div class="header-bar-inst" id="instDuration">Duration : 60 - Min</div>
+
+      <table class="inst-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>+ve</th>
+            <th>-ve</th>
+            <th>Partial</th>
+            <th>General Instructions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SA</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>Standard Multiple Choice Questions</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="inst-grid">
+        <div>
+          <h4 style="margin-bottom:12px; font-size:15px;">General Instructions</h4>
+          <p style="font-size:13px; color:#4b5563; margin-bottom:14px;">
+            The Questions Palette displayed on the left/right side of screen will show the status of each question using one of the following symbols:
+          </p>
+          <table class="palette-legend-table">
+            <tbody>
+              <tr>
+                <td style="width: 50px;"><div class="legend-badge badge-grey">1</div></td>
+                <td>You have not visited the question yet.</td>
+              </tr>
+              <tr>
+                <td><div class="legend-badge badge-red">3</div></td>
+                <td>You have not answered the question.</td>
+              </tr>
+              <tr>
+                <td><div class="legend-badge badge-green">4</div></td>
+                <td>You have answered the question.</td>
+              </tr>
+              <tr>
+                <td><div class="legend-badge badge-orange">7</div></td>
+                <td>You have NOT answered the question, but have marked the question for review.</td>
+              </tr>
+              <tr>
+                <td><div class="legend-badge badge-blue">9</div></td>
+                <td>You have answered the question, but marked it for review.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="user-details-card">
+          <h4 style="margin-bottom:16px; font-size:15px; color:#1e293b;">User Details</h4>
+          
+          <div class="user-detail-row">
+            <span class="detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
+            <span id="cardUserName">--</span>
+          </div>
+
+          <div class="user-detail-row">
+            <span class="detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
+            </span>
+            <span id="cardUserGroup">--</span>
+          </div>
+
+          <div class="user-detail-row">
+            <span class="detail-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </span>
+            <span id="cardUserEmail">--</span>
+          </div>
+
+          <button class="btn-launch-exam" onclick="launchExamNow()">Start Exam</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 3: Examination Workspace -->
+  <div id="screenWorkspace" class="workspace-wrapper" style="display:none;">
+    <!-- Left Sidebar: Palette -->
+    <aside class="sidebar-left">
+      <div>
+        <div class="sidebar-header">
+          <span>Question Palette</span>
+          <span>📄</span>
+        </div>
+        <div id="questionPaletteGrid" class="q-grid"></div>
+      </div>
+
+      <div class="bottom-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#fff; border: 1px solid #d2dae5;"></div> Not Visited</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--color-not-answered);"></div> Not Answered</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--color-answered);"></div> Answered</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--color-answered-review);"></div> Answered Review</div>
+      </div>
+    </aside>
+
+    <!-- Right: Question and Answers -->
+    <main class="exam-main">
+      <div class="top-exam-bar">
+        <div class="user-profile-tag">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span id="examTopUserName">Student</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:20px;">
+          <select style="padding:4px 8px; border-radius:4px; border:1px solid #ccc; font-size:12px;">
+            <option>ENGLISH</option>
+          </select>
+          <div class="timer-text" id="liveTimer">⏱ 00:00:00</div>
+        </div>
+      </div>
+
+      <div class="exam-content-area">
+        <div class="sa-badge">SA</div>
+        <div id="displayQuestionText" class="question-title">Loading question...</div>
+        <div id="displayOptionsContainer" class="options-container-strip"></div>
+      </div>
+
+      <footer class="exam-footer-controls">
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action btn-prev-act" onclick="handlePrev()">Prev</button>
+          <button class="btn-action btn-clear-act" onclick="handleClear()">Clear</button>
+        </div>
+        <button class="btn-action btn-submit-act" onclick="confirmSubmitExam()">Submit</button>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action btn-review-act" onclick="handleReview()">Review</button>
+          <button class="btn-action btn-next-act" onclick="handleNext()">Next</button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- SUC Login Modal -->
+  <div id="sucLoginModal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="close-modal-btn" onclick="closeLoginModal()">&times;</button>
+      <h3>Student Login</h3>
+      <p>Enter your 10-digit SUC code to verify and take tests</p>
+      <input type="text" id="sucCodeInput" class="suc-input" maxlength="10" placeholder="e.g. 2546640001" />
+      <button id="verifySucBtn" class="btn-verify" onclick="verifyStudentSuc()">Verify & Continue</button>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="resultModal" class="result-overlay">
+    <div>
+      <h2 style="font-size:28px; font-weight:800; color:#198754; margin-bottom:12px;">Exam Submitted Successfully!</h2>
+      <p id="finalScoreDetails" style="font-size:18px; color:#4b5563; margin-bottom:24px;"></p>
+      <button class="auth-btn" onclick="location.href = window.location.pathname">Return Home</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFShk6wkLYNFcd7WYSidxIAqcL55te7z8",
+      authDomain: "exams-f7881.firebaseapp.com",
+      projectId: "exams-f7881",
+      storageBucket: "exams-f7881.firebasestorage.app",
+      messagingSenderId: "297962721940",
+      appId: "1:297962721940:web:a2d351b464ad337e2c9a81",
+      measurementId: "G-9WF1R5EHL5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // State
+    let loggedStudent = null;
+    let pendingExamId = null;
+    let selectedExam = null;
+    let questions = [];
+    let currentIndex = 0;
+    let userResponses = {};
+    let visitedMap = {};
+    let timerTimer = null;
+
+    function fixTouchstoneImages(str) {
+      if (!str) return "";
+      const base = "https://touchstone.aditya.ac.in/degree/";
+      return String(str).replace(/<img\s+([^>]*?)src=["'](?!http:\/\/|https:\/\/|\/\/)([^"']+)["']/gi, `<img $1src="${base}$2"`);
+    }
+
+    // Modal Control
+    window.openLoginModal = () => {
+      document.getElementById("sucLoginModal").style.display = "flex";
+      document.getElementById("sucCodeInput").focus();
+    };
+
+    window.closeLoginModal = () => {
+      document.getElementById("sucLoginModal").style.display = "none";
+    };
+
+    // Verify SUC with Cloudflare Worker API
+    window.verifyStudentSuc = async () => {
+      const code = document.getElementById("sucCodeInput").value.trim();
+      const btn = document.getElementById("verifySucBtn");
+
+      if (code.length !== 10 || isNaN(code)) {
+        alert("you must enter correct suc code");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Verifying...";
+
+      try {
+        const res = await fetch(`https://student-api.mentalprasad2001.workers.dev/?id=${code}`);
+        const json = await res.json();
+
+        if (json.status === "success" && json.data && json.data.name) {
+          loggedStudent = json.data;
+          loggedStudent.suc = code;
+
+          // Update navbar state
+          document.getElementById("loginTriggerBtn").style.display = "none";
+          document.getElementById("userProfileDisplay").style.display = "flex";
+          document.getElementById("navUserName").innerText = loggedStudent.name;
+
+          closeLoginModal();
+
+          // Proceed to exam if clicked before login
+          if (pendingExamId) {
+            const nextId = pendingExamId;
+            pendingExamId = null;
+            prepareExam(nextId);
+          }
+        } else {
+          alert("you must enter correct suc code");
+        }
+      } catch (e) {
+        alert("you must enter correct suc code");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Verify & Continue";
+      }
+    };
+
+    // Load available tests from Firestore
+    async function loadExamsList() {
+      const container = document.getElementById("testsContainer");
+      try {
+        const snap = await getDocs(collection(db, "exams"));
+        if (snap.empty) {
+          container.innerHTML = `<p style="color:#6c757d;">No active exams found.</p>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        snap.forEach((d) => {
+          const exam = d.data();
+          const card = document.createElement("div");
+          card.className = "test-strip-card";
+          card.innerHTML = `
+            <div class="strip-left">
+              <div class="strip-icon">🎯</div>
+              <div>
+                <div class="strip-title">CRT</div>
+                <div class="strip-subtitle">${exam.title || "PRACTICE TEST"}</div>
+              </div>
+            </div>
+            <button class="btn-start-test" onclick="prepareExam('${d.id}')">START TEST</button>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        container.innerHTML = `<p style="color:red;">Error loading exams: ${err.message}</p>`;
+      }
+    }
+
+    // Step 2: Prepare instructions
+    window.prepareExam = async (examId) => {
+      if (!loggedStudent) {
+        pendingExamId = examId;
+        openLoginModal();
+        return;
+      }
+
+      const snap = await getDoc(doc(db, "exams", examId));
+      if (!snap.exists()) return alert("Exam data not found!");
+
+      selectedExam = snap.data();
+      questions = [];
+
+      if (Array.isArray(selectedExam.questions)) {
+        questions = selectedExam.questions;
+      } else if (Array.isArray(selectedExam.sections)) {
+        selectedExam.sections.forEach(s => (s.questions || []).forEach(q => questions.push(q)));
+      }
+
+      if (questions.length === 0) return alert("This exam has no questions.");
+
+      document.getElementById("instDuration").innerText = `Duration : ${selectedExam.durationMinutes || 60} - Min`;
+      document.getElementById("cardUserName").innerText = loggedStudent.name || "--";
+      document.getElementById("cardUserGroup").innerText = loggedStudent.group || loggedStudent.phone || "--";
+      document.getElementById("cardUserEmail").innerText = loggedStudent.email || "--";
+
+      document.getElementById("screenTestList").style.display = "none";
+      document.getElementById("screenInstructions").style.display = "block";
+    };
+
+    // Step 3: Start Exam
+    window.launchExamNow = () => {
+      document.getElementById("screenInstructions").style.display = "none";
+      document.getElementById("topNav").style.display = "none";
+      document.getElementById("screenWorkspace").style.display = "grid";
+
+      document.getElementById("examTopUserName").innerText = loggedStudent.name;
+
+      buildPaletteGrid();
+      loadWorkspaceQuestion(0);
+      startExamTimer((selectedExam.durationMinutes || 60) * 60);
+    };
+
+    function buildPaletteGrid() {
+      const grid = document.getElementById("questionPaletteGrid");
+      grid.innerHTML = "";
+      questions.forEach((_, idx) => {
+        const btn = document.createElement("button");
+        btn.id = `palette-item-${idx}`;
+        btn.className = "q-grid-btn not-visited";
+        btn.innerText = idx + 1;
+        btn.onclick = () => loadWorkspaceQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function loadWorkspaceQuestion(idx) {
+      if (visitedMap[currentIndex] && !userResponses[currentIndex]) {
+        userResponses[currentIndex] = { option: null, status: 'not-answered' };
+      }
+
+      currentIndex = idx;
+      visitedMap[idx] = true;
+
+      const q = questions[idx];
+      document.getElementById("displayQuestionText").innerHTML = `${idx + 1}. ${fixTouchstoneImages(q.questionText || `Question #${q.questionId}`)}`;
+
+      const optContainer = document.getElementById("displayOptionsContainer");
+      optContainer.innerHTML = "";
+
+      const options = q.options && q.options.length ? q.options : ["Option 1", "Option 2", "Option 3", "Option 4"];
+
+      options.forEach((opt, oIdx) => {
+        const isSelected = userResponses[idx] && userResponses[idx].option === oIdx;
+        const row = document.createElement("div");
+        row.className = `option-row ${isSelected ? 'selected' : ''}`;
+        row.innerHTML = `
+          <div class="option-check-box">${isSelected ? '✓' : ''}</div>
+          <div class="option-text-desc">${fixTouchstoneImages(opt)}</div>
+        `;
+        row.onclick = () => {
+          userResponses[idx] = { option: oIdx, status: 'answered' };
+          refreshWorkspaceUI();
+          loadWorkspaceQuestion(idx);
+        };
+        optContainer.appendChild(row);
+      });
+
+      refreshWorkspaceUI();
+    }
+
+    function refreshWorkspaceUI() {
+      questions.forEach((_, idx) => {
+        const btn = document.getElementById(`palette-item-${idx}`);
+        if (!btn) return;
+        btn.className = "q-grid-btn";
+
+        // Solid Black 2.5px border for CURRENT active question
+        if (idx === currentIndex) {
+          btn.classList.add("current");
+        }
+
+        const resp = userResponses[idx];
+        if (!resp) {
+          if (visitedMap[idx]) btn.classList.add("not-answered");
+          else btn.classList.add("not-visited");
+        } else {
+          if (resp.status === 'answered') btn.classList.add("answered");
+          else if (resp.status === 'review') btn.classList.add("review");
+          else if (resp.status === 'answered-review') btn.classList.add("answered-review");
+          else btn.classList.add("not-answered");
+        }
+      });
+    }
+
+    window.handlePrev = () => {
+      if (currentIndex > 0) loadWorkspaceQuestion(currentIndex - 1);
+    };
+
+    window.handleNext = () => {
+      if (currentIndex < questions.length - 1) {
+        loadWorkspaceQuestion(currentIndex + 1);
+      }
+    };
+
+    window.handleClear = () => {
+      if (userResponses[currentIndex]) {
+        userResponses[currentIndex] = { option: null, status: 'not-answered' };
+        refreshWorkspaceUI();
+        loadWorkspaceQuestion(currentIndex);
+      }
+    };
+
+    window.handleReview = () => {
+      const resp = userResponses[currentIndex];
+      if (resp && resp.option !== null) {
+        userResponses[currentIndex].status = 'answered-review';
+      } else {
+        userResponses[currentIndex] = { option: null, status: 'review' };
+      }
+      refreshWorkspaceUI();
+      if (currentIndex < questions.length - 1) {
+        loadWorkspaceQuestion(currentIndex + 1);
+      }
+    };
+
+    window.confirmSubmitExam = () => {
+      if (confirm("Are you sure you want to finish and submit the test?")) {
+        endExam();
+      }
+    };
+
+    function startExamTimer(seconds) {
+      let remaining = seconds;
+      const el = document.getElementById("liveTimer");
+      timerTimer = setInterval(() => {
+        const h = Math.floor(remaining / 3600);
+        const m = Math.floor((remaining % 3600) / 60);
+        const s = remaining % 60;
+        el.innerText = `⏱ ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+        if (remaining <= 0) {
+          clearInterval(timerTimer);
+          alert("Time up! Submitting exam.");
+          endExam();
+        }
+        remaining--;
+      }, 1000);
+    }
+
+    function endExam() {
+      clearInterval(timerTimer);
+      let score = 0;
+      let attempted = 0;
+
+      questions.forEach((q, idx) => {
+        const resp = userResponses[idx];
+        if (resp && resp.option !== null) {
+          attempted++;
+          if (resp.option === q.correctOption) {
+            score++;
+          }
+        }
+      });
+
+      document.getElementById("screenWorkspace").style.display = "none";
+      document.getElementById("resultModal").style.display = "flex";
+      document.getElementById("finalScoreDetails").innerHTML = `
+        <strong>Student:</strong> ${loggedStudent.name} (${loggedStudent.suc})<br/><br/>
+        <strong>Attempted:</strong> ${attempted} / ${questions.length}<br/>
+        <strong>Score:</strong> ${score} / ${questions.length}
+      `;
+    }
+
+    document.getElementById("sucCodeInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") verifyStudentSuc();
+    });
+
+    loadExamsList();
+  </script>
+</body>
+</html>
