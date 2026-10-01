@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAttend - Live Class Attendance System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-mono-code {
+            font-family: 'JetBrains+Mono', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .container-print {
+                max-width: 100% !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .card-table-print {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-3 border-b border-slate-100">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 shrink-0">
+                    <i data-lucide="calendar-check-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">SmartAttend Pro</h1>
+                        <span id="syncIndicator" class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="syncStatusText">Live Sync</span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium hidden sm:block">Real-time attendance tracker (Roll 1 to 41)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="openHistoryDrawer()" title="View past attendance records" class="relative inline-flex items-center px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-slate-900/20 ring-1 ring-slate-700 transition cursor-pointer">
+                    <i data-lucide="history" class="w-4 h-4 mr-1.5 text-amber-400"></i>
+                    <span>History</span>
+                    <span id="historyBadgeCount" class="ml-2 px-1.5 py-0.5 bg-indigo-500 text-white text-[11px] font-extrabold rounded-full min-w-[20px] text-center">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls Row -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2.5">
+            <div class="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button onclick="shiftDate(-1)" title="Previous Day" class="p-1.5 hover:bg-white rounded-lg text-slate-600 hover:text-slate-900 transition">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <input type="date" id="attendanceDatePicker" onchange="onDateChanged()" class="bg-transparent text-xs sm:text-sm font-semibold text-slate-800 px-2 py-1 focus:outline-none cursor-pointer">
+                <button onclick="setTodayDate()" title="Jump to Today" class="px-2 py-1 text-xs font-semibold bg-white rounded-lg text-indigo-600 shadow-xs hover:bg-indigo-50 transition">
+                    Today
+                </button>
+                <button onclick="shiftDate(1)" title="Next Day" class="p-1.5 hover:bg-white rounded-lg text-slate-600 hover:text-slate-900 transition">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <div>
+                    <select id="sessionSelector" onchange="onSessionChanged()" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg border border-slate-300 bg-white text-slate-800 focus:outline-none focus:border-indigo-500 shadow-sm cursor-pointer">
+                        <option value="Full Day">Full Day Session</option>
+                        <option value="Morning">Morning Session</option>
+                        <option value="Afternoon">Afternoon Session</option>
+                    </select>
+                </div>
+
+                <div class="inline-flex rounded-lg border border-slate-200 overflow-hidden shadow-sm bg-white">
+                    <button onclick="bulkMarkAll('present')" title="Mark all students Present" class="px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 border-r border-slate-200 transition flex items-center">
+                        <i data-lucide="check" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i> All Present
+                    </button>
+                    <button onclick="bulkMarkAll('absent')" title="Mark all students Absent" class="px-2.5 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-50 border-r border-slate-200 transition flex items-center">
+                        <i data-lucide="x" class="w-3.5 h-3.5 mr-1 text-rose-600"></i> All Absent
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <div class="hidden print-only mb-6 border-b pb-4">
+            <h1 class="text-xl font-bold">Class Attendance Register (Roll 1 to 41)</h1>
+            <div class="text-sm text-gray-600 mt-1 flex gap-4">
+                <span>Date: <strong id="printDate"></strong></span>
+                <span>Session: <strong id="printSession"></strong></span>
+                <span>Present: <strong id="printPresent"></strong></span>
+                <span>Absent: <strong id="printAbsent"></strong></span>
+                <span>Unmarked: <strong id="printUnmarked"></strong></span>
+            </div>
+        </div>
+
+        <!-- Live Statistics Counter Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 no-print">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Class</p>
+                    <h3 class="text-2xl font-extrabold text-slate-900 mt-1" id="statTotal">41</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Roll 1 to 41</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Present</p>
+                    <h3 class="text-2xl font-extrabold text-emerald-600 mt-1" id="statPresent">0</h3>
+                    <p class="text-[11px] text-emerald-700 font-medium mt-0.5" id="statPresentSub">0% of class</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-rose-600 uppercase tracking-wider">Absent</p>
+                    <h3 class="text-2xl font-extrabold text-rose-600 mt-1" id="statAbsent">41</h3>
+                    <p class="text-[11px] text-rose-700 font-medium mt-0.5" id="statAbsentSub">100% of class</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                    <i data-lucide="user-x" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Unmarked</p>
+                    <h3 class="text-2xl font-extrabold text-amber-600 mt-1" id="statUnmarked">0</h3>
+                    <p class="text-[11px] text-amber-700 font-medium mt-0.5" id="statUnmarkedSub">All marked</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="clock" class="w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Rate Progress Bar -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm mb-6 no-print">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-semibold text-slate-600">Live Attendance Status</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700" id="attendanceHealthBadge">Pending Marks</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                <div id="statProgressBar" class="bg-slate-300 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Download & Export Action Bar -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm mb-6 no-print">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs sm:text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Export Reports:</span>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <!-- Absent List Dropdown -->
+                    <div class="relative inline-block text-left" id="absentDropdownContainer">
+                        <button onclick="toggleDropdown('absentDropdown')" class="inline-flex items-center px-3.5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold shadow-md shadow-rose-900/30 transition">
+                            <i data-lucide="user-x" class="w-4 h-4 mr-2"></i>
+                            <span>Absent List</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-1.5"></i>
+                        </button>
+                        <div id="absentDropdown" class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 z-20 py-1.5 text-slate-700">
+                            <button onclick="generateAttendanceImage('absent')" class="w-full text-left px-4 py-2.5 text-xs sm:text-sm hover:bg-rose-50 hover:text-rose-700 flex items-center bg-rose-50/40">
+                                <i data-lucide="image" class="w-4 h-4 mr-2.5 text-rose-600"></i>
+                                <div>
+                                    <div class="font-bold text-rose-700">Download Image (.PNG)</div>
+                                    <div class="text-[11px] text-slate-400">Spreadsheet table layout</div>
+                                </div>
+                            </button>
+                            <button onclick="downloadAbsentCSV()" class="w-full text-left px-4 py-2 text-xs sm:text-sm hover:bg-rose-50 hover:text-rose-600 flex items-center border-t border-slate-100">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2 text-emerald-600"></i> Absentee List (.CSV)
+                            </button>
+                            <button onclick="downloadAbsentFormattedText()" class="w-full text-left px-4 py-2 text-xs sm:text-sm hover:bg-rose-50 hover:text-rose-600 flex items-center">
+                                <i data-lucide="file-text" class="w-4 h-4 mr-2 text-blue-600"></i> Calling Slip (.TXT)
+                            </button>
+                            <button onclick="copyAbsentWhatsApp()" class="w-full text-left px-4 py-2 text-xs sm:text-sm hover:bg-rose-50 hover:text-rose-600 flex items-center border-t border-slate-100">
+                                <i data-lucide="copy" class="w-4 h-4 mr-2 text-indigo-600"></i> Copy WhatsApp Notice
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Present List Dropdown -->
+                    <div class="relative inline-block text-left" id="presentDropdownContainer">
+                        <button onclick="toggleDropdown('presentDropdown')" class="inline-flex items-center px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-md shadow-emerald-900/30 transition">
+                            <i data-lucide="user-check" class="w-4 h-4 mr-2"></i>
+                            <span>Present List</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-1.5"></i>
+                        </button>
+                        <div id="presentDropdown" class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 z-20 py-1.5 text-slate-700">
+                            <button onclick="generateAttendanceImage('present')" class="w-full text-left px-4 py-2.5 text-xs sm:text-sm hover:bg-emerald-50 hover:text-emerald-700 flex items-center bg-emerald-50/40">
+                                <i data-lucide="image" class="w-4 h-4 mr-2.5 text-emerald-600"></i>
+                                <div>
+                                    <div class="font-bold text-emerald-700">Download Image (.PNG)</div>
+                                    <div class="text-[11px] text-slate-400">Spreadsheet table layout</div>
+                                </div>
+                            </button>
+                            <button onclick="downloadPresentCSV()" class="w-full text-left px-4 py-2 text-xs sm:text-sm hover:bg-emerald-50 hover:text-emerald-600 flex items-center border-t border-slate-100">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-2 text-emerald-600"></i> Present List (.CSV)
+                            </button>
+                            <button onclick="downloadPresentFormattedText()" class="w-full text-left px-4 py-2 text-xs sm:text-sm hover:bg-emerald-50 hover:text-emerald-600 flex items-center">
+                                <i data-lucide="file-text" class="w-4 h-4 mr-2 text-blue-600"></i> Present Summary (.TXT)
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="downloadFullAttendanceCSV()" class="inline-flex items-center px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 text-xs sm:text-sm font-semibold transition">
+                        <i data-lucide="table" class="w-4 h-4 mr-2"></i>
+                        <span>Register (CSV)</span>
+                    </button>
+
+                    <button onclick="generateAttendanceImage('full')" class="inline-flex items-center px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md shadow-indigo-900/20 transition">
+                        <i data-lucide="file-image" class="w-4 h-4 mr-2"></i>
+                        <span>Full Sheet (PNG)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar, Filter Chips, and View Mode Toggles -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm mb-6 no-print">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="directorySearchInput" oninput="applyFilters()" placeholder="Search by Roll No, Hall Ticket, Name, Phone..." class="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition">
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 flex-wrap">
+                    <div class="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold text-slate-600">
+                        <button onclick="setStatusFilter('all')" id="filterBtnAll" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm transition">
+                            All (<span id="chipAllCount">41</span>)
+                        </button>
+                        <button onclick="setStatusFilter('unmarked')" id="filterBtnUnmarked" class="px-3 py-1.5 rounded-lg hover:text-slate-900 transition">
+                            Unmarked (<span id="chipUnmarkedCount">0</span>)
+                        </button>
+                        <button onclick="setStatusFilter('present')" id="filterBtnPresent" class="px-3 py-1.5 rounded-lg hover:text-slate-900 transition">
+                            Present (<span id="chipPresentCount">0</span>)
+                        </button>
+                        <button onclick="setStatusFilter('absent')" id="filterBtnAbsent" class="px-3 py-1.5 rounded-lg hover:text-slate-900 transition">
+                            Absent (<span id="chipAbsentCount">41</span>)
+                        </button>
+                    </div>
+
+                    <div class="inline-flex p-1 bg-slate-100 rounded-xl text-slate-600">
+                        <button onclick="setViewMode('cards')" id="viewModeCardsBtn" title="Card Grid View" class="p-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition">
+                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="setViewMode('table')" id="viewModeTableBtn" title="Table View" class="p-1.5 rounded-lg hover:text-indigo-600 transition">
+                            <i data-lucide="list" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Attendance Container: Card Grid -->
+        <div id="studentsCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"></div>
+
+        <!-- Student Attendance Container: Table View -->
+        <div id="studentsTableContainer" class="hidden bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm mb-8 card-table-print">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-semibold border-b border-slate-200 tracking-wider">
+                        <tr>
+                            <th class="py-3.5 px-4 w-20">Roll #</th>
+                            <th class="py-3.5 px-4">Hall Ticket</th>
+                            <th class="py-3.5 px-4">Student Name</th>
+                            <th class="py-3.5 px-4 hidden md:table-cell">Contact Details</th>
+                            <th class="py-3.5 px-4 text-center w-52">Attendance Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="noResultsState" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-3">
+                <i data-lucide="search-x" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-800">No matching students found</h3>
+            <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Try adjusting your search terms or filter chip to find what you are looking for.</p>
+            <button onclick="clearSearch()" class="mt-4 px-4 py-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-semibold transition">
+                Clear Filters
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-400 no-print mt-auto">
+        <div class="max-w-7xl mx-auto px-4">
+            SmartAttend Real-Time Class Portal &bull; Live synchronized across all devices.
+        </div>
+    </footer>
+
+    <!-- History Slide-over Drawer & Modal Overlay -->
+    <div id="historyModalOverlay" onclick="closeHistoryDrawerOnBackdrop(event)" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex justify-end transition-opacity duration-300 no-print">
+        <div id="historyDrawerContent" class="w-full max-w-md bg-white h-full shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-out">
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                        <i data-lucide="history" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Attendance History</h3>
+                        <p class="text-xs text-slate-500" id="cloudStatusLabel">Saved Records by Date & Session</p>
+                    </div>
+                </div>
+                <button onclick="closeHistoryDrawer()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="historyListContainer" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+
+            <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+                <span>Select a record to load into view</span>
+                <button onclick="closeHistoryDrawer()" class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white font-semibold text-slate-700 hover:bg-slate-100 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Message Box -->
+    <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl bg-slate-900 text-white text-sm border border-slate-800">
+            <span id="toastIcon" class="text-emerald-400">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+            </span>
+            <span id="toastMessage" class="font-medium text-slate-100">Syncing...</span>
+        </div>
+    </div>
+
+    <textarea id="clipboardBuffer" class="sr-only" aria-hidden="true"></textarea>
+    <canvas id="exportDirectCanvas" class="hidden"></canvas>
+
+    <!-- 1. APPLICATION LOGIC & STUDENTS DATA -->
+    <script>
+        const DEFAULT_SECTION = "Bsc-DTSC-2-1A";
+        window.STUDENTS = [
+            { roll: 1, hallTicket: "250807172298", name: "SAI GANESH LAVETI", suc: "2546640703", section: DEFAULT_SECTION, email: "siddhul7852@gmail.com", phone: "9133944606" },
+            { roll: 2, hallTicket: "250807172318", name: "DANDI SIVA GANESH SIRIMALLA", suc: "2546640367", section: DEFAULT_SECTION, email: "siva2005@gmail.com", phone: "9347634739" },
+            { roll: 3, hallTicket: "250807172301", name: "REVANTH SAI KUMAR REDDY MALLIDI", suc: "2546640067", section: DEFAULT_SECTION, email: "revanthreddy5292m@gmail.com", phone: "8247584384" },
+            { roll: 4, hallTicket: "250807172312", name: "CHANDRAHASA VENKAT PITHAPURAPU", suc: "2546640075", section: DEFAULT_SECTION, email: "venkatachandra372@gmail.com", phone: "8328646158" },
+            { roll: 5, hallTicket: "250807172282", name: "RISHITHA AMPOLU", suc: "2546640171", section: DEFAULT_SECTION, email: "rishithaampolu@gmail.com", phone: "9989089677" },
+            { roll: 6, hallTicket: "250807172291", name: "ALEKHYA KATA", suc: "2546640172", section: DEFAULT_SECTION, email: "alekhyakata08@gmail.com", phone: "9848349430" },
+            { roll: 7, hallTicket: "250807172304", name: "SANTHOSH MARUKURTHI", suc: "2546640694", section: DEFAULT_SECTION, email: "santhoshyadav1106@gmail.com", phone: "7207536909" },
+            { roll: 8, hallTicket: "250807172315", name: "NAGA SURYA LAKSHMAN SAI RAM ROKKAM", suc: "2546640689", section: DEFAULT_SECTION, email: "sairamrokkam85@gmail.com", phone: "8790131156" },
+            { roll: 9, hallTicket: "250807172319", name: "RAKSHITHA TILLAPUDI", suc: "2546640188", section: DEFAULT_SECTION, email: "rakshithatillapudi@gmail.com", phone: "9492469831" },
+            { roll: 10, hallTicket: "250807172283", name: "YASWANTH SUNDHAR ANKAM", suc: "2546640204", section: DEFAULT_SECTION, email: "yaswanthsundharankam@gmail.com", phone: "9908438932" },
+            { roll: 11, hallTicket: "250807172294", name: "MOUNIKA KOMATI", suc: "2546640210", section: DEFAULT_SECTION, email: "veerababukomati047@gmail.com", phone: "9949545629" },
+            { roll: 12, hallTicket: "250807172297", name: "DIVYA SRI LANKA", suc: "2546640211", section: DEFAULT_SECTION, email: "dsri08506@gmail.com", phone: "8121526784" },
+            { roll: 13, hallTicket: "250807172290", name: "JAYARAM DURGA PRADEEP KALLA", suc: "2546640218", section: DEFAULT_SECTION, email: "kallapradeep15@gmail.com", phone: "7981496595" },
+            { roll: 14, hallTicket: "250807172289", name: "TARUN KUMAR JAGARAPU", suc: "2546640229", section: DEFAULT_SECTION, email: "jagaraputarunkumar9@gmail.com", phone: "9515587169" },
+            { roll: 15, hallTicket: "250807172305", name: "BHAGAT RAJ SWAROOP MEDETI", suc: "2546640232", section: DEFAULT_SECTION, email: "bhagatarajswaroopm@gmail.com", phone: "9866993510" },
+            { roll: 16, hallTicket: "250807172307", name: "VENKATA SAI SANTHOSH MUNGANDA", suc: "2546640242", section: DEFAULT_SECTION, email: "mungandasanthosh72@gmail.com", phone: "9949578747" },
+            { roll: 17, hallTicket: "250807172309", name: "LAKSHMI SAI PRANUSHA PAALURI", suc: "2546640259", section: DEFAULT_SECTION, email: "paluri.pranusha@gmail.com", phone: "9490152855" },
+            { roll: 18, hallTicket: "250807172303", name: "SIVA MEGHANA MANGALAGIRI", suc: "2546640637", section: DEFAULT_SECTION, email: "kumarmangalagiri02@gmail.com", phone: "6281011662" },
+            { roll: 19, hallTicket: "250807172320", name: "BINDHU SAI SRI TUTI", suc: "2546640292", section: DEFAULT_SECTION, email: "bindhusaisree3@gmail.com", phone: "9912505506" },
+            { roll: 20, hallTicket: "250807172300", name: "SAMUEL RAJU MAJJI", suc: "2546640301", section: DEFAULT_SECTION, email: "samisamul2164@gmail.com", phone: "9885358493" },
+            { roll: 21, hallTicket: "250807172288", name: "SATYA VARA PRASAD GOLLA", suc: "2546640307", section: DEFAULT_SECTION, email: "gollav732@gmail.com", phone: "9121392876" },
+            { roll: 22, hallTicket: "250807172295", name: "PHANENDRA BHASKAR KUMAR KOTTAPALLI", suc: "2546640326", section: DEFAULT_SECTION, email: "phanendrakottapalli40@gmail.com", phone: "9985446128" },
+            { roll: 23, hallTicket: "250807172308", name: "SIMHADRI MYLAPILLI", suc: "2546640596", section: DEFAULT_SECTION, email: "mylapillisimhadri9@gmail.com", phone: "7672081367" },
+            { roll: 24, hallTicket: "250807172286", name: "CHANDU SIVA RAM CHALLA", suc: "2546640383", section: DEFAULT_SECTION, email: "chandusivaram40@gmail.com", phone: "8886108864" },
+            { roll: 25, hallTicket: "250807172287", name: "GANGA BHAVANI GEESALA", suc: "2546640391", section: DEFAULT_SECTION, email: "gangabhavani9958839@gmail.com", phone: "9392407337" },
+            { roll: 26, hallTicket: "250807172284", name: "D V S D BALA RAMA KRISHNA ATHKOORI", suc: "2546640540", section: DEFAULT_SECTION, email: "avhprjy@gmail.com", phone: "8074774083" },
+            { roll: 27, hallTicket: "250807172281", name: "DEEVEN KUMAR AKULA", suc: "2546640419", section: DEFAULT_SECTION, email: "deevenkumar143@gmail.com", phone: "8179706960" },
+            { roll: 28, hallTicket: "250807172310", name: "DHANA SAI DEEPAK PARAMKUSAM", suc: "2546640438", section: DEFAULT_SECTION, email: "deepaknaidu92@gmail.com", phone: "8688087843" },
+            { roll: 29, hallTicket: "250807172311", name: "RISHITHA NAVYA PENUGONDA", suc: "2546640440", section: DEFAULT_SECTION, email: "rishithanavyapenugonda@gmail.com", phone: "6304115514" },
+            { roll: 30, hallTicket: "250807172321", name: "MOKSHAGNA YELLA", suc: "2546640450", section: DEFAULT_SECTION, email: "subramanyamyalla30@gmail.com", phone: "9866996533" },
+            { roll: 31, hallTicket: "250807172316", name: "FARIDA SAYYED", suc: "2546640456", section: DEFAULT_SECTION, email: "sayyedfarida159@gmail.com", phone: "9701259158" },
+            { roll: 32, hallTicket: "250807172285", name: "TARUN REDDY BADE", suc: "2546640462", section: DEFAULT_SECTION, email: "tarunreddybade@gmail.com", phone: "8790264299" },
+            { roll: 33, hallTicket: "250807172317", name: "SHAJAHAN SHAIK", suc: "2546640468", section: DEFAULT_SECTION, email: "shajahanshaik7797@gmail.com", phone: "8099803312" },
+            { roll: 34, hallTicket: "250807172292", name: "MEGHANA KATTA", suc: "2546640471", section: DEFAULT_SECTION, email: "meghanakatta6411@gmail.com", phone: "9347195760" },
+            { roll: 35, hallTicket: "250807172296", name: "MANIKANTA KUKKALA", suc: "2546640481", section: DEFAULT_SECTION, email: "m9515456118@gmail.com", phone: "6300864122" },
+            { roll: 36, hallTicket: "250807172313", name: "SAI GANESH RAMINETI", suc: "2546640486", section: DEFAULT_SECTION, email: "saiganeshramineti@gmail.com", phone: "9666756065" },
+            { roll: 37, hallTicket: "250807172293", name: "CHITTU USHA DEVI KILLADA", suc: "2546640491", section: DEFAULT_SECTION, email: "ushalily2007@gmail.com", phone: "9966318293" },
+            { roll: 38, hallTicket: "250807172314", name: "SAI SANDEEP REGULABANDA", suc: "2546640496", section: DEFAULT_SECTION, email: "saisandeepregulabandha@gmail.com", phone: "7285986781" },
+            { roll: 39, hallTicket: "250807172306", name: "HARSHITH VIVEK MEDISETTI", suc: "2546640516", section: DEFAULT_SECTION, email: "mharshithvivek@gmail.com", phone: "8341162331" },
+            { roll: 40, hallTicket: "250807172299", name: "V V SIVA SATYA ASHOK MADDALA", suc: "2546640524", section: DEFAULT_SECTION, email: "ashokmaddala720@gmail.com", phone: "7207550449" },
+            { roll: 41, hallTicket: "250807172302", name: "ARUN SAI MANDA", suc: "2546640535", section: DEFAULT_SECTION, email: "arunsaimanda2222@gmail.com", phone: "8500797655" }
+        ];
+
+        function getFormattedDate(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        window.currentDate = getFormattedDate(new Date());
+        window.currentSession = "Full Day";
+        window.attendanceRecord = {}; 
+        let currentStatusFilter = 'all'; 
+        let currentViewMode = 'cards'; 
+
+        function initializeDatePicker() {
+            const picker = document.getElementById('attendanceDatePicker');
+            if (picker) picker.value = currentDate;
+            const sessionSelect = document.getElementById('sessionSelector');
+            if (sessionSelect) sessionSelect.value = currentSession;
+        }
+
+        window.getStorageKey = function() {
+            return `attendance_v2_${currentDate}_${currentSession.replace(/\s+/g, '_')}`;
+        };
+
+        window.loadAttendanceForCurrentSelection = function() {
+            const key = getStorageKey();
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                try {
+                    attendanceRecord = JSON.parse(saved);
+                    STUDENTS.forEach(s => {
+                        if (!attendanceRecord[s.roll]) {
+                            attendanceRecord[s.roll] = 'absent';
+                        }
+                    });
+                } catch (e) {
+                    initAllAbsent();
+                }
+            } else {
+                initAllAbsent();
+            }
+        };
+
+        function initAllAbsent() {
+            attendanceRecord = {};
+            STUDENTS.forEach(s => {
+                attendanceRecord[s.roll] = 'absent';
+            });
+            saveAttendanceToStorage();
+        }
+
+        window.saveAttendanceToStorage = function() {
+            const key = getStorageKey();
+            localStorage.setItem(key, JSON.stringify(attendanceRecord));
+        };
+
+        window.showToast = function(message, type = 'info') {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (!toast || !toastMsg || !toastIcon) return;
+
+            toastMsg.textContent = message;
+
+            if (type === 'success') {
+                toastIcon.className = "text-emerald-400";
+                toastIcon.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i>`;
+            } else if (type === 'error') {
+                toastIcon.className = "text-rose-400";
+                toastIcon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i>`;
+            } else {
+                toastIcon.className = "text-indigo-400";
+                toastIcon.innerHTML = `<i data-lucide="info" class="w-5 h-5"></i>`;
+            }
+            if (window.lucide) lucide.createIcons();
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        };
+
+        window.onDateChanged = function() {
+            const val = document.getElementById('attendanceDatePicker').value;
+            if (val) {
+                currentDate = val;
+                loadAttendanceForCurrentSelection();
+                renderUI();
+                if (window.listenToCurrentDate) window.listenToCurrentDate();
+            }
+        };
+
+        window.shiftDate = function(days) {
+            const [y, m, d] = currentDate.split('-').map(Number);
+            const dt = new Date(y, m - 1, d);
+            dt.setDate(dt.getDate() + days);
+            currentDate = getFormattedDate(dt);
+            document.getElementById('attendanceDatePicker').value = currentDate;
+            loadAttendanceForCurrentSelection();
+            renderUI();
+            if (window.listenToCurrentDate) window.listenToCurrentDate();
+        };
+
+        window.setTodayDate = function() {
+            currentDate = getFormattedDate(new Date());
+            document.getElementById('attendanceDatePicker').value = currentDate;
+            loadAttendanceForCurrentSelection();
+            renderUI();
+            if (window.listenToCurrentDate) window.listenToCurrentDate();
+        };
+
+        window.onSessionChanged = function() {
+            currentSession = document.getElementById('sessionSelector').value;
+            loadAttendanceForCurrentSelection();
+            renderUI();
+            if (window.listenToCurrentDate) window.listenToCurrentDate();
+        };
+
+        // AUTO-SAVE ON SINGLE CLICK
+        window.setStudentStatus = function(roll, status) {
+            if (attendanceRecord[roll] === status) {
+                attendanceRecord[roll] = (status === 'present') ? 'absent' : 'present';
+            } else {
+                attendanceRecord[roll] = status;
+            }
+            // Save local
+            saveAttendanceToStorage();
+            updateStatistics();
+            updateRowOrCardVisual(roll);
+            
+            // Sync to Firestore immediately
+            if (window.triggerAutoCloudSync) {
+                window.triggerAutoCloudSync();
+            }
+        };
+
+        // AUTO-SAVE ON BULK MARK
+        window.bulkMarkAll = function(status) {
+            STUDENTS.forEach(student => {
+                attendanceRecord[student.roll] = status || 'absent';
+            });
+            saveAttendanceToStorage();
+            renderUI();
+            if (window.triggerAutoCloudSync) {
+                window.triggerAutoCloudSync();
+            }
+            showToast(`All marked as ${status.toUpperCase()} (Synced)`, 'success');
+        };
+
+        window.setViewMode = function(mode) {
+            currentViewMode = mode;
+            const cardBtn = document.getElementById('viewModeCardsBtn');
+            const tableBtn = document.getElementById('viewModeTableBtn');
+            const cardContainer = document.getElementById('studentsCardsContainer');
+            const tableContainer = document.getElementById('studentsTableContainer');
+
+            if (mode === 'cards') {
+                cardBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                tableBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                cardContainer.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+            } else {
+                tableBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                cardBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                tableContainer.classList.remove('hidden');
+                cardContainer.classList.add('hidden');
+            }
+            lucide.createIcons();
+        };
+
+        window.setStatusFilter = function(filter) {
+            currentStatusFilter = filter;
+            const buttons = {
+                all: document.getElementById('filterBtnAll'),
+                unmarked: document.getElementById('filterBtnUnmarked'),
+                present: document.getElementById('filterBtnPresent'),
+                absent: document.getElementById('filterBtnAbsent')
+            };
+
+            Object.keys(buttons).forEach(key => {
+                if (buttons[key]) {
+                    if (key === filter) {
+                        buttons[key].className = "px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm transition";
+                    } else {
+                        buttons[key].className = "px-3 py-1.5 rounded-lg hover:text-slate-900 transition";
+                    }
+                }
+            });
+
+            applyFilters();
+        };
+
+        window.clearSearch = function() {
+            const input = document.getElementById('directorySearchInput');
+            if (input) input.value = '';
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            applyFilters();
+        };
+
+        window.applyFilters = function() {
+            const searchEl = document.getElementById('directorySearchInput');
+            const query = (searchEl ? searchEl.value : '').trim().toLowerCase();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) {
+                if (query.length > 0) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
+            }
+
+            let visibleCount = 0;
+
+            STUDENTS.forEach(student => {
+                const status = attendanceRecord[student.roll] || 'absent';
+                let matchesStatus = false;
+                
+                if (currentStatusFilter === 'all') {
+                    matchesStatus = true;
+                } else if (currentStatusFilter === 'unmarked') {
+                    matchesStatus = (status === null || status === undefined);
+                } else {
+                    matchesStatus = (status === currentStatusFilter);
+                }
+                
+                const matchesQuery = !query || 
+                    student.name.toLowerCase().includes(query) ||
+                    String(student.roll).includes(query) ||
+                    student.hallTicket.toLowerCase().includes(query) ||
+                    student.phone.includes(query) ||
+                    student.suc.includes(query);
+
+                const isVisible = matchesStatus && matchesQuery;
+                if (isVisible) visibleCount++;
+
+                const cardEl = document.getElementById(`student-card-${student.roll}`);
+                if (cardEl) cardEl.style.display = isVisible ? 'flex' : 'none';
+
+                const rowEl = document.getElementById(`student-row-${student.roll}`);
+                if (rowEl) rowEl.style.display = isVisible ? '' : 'none';
+            });
+
+            const noResults = document.getElementById('noResultsState');
+            if (noResults) {
+                if (visibleCount === 0) noResults.classList.remove('hidden');
+                else noResults.classList.add('hidden');
+            }
+        };
+
+        window.renderUI = function() {
+            renderCards();
+            renderTable();
+            updateStatistics();
+            applyFilters();
+            updatePrintHeaders();
+            lucide.createIcons();
+        };
+
+        function updatePrintHeaders() {
+            const pDate = document.getElementById('printDate');
+            const pSession = document.getElementById('printSession');
+            if (pDate) pDate.textContent = currentDate;
+            if (pSession) pSession.textContent = currentSession;
+        }
+
+        function renderCards() {
+            const container = document.getElementById('studentsCardsContainer');
+            if (!container) return;
+            container.innerHTML = STUDENTS.map(student => {
+                const status = attendanceRecord[student.roll] || 'absent';
+                const isPresent = status === 'present';
+                const isAbsent = status === 'absent';
+
+                let borderStyle = 'border-slate-200 ring-0';
+                let rollBadgeStyle = 'bg-slate-100 text-slate-700 border border-slate-200';
+
+                if (isPresent) {
+                    borderStyle = 'border-emerald-300 ring-1 ring-emerald-200';
+                    rollBadgeStyle = 'bg-emerald-50 text-emerald-700 border border-emerald-300';
+                } else if (isAbsent) {
+                    borderStyle = 'border-rose-300 ring-1 ring-rose-200';
+                    rollBadgeStyle = 'bg-rose-50 text-rose-700 border border-rose-300';
+                }
+
+                return `
+                <div id="student-card-${student.roll}" class="bg-white rounded-2xl border ${borderStyle} p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-lg ${rollBadgeStyle}">
+                                    Roll #${student.roll}
+                                </span>
+                                <span class="font-mono-code text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                                    HT: ${student.hallTicket}
+                                </span>
+                            </div>
+                            <span class="text-[10px] font-mono text-slate-400">SUC: ${student.suc}</span>
+                        </div>
+
+                        <h4 class="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition leading-snug min-h-[2.5rem]">
+                            ${student.name}
+                        </h4>
+
+                        <div class="mt-3 space-y-1 text-xs text-slate-500">
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center text-slate-400"><i data-lucide="phone" class="w-3 h-3 mr-1.5 text-slate-400"></i>Phone:</span>
+                                <a href="tel:${student.phone}" class="font-medium text-slate-700 hover:text-indigo-600 underline-offset-2 hover:underline">${student.phone}</a>
+                            </div>
+                            <div class="flex items-center justify-between truncate">
+                                <span class="flex items-center text-slate-400"><i data-lucide="mail" class="w-3 h-3 mr-1.5 text-slate-400"></i>Email:</span>
+                                <a href="mailto:${student.email}" title="${student.email}" class="font-medium text-slate-700 hover:text-indigo-600 truncate max-w-[170px] text-right underline-offset-2 hover:underline">${student.email}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
+                            <button onclick="setStudentStatus(${student.roll}, 'present')" class="py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${isPresent ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-emerald-700'}">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> Present
+                            </button>
+                            <button onclick="setStudentStatus(${student.roll}, 'absent')" class="py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${isAbsent ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:text-rose-700'}">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i> Absent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('studentsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = STUDENTS.map((student) => {
+                const status = attendanceRecord[student.roll] || 'absent';
+                const isPresent = status === 'present';
+                const isAbsent = status === 'absent';
+
+                let rollBadgeStyle = 'bg-slate-100 text-slate-700';
+                if (isPresent) rollBadgeStyle = 'bg-emerald-100 text-emerald-800';
+                if (isAbsent) rollBadgeStyle = 'bg-rose-100 text-rose-800';
+
+                return `
+                <tr id="student-row-${student.roll}" class="hover:bg-slate-50/80 transition">
+                    <td class="py-3 px-4 font-bold text-slate-900">
+                        <span class="inline-block px-2 py-0.5 rounded text-xs ${rollBadgeStyle}">
+                            #${student.roll}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 font-mono-code text-xs text-slate-700 font-semibold">
+                        ${student.hallTicket}
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-900 text-sm">${student.name}</div>
+                        <div class="text-xs text-slate-400 font-mono">SUC: ${student.suc}</div>
+                    </td>
+                    <td class="py-3 px-4 hidden md:table-cell">
+                        <div class="text-xs text-slate-700"><a href="tel:${student.phone}" class="hover:text-indigo-600">${student.phone}</a></div>
+                        <div class="text-xs text-slate-400"><a href="mailto:${student.email}" class="hover:underline">${student.email}</a></div>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="inline-flex rounded-lg p-1 bg-slate-100 border border-slate-200">
+                            <button onclick="setStudentStatus(${student.roll}, 'present')" class="px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${isPresent ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-emerald-700'}">
+                                Present
+                            </button>
+                            <button onclick="setStudentStatus(${student.roll}, 'absent')" class="px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${isAbsent ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-rose-700'}">
+                                Absent
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function updateRowOrCardVisual(roll) {
+            const status = attendanceRecord[roll] || 'absent';
+            const isPresent = status === 'present';
+            const isAbsent = status === 'absent';
+
+            const card = document.getElementById(`student-card-${roll}`);
+            if (card) {
+                let borderStyle = 'border-slate-200 ring-0';
+                let rollBadgeStyle = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 border border-slate-200';
+
+                if (isPresent) {
+                    borderStyle = 'border-emerald-300 ring-1 ring-emerald-200';
+                    rollBadgeStyle = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-300';
+                } else if (isAbsent) {
+                    borderStyle = 'border-rose-300 ring-1 ring-rose-200';
+                    rollBadgeStyle = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-50 text-rose-700 border border-rose-300';
+                }
+
+                card.className = `bg-white rounded-2xl border ${borderStyle} p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group`;
+                
+                const rollBadge = card.querySelector('.font-bold.rounded-lg');
+                if (rollBadge) rollBadge.className = rollBadgeStyle;
+
+                const buttons = card.querySelectorAll('.grid button');
+                if (buttons.length === 2) {
+                    buttons[0].className = `py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${isPresent ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-emerald-700'}`;
+                    buttons[1].className = `py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${isAbsent ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:text-rose-700'}`;
+                }
+            }
+
+            const row = document.getElementById(`student-row-${roll}`);
+            if (row) {
+                const badge = row.querySelector('span.inline-block');
+                if (badge) {
+                    let rollBadgeStyle = 'inline-block px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700';
+                    if (isPresent) rollBadgeStyle = 'inline-block px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800';
+                    if (isAbsent) rollBadgeStyle = 'inline-block px-2 py-0.5 rounded text-xs bg-rose-100 text-rose-800';
+                    badge.className = rollBadgeStyle;
+                }
+                const btns = row.querySelectorAll('.inline-flex button');
+                if (btns.length === 2) {
+                    btns[0].className = `px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${isPresent ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-emerald-700'}`;
+                    btns[1].className = `px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer ${isAbsent ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-rose-700'}`;
+                }
+            }
+
+            if (currentStatusFilter !== 'all') {
+                applyFilters();
+            }
+        }
+
+        function updateStatistics() {
+            const total = STUDENTS.length;
+            let presentCount = 0;
+            let absentCount = 0;
+            let unmarkedCount = 0;
+
+            STUDENTS.forEach(s => {
+                const st = attendanceRecord[s.roll];
+                if (st === 'present') presentCount++;
+                else if (st === 'absent') absentCount++;
+                else unmarkedCount++;
+            });
+
+            const percent = total > 0 ? Math.round((presentCount / total) * 100) : 0;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statPresent').textContent = presentCount;
+            document.getElementById('statAbsent').textContent = absentCount;
+            document.getElementById('statUnmarked').textContent = unmarkedCount;
+
+            document.getElementById('statPresentSub').textContent = `${percent}% of class`;
+            document.getElementById('statAbsentSub').textContent = `${Math.round((absentCount / total) * 100)}% of class`;
+            document.getElementById('statUnmarkedSub').textContent = unmarkedCount === 0 ? "All students marked" : `${unmarkedCount} pending`;
+
+            const progressBar = document.getElementById('statProgressBar');
+            if (progressBar) progressBar.style.width = `${percent}%`;
+
+            const badge = document.getElementById('attendanceHealthBadge');
+            if (badge && progressBar) {
+                if (unmarkedCount === total) {
+                    badge.textContent = "Attendance Not Started";
+                    badge.className = "text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700";
+                    progressBar.className = "bg-slate-300 h-full rounded-full transition-all duration-300";
+                } else if (percent >= 85) {
+                    badge.textContent = "High Attendance";
+                    badge.className = "text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+                    progressBar.className = "bg-emerald-500 h-full rounded-full transition-all duration-300";
+                } else if (percent >= 65) {
+                    badge.textContent = "Moderate";
+                    badge.className = "text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800";
+                    progressBar.className = "bg-amber-500 h-full rounded-full transition-all duration-300";
+                } else {
+                    badge.textContent = "Low Attendance";
+                    badge.className = "text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800";
+                    progressBar.className = "bg-rose-500 h-full rounded-full transition-all duration-300";
+                }
+            }
+
+            document.getElementById('chipAllCount').textContent = total;
+            document.getElementById('chipUnmarkedCount').textContent = unmarkedCount;
+            document.getElementById('chipPresentCount').textContent = presentCount;
+            document.getElementById('chipAbsentCount').textContent = absentCount;
+
+            const printPresent = document.getElementById('printPresent');
+            const printAbsent = document.getElementById('printAbsent');
+            const printUnmarked = document.getElementById('printUnmarked');
+            if (printPresent) printPresent.textContent = presentCount;
+            if (printAbsent) printAbsent.textContent = absentCount;
+            if (printUnmarked) printUnmarked.textContent = unmarkedCount;
+        }
+
+        window.toggleDropdown = function(id) {
+            const el = document.getElementById(id);
+            const isHidden = el.classList.contains('hidden');
+            document.getElementById('absentDropdown').classList.add('hidden');
+            document.getElementById('presentDropdown').classList.add('hidden');
+            if (isHidden) el.classList.remove('hidden');
+        };
+
+        // EXPORT LOGIC
+        window.triggerFileDownload = function(filename, content, mimeType = 'text/csv;charset=utf-8;') {
+            const blob = new Blob([content], { type: mimeType });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        };
+
+        window.downloadAbsentCSV = function() {
+            document.getElementById('absentDropdown').classList.add('hidden');
+            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
+            if (absentees.length === 0) {
+                showToast("No absent students marked yet.", "info");
+                return;
+            }
+            let csv = "Roll No,Hall Ticket No,Student Name,SUC,Phone Number,Email,Status,Date,Session\n";
+            absentees.forEach(s => {
+                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","ABSENT","${currentDate}","${currentSession}"\n`;
+            });
+            triggerFileDownload(`Absent_Students_${currentDate}_${currentSession.replace(/\s+/g, '_')}.csv`, csv);
+            showToast(`Downloaded absent list (${absentees.length} students)`, "success");
+        };
+
+        window.downloadAbsentFormattedText = function() {
+            document.getElementById('absentDropdown').classList.add('hidden');
+            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
+            if (absentees.length === 0) {
+                showToast("No absent students marked to export.", "info");
+                return;
+            }
+            let txt = `=================================================\n`;
+            txt += `      CLASS ABSENTEE REPORT - ${currentDate}\n`;
+            txt += `      Session: ${currentSession} | Total Absent: ${absentees.length}\n`;
+            txt += `=================================================\n\n`;
+            absentees.forEach((s, idx) => {
+                txt += `${idx + 1}. Roll #${s.roll} | HT: ${s.hallTicket}\n`;
+                txt += `   Name : ${s.name}\n`;
+                txt += `   Phone: ${s.phone}\n`;
+                txt += `   Email: ${s.email}\n`;
+                txt += `-------------------------------------------------\n`;
+            });
+            txt += `\nReport generated on ${new Date().toLocaleString()}\n`;
+            triggerFileDownload(`Absentee_Call_List_${currentDate}.txt`, txt, 'text/plain;charset=utf-8;');
+            showToast("Downloaded text slip for phone calls", "success");
+        };
+
+        window.downloadPresentCSV = function() {
+            document.getElementById('presentDropdown').classList.add('hidden');
+            const presents = STUDENTS.filter(s => attendanceRecord[s.roll] === 'present');
+            if (presents.length === 0) {
+                showToast("0 students marked present.", "error");
+                return;
+            }
+            let csv = "Roll No,Hall Ticket No,Student Name,SUC,Phone Number,Email,Status,Date,Session\n";
+            presents.forEach(s => {
+                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","PRESENT","${currentDate}","${currentSession}"\n`;
+            });
+            triggerFileDownload(`Present_Students_${currentDate}_${currentSession.replace(/\s+/g, '_')}.csv`, csv);
+            showToast(`Downloaded present list (${presents.length} students)`, "success");
+        };
+
+        window.downloadFullAttendanceCSV = function() {
+            let csv = "Roll No,Hall Ticket No,Student Name,SUC,Phone Number,Email,Attendance Status,Date,Session\n";
+            STUDENTS.forEach(s => {
+                const raw = attendanceRecord[s.roll] || 'absent';
+                const status = raw ? raw.toUpperCase() : "ABSENT";
+                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","${status}","${currentDate}","${currentSession}"\n`;
+            });
+            triggerFileDownload(`Class_Attendance_Register_${currentDate}_${currentSession.replace(/\s+/g, '_')}.csv`, csv);
+            showToast("Complete attendance sheet downloaded", "success");
+        };
+
+        window.copyAbsentWhatsApp = function() {
+            document.getElementById('absentDropdown').classList.add('hidden');
+            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
+            const presents = STUDENTS.filter(s => attendanceRecord[s.roll] === 'present');
+            
+            let msg = `📅 *Attendance Notice: ${currentDate} (${currentSession})*\n`;
+            msg += `Total Enrolled: 41 | Present: ${presents.length} | Absent: ${absentees.length}\n\n`;
+
+            if (absentees.length === 0) {
+                msg += `🎉 0 Absentees recorded.`;
+            } else {
+                msg += `*Absent Students List (${absentees.length}):*\n`;
+                absentees.forEach((s, i) => {
+                    msg += `${i + 1}. Roll #${s.roll} - ${s.name} (Ph: ${s.phone})\n`;
+                });
+                msg += `\nPlease ensure parents are notified.`;
+            }
+
+            const buffer = document.getElementById('clipboardBuffer');
+            buffer.value = msg;
+            buffer.select();
+            try {
+                document.execCommand('copy');
+                showToast("Absentee notice copied to clipboard", "success");
+            } catch (err) {
+                showToast("Failed to copy notice", "error");
+            }
+        };
+
+        window.generateAttendanceImage = function(type = 'present') {
+            document.getElementById('absentDropdown').classList.add('hidden');
+            document.getElementById('presentDropdown').classList.add('hidden');
+
+            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
+            const presents = STUDENTS.filter(s => attendanceRecord[s.roll] === 'present');
+            const total = STUDENTS.length;
+
+            let dataset = [];
+            let sheetTitle = "CLASS ATTENDANCE LIST - PRESENT STUDENTS";
+            let filenamePrefix = "Present_List_Spreadsheet";
+
+            if (type === 'absent') {
+                dataset = absentees;
+                sheetTitle = "CLASS ATTENDANCE LIST - ABSENT STUDENTS";
+                filenamePrefix = "Absent_List_Spreadsheet";
+                if (dataset.length === 0) {
+                    showToast("No students marked absent to export.", "info");
+                    return;
+                }
+            } else if (type === 'full') {
+                dataset = STUDENTS;
+                sheetTitle = "COMPLETE CLASS ATTENDANCE REGISTER";
+                filenamePrefix = "Full_Attendance_Register";
+            } else {
+                dataset = presents;
+                if (dataset.length === 0) {
+                    showToast("No students marked present to export.", "error");
+                    return;
+                }
+            }
+
+            showToast("Generating image...", "info");
+
+            const canvas = document.getElementById('exportDirectCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const cols = [
+                { id: "sno", label: "Sno", width: 60, align: "center" },
+                { id: "suc", label: "Suc", width: 140, align: "center" },
+                { id: "name", label: "Name", width: 380, align: "left" },
+                { id: "section", label: "Section", width: 140, align: "center" },
+                { id: "status", label: "Status", width: 100, align: "center" }
+            ];
+
+            const totalTableWidth = cols.reduce((sum, c) => sum + c.width, 0);
+            const paddingX = 40;
+            const titleBlockHeight = 85;
+            const rowHeight = 30;
+            const headerRowHeight = 34;
+
+            const canvasWidth = totalTableWidth + (paddingX * 2);
+            const totalRows = dataset.length;
+            const canvasHeight = titleBlockHeight + headerRowHeight + (totalRows * rowHeight) + 40;
+
+            const scale = 2;
+            canvas.width = canvasWidth * scale;
+            canvas.height = canvasHeight * scale;
+            ctx.scale(scale, scale);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            ctx.fillStyle = "#000000";
+            ctx.font = "bold 17px Arial, Helvetica, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(sheetTitle, canvasWidth / 2, 35);
+
+            ctx.font = "12px Arial, Helvetica, sans-serif";
+            ctx.fillStyle = "#333333";
+            ctx.fillText(`Date: ${currentDate}   |   Session: ${currentSession}   |   Total Count: ${dataset.length} / ${total}`, canvasWidth / 2, 60);
+
+            const startX = paddingX;
+            const startY = titleBlockHeight;
+
+            let currX = startX;
+            cols.forEach(col => {
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 1.2;
+                ctx.strokeRect(currX, startY, col.width, headerRowHeight);
+                ctx.fillStyle = "#000000";
+                ctx.font = "bold 13px Arial, Helvetica, sans-serif";
+                
+                if (col.align === "center") {
+                    ctx.textAlign = "center";
+                    ctx.fillText(col.label, currX + (col.width / 2), startY + 22);
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(col.label, currX + 14, startY + 22);
+                }
+                currX += col.width;
+            });
+
+            let currY = startY + headerRowHeight;
+
+            dataset.forEach((student, index) => {
+                const status = attendanceRecord[student.roll] || 'absent';
+                let cellX = startX;
+
+                cols.forEach(col => {
+                    ctx.strokeStyle = "#000000";
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(cellX, currY, col.width, rowHeight);
+
+                    ctx.font = "12px Arial, Helvetica, sans-serif";
+                    ctx.fillStyle = "#000000";
+
+                    if (col.id === "sno") {
+                        ctx.textAlign = "center";
+                        ctx.fillText(String(index + 1), cellX + (col.width / 2), currY + 20);
+                    } else if (col.id === "suc") {
+                        ctx.textAlign = "center";
+                        ctx.fillText(student.suc, cellX + (col.width / 2), currY + 20);
+                    } else if (col.id === "name") {
+                        ctx.textAlign = "left";
+                        ctx.font = "bold 12px Arial, Helvetica, sans-serif";
+                        let displayName = student.name;
+                        const maxW = col.width - 20;
+                        if (ctx.measureText(displayName).width > maxW) {
+                            while (ctx.measureText(displayName + '...').width > maxW && displayName.length > 0) {
+                                displayName = displayName.slice(0, -1);
+                            }
+                            displayName += '...';
+                        }
+                        ctx.fillText(displayName, cellX + 12, currY + 20);
+                    } else if (col.id === "section") {
+                        ctx.textAlign = "center";
+                        ctx.font = "12px Arial, Helvetica, sans-serif";
+                        ctx.fillText(student.section || DEFAULT_SECTION, cellX + (col.width / 2), currY + 20);
+                    } else if (col.id === "status") {
+                        ctx.textAlign = "center";
+                        ctx.font = "bold 11px Arial, Helvetica, sans-serif";
+                        if (status === 'present') {
+                            ctx.fillStyle = "#059669";
+                            ctx.fillText("PRESENT", cellX + (col.width / 2), currY + 20);
+                        } else if (status === 'absent') {
+                            ctx.fillStyle = "#dc2626";
+                            ctx.fillText("ABSENT", cellX + (col.width / 2), currY + 20);
+                        } else {
+                            ctx.fillStyle = "#94a3b8";
+                            ctx.fillText("-", cellX + (col.width / 2), currY + 20);
+                        }
+                    }
+                    cellX += col.width;
+                });
+                currY += rowHeight;
+            });
+
+            try {
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        showToast("Failed to render image.", "error");
+                        return;
+                    }
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = `${filenamePrefix}_${currentDate}_${currentSession.replace(/\s+/g, '_')}.png`;
+                    link.href = downloadUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(downloadUrl);
+                    showToast("Downloaded spreadsheet image!", "success");
+                }, "image/png");
+            } catch (err) {
+                console.error("Canvas export error:", err);
+                showToast("Could not download image.", "error");
+            }
+        };
+
+        // Initialize Local View
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDatePicker();
+            loadAttendanceForCurrentSelection();
+            renderUI();
+            
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('#absentDropdownContainer')) {
+                    const el = document.getElementById('absentDropdown');
+                    if (el) el.classList.add('hidden');
+                }
+                if (!e.target.closest('#presentDropdownContainer')) {
+                    const el = document.getElementById('presentDropdown');
+                    if (el) el.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+
+    <!-- 2. FIREBASE REAL-TIME MULTI-DEVICE CLOUD SYNC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArqJycgZtlLpM7KQ2T9h-e2eJUHtMg-TY",
+            authDomain: "tff-earns.firebaseapp.com",
+            databaseURL: "https://tff-earns-default-rtdb.firebaseio.com",
+            projectId: "tff-earns",
+            storageBucket: "tff-earns.firebasestorage.app",
+            messagingSenderId: "762695597074",
+            appId: "1:762695597074:web:4238b34996f68b3eb26ccb",
+            measurementId: "G-970WKZ8HD5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let unsubscribeCurrentDoc = null;
+        let savedHistoryData = [];
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                subscribeToAttendanceHistory();
+                window.listenToCurrentDate();
+            } else {
+                signInAnonymously(auth).catch(err => {
+                    console.warn("Auth note:", err);
+                    const label = document.getElementById('syncStatusText');
+                    if (label) label.textContent = "Offline Mode";
+                });
+            }
+        });
+
+        // LIVE LISTENER FOR THE CURRENT DATE & SESSION
+        window.listenToCurrentDate = function() {
+            if (unsubscribeCurrentDoc) {
+                unsubscribeCurrentDoc();
+            }
+
+            const docKey = `${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}`;
+            const docRef = doc(db, 'attendance_records', docKey);
+
+            unsubscribeCurrentDoc = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.attendanceRecord) {
+                        try {
+                            const parsed = JSON.parse(data.attendanceRecord);
+                            window.attendanceRecord = parsed;
+                            window.saveAttendanceToStorage();
+                            window.renderUI();
+                        } catch (e) {
+                            console.error("Parse cloud record err:", e);
+                        }
+                    }
+                }
+            }, (error) => {
+                console.warn("Realtime sync fallback:", error);
+            });
+        };
+
+        // AUTO-SAVE FUNCTION FIRED ON EVERY CLICK
+        window.triggerAutoCloudSync = async function() {
+            let presentCount = 0;
+            let absentCount = 0;
+            let unmarkedCount = 0;
+            const absenteesList = [];
+
+            window.STUDENTS.forEach(s => {
+                const status = window.attendanceRecord[s.roll];
+                if (status === 'present') {
+                    presentCount++;
+                } else if (status === 'absent') {
+                    absentCount++;
+                    absenteesList.push({ roll: s.roll, name: s.name, phone: s.phone });
+                } else {
+                    unmarkedCount++;
+                }
+            });
+
+            const docKey = `${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}`;
+            const recordPayload = {
+                date: window.currentDate,
+                session: window.currentSession,
+                totalStudents: window.STUDENTS.length,
+                presentCount: presentCount,
+                absentCount: absentCount,
+                unmarkedCount: unmarkedCount,
+                attendanceRecord: JSON.stringify(window.attendanceRecord),
+                absentees: absenteesList,
+                updatedAt: new Date().toISOString(),
+                savedBy: currentUser ? currentUser.uid : "anonymous"
+            };
+
+            try {
+                if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+                const docRef = doc(db, 'attendance_records', docKey);
+                await setDoc(docRef, recordPayload, { merge: true });
+            } catch (err) {
+                console.warn("Cloud live save fallback:", err);
+            }
+        };
+
+        // HISTORY SUBSCRIPTION
+        function subscribeToAttendanceHistory() {
+            try {
+                const recordsCol = collection(db, 'attendance_records');
+                onSnapshot(recordsCol, (snapshot) => {
+                    const list = [];
+                    snapshot.forEach(docSnap => {
+                        list.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+
+                    list.sort((a, b) => {
+                        const dtA = new Date((a.date || "") + " " + (a.session || ""));
+                        const dtB = new Date((b.date || "") + " " + (b.session || ""));
+                        return dtB - dtA;
+                    });
+
+                    savedHistoryData = list;
+                    updateHistoryBadge(list.length);
+                    renderHistoryUI();
+                }, (err) => {
+                    console.warn("History listener fallback", err);
+                });
+            } catch(e) {}
+        }
+
+        function renderHistoryUI() {
+            const container = document.getElementById('historyListContainer');
+            if (!container) return;
+
+            if (savedHistoryData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 px-4">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="calendar-x-2" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-700">No Records Yet</h4>
+                        <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">Mark attendance to see records saved here automatically.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = savedHistoryData.map(item => {
+                const isSelected = item.date === window.currentDate && item.session === window.currentSession;
+                const formattedDate = item.date;
+                const savedTime = item.updatedAt ? new Date(item.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                const pct = Math.round((item.presentCount / (item.totalStudents || 41)) * 100);
+
+                return `
+                <div class="p-3.5 rounded-xl border transition-all ${isSelected ? 'border-indigo-400 bg-indigo-50/40 shadow-xs ring-1 ring-indigo-200' : 'border-slate-200 bg-white hover:border-slate-300 shadow-xs'}">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-900">${formattedDate}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">${item.session}</span>
+                                ${isSelected ? '<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">Active</span>' : ''}
+                            </div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">Updated at ${savedTime}</div>
+                        </div>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full ${pct >= 85 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${pct}% Turnout
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 my-2.5 bg-slate-50 p-2 rounded-lg text-xs">
+                        <div class="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            Present: <span>${item.presentCount || 0}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-rose-700 font-semibold">
+                            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                            Absent: <span>${item.absentCount || 0}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                        <button onclick="loadAttendanceFromHistory('${item.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition flex items-center gap-1 cursor-pointer">
+                            <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> Open Date
+                        </button>
+                        <button onclick="deleteAttendanceFromHistory('${item.id}')" title="Delete Saved Record" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function updateHistoryBadge(count) {
+            const badge = document.getElementById('historyBadgeCount');
+            if (badge) badge.textContent = count;
+        }
+
+        window.loadAttendanceFromHistory = function(recordId) {
+            const record = savedHistoryData.find(r => r.id === recordId);
+            if (!record) return;
+
+            window.currentDate = record.date;
+            window.currentSession = record.session;
+
+            if (record.attendanceRecord) {
+                try {
+                    window.attendanceRecord = JSON.parse(record.attendanceRecord);
+                } catch(e) {
+                    console.error("Parse record error", e);
+                }
+            }
+
+            document.getElementById('attendanceDatePicker').value = window.currentDate;
+            document.getElementById('sessionSelector').value = window.currentSession;
+
+            window.saveAttendanceToStorage();
+            window.renderUI();
+            window.listenToCurrentDate();
+            window.closeHistoryDrawer();
+            window.showToast(`Loaded ${window.currentDate} (${window.currentSession})`, 'info');
+        };
+
+        window.deleteAttendanceFromHistory = async function(recordId) {
+            try {
+                const docRef = doc(db, 'attendance_records', recordId);
+                await deleteDoc(docRef);
+                window.showToast("Record removed", "info");
+            } catch (err) {
+                console.error("Delete record err:", err);
+            }
+        };
+
+        window.openHistoryDrawer = function() {
+            const overlay = document.getElementById('historyModalOverlay');
+            const drawer = document.getElementById('historyDrawerContent');
+            if (overlay && drawer) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
+            }
+            renderHistoryUI();
+        };
+
+        window.closeHistoryDrawer = function() {
+            const overlay = document.getElementById('historyModalOverlay');
+            const drawer = document.getElementById('historyDrawerContent');
+            if (overlay && drawer) {
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300);
+            }
+        };
+
+        window.closeHistoryDrawerOnBackdrop = function(e) {
+            if (e.target.id === 'historyModalOverlay') {
+                window.closeHistoryDrawer();
+            }
+        };
+    </script>
+</body>
+</html>
