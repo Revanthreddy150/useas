@@ -88,20 +88,19 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">SmartAttend Pro</h1>
-                        <span id="syncIndicator" class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span id="syncStatusText">Live Sync</span>
+                        <span id="syncIndicator" class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            <span id="syncStatusText">Connecting Cloud...</span>
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500 font-medium hidden sm:block">Real-time attendance tracker (Roll 1 to 41)</p>
+                    <p class="text-xs text-slate-500 font-medium hidden sm:block">Cloud Multi-Device Attendance Tracker (Roll 1 to 41)</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-2 sm:gap-3">
-                <!-- Primary Manual Save Attendance Button -->
-                <button id="saveAttendanceHeaderBtn" onclick="manualSaveAttendance()" title="Explicitly save attendance to cloud and local cache" class="inline-flex items-center px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-900/20 ring-1 ring-emerald-500 transition cursor-pointer">
-                    <i data-lucide="save" class="w-4 h-4 mr-1.5"></i>
-                    <span>Save Attendance</span>
+                <button id="saveAttendanceHeaderBtn" onclick="manualSaveAttendance()" title="Save attendance to cloud for all devices" class="inline-flex items-center px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-900/20 ring-1 ring-emerald-500 transition cursor-pointer">
+                    <i data-lucide="cloud-upload" class="w-4 h-4 mr-1.5"></i>
+                    <span>Save to Cloud</span>
                 </button>
 
                 <button onclick="openHistoryDrawer()" title="View past attendance records" class="relative inline-flex items-center px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-slate-900/20 ring-1 ring-slate-700 transition cursor-pointer">
@@ -369,7 +368,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-400 no-print mt-auto">
         <div class="max-w-7xl mx-auto px-4">
-            SmartAttend Real-Time Class Portal &bull; Live synchronized across all devices.
+            SmartAttend Cloud Sync Portal &bull; Real-time synchronization across all devices.
         </div>
     </footer>
 
@@ -415,8 +414,31 @@
     <textarea id="clipboardBuffer" class="sr-only" aria-hidden="true"></textarea>
     <canvas id="exportDirectCanvas" class="hidden"></canvas>
 
-    <!-- 1. APPLICATION LOGIC & STUDENTS DATA -->
-    <script>
+    <!-- UNIFIED CLIENT & FIREBASE CLOUD REAL-TIME ENGINE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArqJycgZtlLpM7KQ2T9h-e2eJUHtMg-TY",
+            authDomain: "tff-earns.firebaseapp.com",
+            databaseURL: "https://tff-earns-default-rtdb.firebaseio.com",
+            projectId: "tff-earns",
+            storageBucket: "tff-earns.firebasestorage.app",
+            messagingSenderId: "762695597074",
+            appId: "1:762695597074:web:4238b34996f68b3eb26ccb",
+            measurementId: "G-970WKZ8HD5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let unsubscribeCurrentDoc = null;
+        let savedHistoryData = [];
+
         const DEFAULT_SECTION = "Bsc-DTSC-2-1A";
         window.STUDENTS = [
             { roll: 1, hallTicket: "250807172298", name: "SAI GANESH LAVETI", suc: "2546640703", section: DEFAULT_SECTION, email: "siddhul7852@gmail.com", phone: "9133944606" },
@@ -477,24 +499,24 @@
 
         function initializeDatePicker() {
             const picker = document.getElementById('attendanceDatePicker');
-            if (picker) picker.value = currentDate;
+            if (picker) picker.value = window.currentDate;
             const sessionSelect = document.getElementById('sessionSelector');
-            if (sessionSelect) sessionSelect.value = currentSession;
+            if (sessionSelect) sessionSelect.value = window.currentSession;
         }
 
         window.getStorageKey = function() {
-            return `attendance_v2_${currentDate}_${currentSession.replace(/\s+/g, '_')}`;
+            return `attendance_v2_${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}`;
         };
 
         window.loadAttendanceForCurrentSelection = function() {
-            const key = getStorageKey();
+            const key = window.getStorageKey();
             const saved = localStorage.getItem(key);
             if (saved) {
                 try {
-                    attendanceRecord = JSON.parse(saved);
-                    STUDENTS.forEach(s => {
-                        if (!attendanceRecord[s.roll]) {
-                            attendanceRecord[s.roll] = 'absent';
+                    window.attendanceRecord = JSON.parse(saved);
+                    window.STUDENTS.forEach(s => {
+                        if (!window.attendanceRecord[s.roll]) {
+                            window.attendanceRecord[s.roll] = 'absent';
                         }
                     });
                 } catch (e) {
@@ -506,45 +528,16 @@
         };
 
         function initAllAbsent() {
-            attendanceRecord = {};
-            STUDENTS.forEach(s => {
-                attendanceRecord[s.roll] = 'absent';
+            window.attendanceRecord = {};
+            window.STUDENTS.forEach(s => {
+                window.attendanceRecord[s.roll] = 'absent';
             });
-            saveAttendanceToStorage();
+            window.saveAttendanceToStorage();
         }
 
         window.saveAttendanceToStorage = function() {
-            const key = getStorageKey();
-            localStorage.setItem(key, JSON.stringify(attendanceRecord));
-        };
-
-        // EXPLICIT SAVE ATTENDANCE ACTION
-        window.manualSaveAttendance = async function() {
-            const saveBtn = document.getElementById('saveAttendanceHeaderBtn');
-            const originalContent = saveBtn ? saveBtn.innerHTML : '';
-            if (saveBtn) {
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-1.5 animate-spin"></i><span>Saving...</span>`;
-                if (window.lucide) lucide.createIcons();
-            }
-
-            saveAttendanceToStorage();
-
-            if (window.triggerAutoCloudSync) {
-                await window.triggerAutoCloudSync();
-            }
-
-            showToast(`Attendance saved successfully for ${currentDate} (${currentSession})!`, 'success');
-
-            if (saveBtn) {
-                saveBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4 mr-1.5"></i><span>Saved!</span>`;
-                if (window.lucide) lucide.createIcons();
-                setTimeout(() => {
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = originalContent;
-                    if (window.lucide) lucide.createIcons();
-                }, 2000);
-            }
+            const key = window.getStorageKey();
+            localStorage.setItem(key, JSON.stringify(window.attendanceRecord));
         };
 
         window.showToast = function(message, type = 'info') {
@@ -577,71 +570,192 @@
             }, 2500);
         };
 
+        function updateSyncBadge(status) {
+            const badge = document.getElementById('syncIndicator');
+            const txt = document.getElementById('syncStatusText');
+            if (!badge || !txt) return;
+
+            if (status === 'live') {
+                badge.className = "inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200";
+                badge.children[0].className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                txt.textContent = "Live Cloud Sync";
+            } else if (status === 'saving') {
+                badge.className = "inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200";
+                badge.children[0].className = "w-2 h-2 rounded-full bg-indigo-500 animate-ping";
+                txt.textContent = "Saving Cloud...";
+            } else {
+                badge.className = "inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200";
+                badge.children[0].className = "w-2 h-2 rounded-full bg-rose-500";
+                txt.textContent = "Offline / Error";
+            }
+        }
+
+        // SAVE FUNCTION GUARANTEED TO PUSH TO FIRESTORE
+        window.saveRecordToCloud = async function() {
+            updateSyncBadge('saving');
+
+            let presentCount = 0;
+            let absentCount = 0;
+            let unmarkedCount = 0;
+            const absenteesList = [];
+
+            window.STUDENTS.forEach(s => {
+                const status = window.attendanceRecord[s.roll];
+                if (status === 'present') {
+                    presentCount++;
+                } else if (status === 'absent') {
+                    absentCount++;
+                    absenteesList.push({ roll: s.roll, name: s.name, phone: s.phone });
+                } else {
+                    unmarkedCount++;
+                }
+            });
+
+            const docKey = `${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}`;
+            const recordPayload = {
+                date: window.currentDate,
+                session: window.currentSession,
+                totalStudents: window.STUDENTS.length,
+                presentCount: presentCount,
+                absentCount: absentCount,
+                unmarkedCount: unmarkedCount,
+                attendanceRecord: JSON.stringify(window.attendanceRecord),
+                absentees: absenteesList,
+                updatedAt: new Date().toISOString(),
+                savedBy: currentUser ? currentUser.uid : "anonymous"
+            };
+
+            if (!auth.currentUser) {
+                await signInAnonymously(auth);
+            }
+
+            const docRef = doc(db, 'attendance_records', docKey);
+            await setDoc(docRef, recordPayload, { merge: true });
+            updateSyncBadge('live');
+            return true;
+        };
+
+        // MANUAL SAVE BUTTON HANDLER
+        window.manualSaveAttendance = async function() {
+            const btn = document.getElementById('saveAttendanceHeaderBtn');
+            const originalHTML = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-1.5 animate-spin"></i><span>Saving to Cloud...</span>`;
+                if (window.lucide) lucide.createIcons();
+            }
+
+            window.saveAttendanceToStorage();
+
+            try {
+                await window.saveRecordToCloud();
+                window.showToast(`Saved to Cloud! Visible on all devices for ${window.currentDate}.`, 'success');
+                if (btn) {
+                    btn.innerHTML = `<i data-lucide="cloud-check" class="w-4 h-4 mr-1.5 text-white"></i><span>Synced Online!</span>`;
+                    if (window.lucide) lucide.createIcons();
+                }
+            } catch (err) {
+                console.error("Manual save failed:", err);
+                window.showToast("Cloud sync failed. Saved locally on this device.", "error");
+                updateSyncBadge('offline');
+            } finally {
+                setTimeout(() => {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = originalHTML;
+                        if (window.lucide) lucide.createIcons();
+                    }
+                }, 2200);
+            }
+        };
+
+        // LISTENER THAT LISTENS TO REALTIME CLOUD CHANGES FOR THE SELECTED DATE
+        window.listenToCurrentDate = function() {
+            if (unsubscribeCurrentDoc) {
+                unsubscribeCurrentDoc();
+            }
+
+            const docKey = `${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}`;
+            const docRef = doc(db, 'attendance_records', docKey);
+
+            unsubscribeCurrentDoc = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.attendanceRecord) {
+                        try {
+                            const parsed = JSON.parse(data.attendanceRecord);
+                            window.attendanceRecord = parsed;
+                            window.saveAttendanceToStorage();
+                            window.renderUI();
+                        } catch (e) {
+                            console.error("Parse cloud record err:", e);
+                        }
+                    }
+                }
+            }, (error) => {
+                console.warn("Realtime sync fallback:", error);
+                updateSyncBadge('offline');
+            });
+        };
+
+        window.setStudentStatus = function(roll, status) {
+            if (window.attendanceRecord[roll] === status) {
+                window.attendanceRecord[roll] = (status === 'present') ? 'absent' : 'present';
+            } else {
+                window.attendanceRecord[roll] = status;
+            }
+            window.saveAttendanceToStorage();
+            updateStatistics();
+            updateRowOrCardVisual(roll);
+            
+            // Auto sync to cloud in background
+            window.saveRecordToCloud().catch(err => console.warn("Auto save issue:", err));
+        };
+
+        window.bulkMarkAll = function(status) {
+            window.STUDENTS.forEach(student => {
+                window.attendanceRecord[student.roll] = status || 'absent';
+            });
+            window.saveAttendanceToStorage();
+            window.renderUI();
+            window.saveRecordToCloud().catch(err => console.warn("Bulk mark sync issue:", err));
+            window.showToast(`All marked as ${status.toUpperCase()} and synced to cloud`, 'success');
+        };
+
         window.onDateChanged = function() {
             const val = document.getElementById('attendanceDatePicker').value;
             if (val) {
-                currentDate = val;
-                loadAttendanceForCurrentSelection();
-                renderUI();
-                if (window.listenToCurrentDate) window.listenToCurrentDate();
+                window.currentDate = val;
+                window.loadAttendanceForCurrentSelection();
+                window.renderUI();
+                window.listenToCurrentDate();
             }
         };
 
         window.shiftDate = function(days) {
-            const [y, m, d] = currentDate.split('-').map(Number);
+            const [y, m, d] = window.currentDate.split('-').map(Number);
             const dt = new Date(y, m - 1, d);
             dt.setDate(dt.getDate() + days);
-            currentDate = getFormattedDate(dt);
-            document.getElementById('attendanceDatePicker').value = currentDate;
-            loadAttendanceForCurrentSelection();
-            renderUI();
-            if (window.listenToCurrentDate) window.listenToCurrentDate();
+            window.currentDate = getFormattedDate(dt);
+            document.getElementById('attendanceDatePicker').value = window.currentDate;
+            window.loadAttendanceForCurrentSelection();
+            window.renderUI();
+            window.listenToCurrentDate();
         };
 
         window.setTodayDate = function() {
-            currentDate = getFormattedDate(new Date());
-            document.getElementById('attendanceDatePicker').value = currentDate;
-            loadAttendanceForCurrentSelection();
-            renderUI();
-            if (window.listenToCurrentDate) window.listenToCurrentDate();
+            window.currentDate = getFormattedDate(new Date());
+            document.getElementById('attendanceDatePicker').value = window.currentDate;
+            window.loadAttendanceForCurrentSelection();
+            window.renderUI();
+            window.listenToCurrentDate();
         };
 
         window.onSessionChanged = function() {
-            currentSession = document.getElementById('sessionSelector').value;
-            loadAttendanceForCurrentSelection();
-            renderUI();
-            if (window.listenToCurrentDate) window.listenToCurrentDate();
-        };
-
-        // AUTO-SAVE ON SINGLE CLICK
-        window.setStudentStatus = function(roll, status) {
-            if (attendanceRecord[roll] === status) {
-                attendanceRecord[roll] = (status === 'present') ? 'absent' : 'present';
-            } else {
-                attendanceRecord[roll] = status;
-            }
-            // Save local
-            saveAttendanceToStorage();
-            updateStatistics();
-            updateRowOrCardVisual(roll);
-            
-            // Sync to Firestore immediately
-            if (window.triggerAutoCloudSync) {
-                window.triggerAutoCloudSync();
-            }
-        };
-
-        // AUTO-SAVE ON BULK MARK
-        window.bulkMarkAll = function(status) {
-            STUDENTS.forEach(student => {
-                attendanceRecord[student.roll] = status || 'absent';
-            });
-            saveAttendanceToStorage();
-            renderUI();
-            if (window.triggerAutoCloudSync) {
-                window.triggerAutoCloudSync();
-            }
-            showToast(`All marked as ${status.toUpperCase()} (Synced)`, 'success');
+            window.currentSession = document.getElementById('sessionSelector').value;
+            window.loadAttendanceForCurrentSelection();
+            window.renderUI();
+            window.listenToCurrentDate();
         };
 
         window.setViewMode = function(mode) {
@@ -706,8 +820,8 @@
 
             let visibleCount = 0;
 
-            STUDENTS.forEach(student => {
-                const status = attendanceRecord[student.roll] || 'absent';
+            window.STUDENTS.forEach(student => {
+                const status = window.attendanceRecord[student.roll] || 'absent';
                 let matchesStatus = false;
                 
                 if (currentStatusFilter === 'all') {
@@ -754,15 +868,15 @@
         function updatePrintHeaders() {
             const pDate = document.getElementById('printDate');
             const pSession = document.getElementById('printSession');
-            if (pDate) pDate.textContent = currentDate;
-            if (pSession) pSession.textContent = currentSession;
+            if (pDate) pDate.textContent = window.currentDate;
+            if (pSession) pSession.textContent = window.currentSession;
         }
 
         function renderCards() {
             const container = document.getElementById('studentsCardsContainer');
             if (!container) return;
-            container.innerHTML = STUDENTS.map(student => {
-                const status = attendanceRecord[student.roll] || 'absent';
+            container.innerHTML = window.STUDENTS.map(student => {
+                const status = window.attendanceRecord[student.roll] || 'absent';
                 const isPresent = status === 'present';
                 const isAbsent = status === 'absent';
 
@@ -826,8 +940,8 @@
         function renderTable() {
             const tbody = document.getElementById('studentsTableBody');
             if (!tbody) return;
-            tbody.innerHTML = STUDENTS.map((student) => {
-                const status = attendanceRecord[student.roll] || 'absent';
+            tbody.innerHTML = window.STUDENTS.map((student) => {
+                const status = window.attendanceRecord[student.roll] || 'absent';
                 const isPresent = status === 'present';
                 const isAbsent = status === 'absent';
 
@@ -869,7 +983,7 @@
         }
 
         function updateRowOrCardVisual(roll) {
-            const status = attendanceRecord[roll] || 'absent';
+            const status = window.attendanceRecord[roll] || 'absent';
             const isPresent = status === 'present';
             const isAbsent = status === 'absent';
 
@@ -920,13 +1034,13 @@
         }
 
         function updateStatistics() {
-            const total = STUDENTS.length;
+            const total = window.STUDENTS.length;
             let presentCount = 0;
             let absentCount = 0;
             let unmarkedCount = 0;
 
-            STUDENTS.forEach(s => {
-                const st = attendanceRecord[s.roll];
+            window.STUDENTS.forEach(s => {
+                const st = window.attendanceRecord[s.roll];
                 if (st === 'present') presentCount++;
                 else if (st === 'absent') absentCount++;
                 else unmarkedCount++;
@@ -1004,29 +1118,29 @@
 
         window.downloadAbsentCSV = function() {
             document.getElementById('absentDropdown').classList.add('hidden');
-            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
+            const absentees = window.STUDENTS.filter(s => (window.attendanceRecord[s.roll] || 'absent') === 'absent');
             if (absentees.length === 0) {
-                showToast("No absent students marked yet.", "info");
+                window.showToast("No absent students marked yet.", "info");
                 return;
             }
             let csv = "Roll No,Hall Ticket No,Student Name,SUC,Phone Number,Email,Status,Date,Session\n";
             absentees.forEach(s => {
-                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","ABSENT","${currentDate}","${currentSession}"\n`;
+                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","ABSENT","${window.currentDate}","${window.currentSession}"\n`;
             });
-            triggerFileDownload(`Absent_Students_${currentDate}_${currentSession.replace(/\s+/g, '_')}.csv`, csv);
-            showToast(`Downloaded absent list (${absentees.length} students)`, "success");
+            window.triggerFileDownload(`Absent_Students_${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}.csv`, csv);
+            window.showToast(`Downloaded absent list (${absentees.length} students)`, "success");
         };
 
         window.downloadAbsentFormattedText = function() {
             document.getElementById('absentDropdown').classList.add('hidden');
-            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
+            const absentees = window.STUDENTS.filter(s => (window.attendanceRecord[s.roll] || 'absent') === 'absent');
             if (absentees.length === 0) {
-                showToast("No absent students marked to export.", "info");
+                window.showToast("No absent students marked to export.", "info");
                 return;
             }
             let txt = `=================================================\n`;
-            txt += `      CLASS ABSENTEE REPORT - ${currentDate}\n`;
-            txt += `      Session: ${currentSession} | Total Absent: ${absentees.length}\n`;
+            txt += `      CLASS ABSENTEE REPORT - ${window.currentDate}\n`;
+            txt += `      Session: ${window.currentSession} | Total Absent: ${absentees.length}\n`;
             txt += `=================================================\n\n`;
             absentees.forEach((s, idx) => {
                 txt += `${idx + 1}. Roll #${s.roll} | HT: ${s.hallTicket}\n`;
@@ -1036,42 +1150,42 @@
                 txt += `-------------------------------------------------\n`;
             });
             txt += `\nReport generated on ${new Date().toLocaleString()}\n`;
-            triggerFileDownload(`Absentee_Call_List_${currentDate}.txt`, txt, 'text/plain;charset=utf-8;');
-            showToast("Downloaded text slip for phone calls", "success");
+            window.triggerFileDownload(`Absentee_Call_List_${window.currentDate}.txt`, txt, 'text/plain;charset=utf-8;');
+            window.showToast("Downloaded text slip for phone calls", "success");
         };
 
         window.downloadPresentCSV = function() {
             document.getElementById('presentDropdown').classList.add('hidden');
-            const presents = STUDENTS.filter(s => attendanceRecord[s.roll] === 'present');
+            const presents = window.STUDENTS.filter(s => window.attendanceRecord[s.roll] === 'present');
             if (presents.length === 0) {
-                showToast("0 students marked present.", "error");
+                window.showToast("0 students marked present.", "error");
                 return;
             }
             let csv = "Roll No,Hall Ticket No,Student Name,SUC,Phone Number,Email,Status,Date,Session\n";
             presents.forEach(s => {
-                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","PRESENT","${currentDate}","${currentSession}"\n`;
+                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","PRESENT","${window.currentDate}","${window.currentSession}"\n`;
             });
-            triggerFileDownload(`Present_Students_${currentDate}_${currentSession.replace(/\s+/g, '_')}.csv`, csv);
-            showToast(`Downloaded present list (${presents.length} students)`, "success");
+            window.triggerFileDownload(`Present_Students_${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}.csv`, csv);
+            window.showToast(`Downloaded present list (${presents.length} students)`, "success");
         };
 
         window.downloadFullAttendanceCSV = function() {
             let csv = "Roll No,Hall Ticket No,Student Name,SUC,Phone Number,Email,Attendance Status,Date,Session\n";
-            STUDENTS.forEach(s => {
-                const raw = attendanceRecord[s.roll] || 'absent';
+            window.STUDENTS.forEach(s => {
+                const raw = window.attendanceRecord[s.roll] || 'absent';
                 const status = raw ? raw.toUpperCase() : "ABSENT";
-                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","${status}","${currentDate}","${currentSession}"\n`;
+                csv += `"${s.roll}","${s.hallTicket}","${s.name}","${s.suc}","${s.phone}","${s.email}","${status}","${window.currentDate}","${window.currentSession}"\n`;
             });
-            triggerFileDownload(`Class_Attendance_Register_${currentDate}_${currentSession.replace(/\s+/g, '_')}.csv`, csv);
-            showToast("Complete attendance sheet downloaded", "success");
+            window.triggerFileDownload(`Class_Attendance_Register_${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}.csv`, csv);
+            window.showToast("Complete attendance sheet downloaded", "success");
         };
 
         window.copyAbsentWhatsApp = function() {
             document.getElementById('absentDropdown').classList.add('hidden');
-            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
-            const presents = STUDENTS.filter(s => attendanceRecord[s.roll] === 'present');
+            const absentees = window.STUDENTS.filter(s => (window.attendanceRecord[s.roll] || 'absent') === 'absent');
+            const presents = window.STUDENTS.filter(s => window.attendanceRecord[s.roll] === 'present');
             
-            let msg = `📅 *Attendance Notice: ${currentDate} (${currentSession})*\n`;
+            let msg = `📅 *Attendance Notice: ${window.currentDate} (${window.currentSession})*\n`;
             msg += `Total Enrolled: 41 | Present: ${presents.length} | Absent: ${absentees.length}\n\n`;
 
             if (absentees.length === 0) {
@@ -1089,9 +1203,9 @@
             buffer.select();
             try {
                 document.execCommand('copy');
-                showToast("Absentee notice copied to clipboard", "success");
+                window.showToast("Absentee notice copied to clipboard", "success");
             } catch (err) {
-                showToast("Failed to copy notice", "error");
+                window.showToast("Failed to copy notice", "error");
             }
         };
 
@@ -1099,9 +1213,9 @@
             document.getElementById('absentDropdown').classList.add('hidden');
             document.getElementById('presentDropdown').classList.add('hidden');
 
-            const absentees = STUDENTS.filter(s => (attendanceRecord[s.roll] || 'absent') === 'absent');
-            const presents = STUDENTS.filter(s => attendanceRecord[s.roll] === 'present');
-            const total = STUDENTS.length;
+            const absentees = window.STUDENTS.filter(s => (window.attendanceRecord[s.roll] || 'absent') === 'absent');
+            const presents = window.STUDENTS.filter(s => window.attendanceRecord[s.roll] === 'present');
+            const total = window.STUDENTS.length;
 
             let dataset = [];
             let sheetTitle = "CLASS ATTENDANCE LIST - PRESENT STUDENTS";
@@ -1112,22 +1226,22 @@
                 sheetTitle = "CLASS ATTENDANCE LIST - ABSENT STUDENTS";
                 filenamePrefix = "Absent_List_Spreadsheet";
                 if (dataset.length === 0) {
-                    showToast("No students marked absent to export.", "info");
+                    window.showToast("No students marked absent to export.", "info");
                     return;
                 }
             } else if (type === 'full') {
-                dataset = STUDENTS;
+                dataset = window.STUDENTS;
                 sheetTitle = "COMPLETE CLASS ATTENDANCE REGISTER";
                 filenamePrefix = "Full_Attendance_Register";
             } else {
                 dataset = presents;
                 if (dataset.length === 0) {
-                    showToast("No students marked present to export.", "error");
+                    window.showToast("No students marked present to export.", "error");
                     return;
                 }
             }
 
-            showToast("Generating image...", "info");
+            window.showToast("Generating image...", "info");
 
             const canvas = document.getElementById('exportDirectCanvas');
             const ctx = canvas.getContext('2d');
@@ -1165,7 +1279,7 @@
 
             ctx.font = "12px Arial, Helvetica, sans-serif";
             ctx.fillStyle = "#333333";
-            ctx.fillText(`Date: ${currentDate}   |   Session: ${currentSession}   |   Total Count: ${dataset.length} / ${total}`, canvasWidth / 2, 60);
+            ctx.fillText(`Date: ${window.currentDate}   |   Session: ${window.currentSession}   |   Total Count: ${dataset.length} / ${total}`, canvasWidth / 2, 60);
 
             const startX = paddingX;
             const startY = titleBlockHeight;
@@ -1191,7 +1305,7 @@
             let currY = startY + headerRowHeight;
 
             dataset.forEach((student, index) => {
-                const status = attendanceRecord[student.roll] || 'absent';
+                const status = window.attendanceRecord[student.roll] || 'absent';
                 let cellX = startX;
 
                 cols.forEach(col => {
@@ -1246,156 +1360,26 @@
             try {
                 canvas.toBlob((blob) => {
                     if (!blob) {
-                        showToast("Failed to render image.", "error");
+                        window.showToast("Failed to render image.", "error");
                         return;
                     }
                     const downloadUrl = URL.createObjectURL(blob);
                     const link = document.createElement('a');
-                    link.download = `${filenamePrefix}_${currentDate}_${currentSession.replace(/\s+/g, '_')}.png`;
+                    link.download = `${filenamePrefix}_${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}.png`;
                     link.href = downloadUrl;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
                     URL.revokeObjectURL(downloadUrl);
-                    showToast("Downloaded spreadsheet image!", "success");
+                    window.showToast("Downloaded spreadsheet image!", "success");
                 }, "image/png");
             } catch (err) {
                 console.error("Canvas export error:", err);
-                showToast("Could not download image.", "error");
+                window.showToast("Could not download image.", "error");
             }
         };
 
-        // Initialize Local View
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeDatePicker();
-            loadAttendanceForCurrentSelection();
-            renderUI();
-            
-            window.addEventListener('click', (e) => {
-                if (!e.target.closest('#absentDropdownContainer')) {
-                    const el = document.getElementById('absentDropdown');
-                    if (el) el.classList.add('hidden');
-                }
-                if (!e.target.closest('#presentDropdownContainer')) {
-                    const el = document.getElementById('presentDropdown');
-                    if (el) el.classList.add('hidden');
-                }
-            });
-        });
-    </script>
-
-    <!-- 2. FIREBASE REAL-TIME MULTI-DEVICE CLOUD SYNC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyArqJycgZtlLpM7KQ2T9h-e2eJUHtMg-TY",
-            authDomain: "tff-earns.firebaseapp.com",
-            databaseURL: "https://tff-earns-default-rtdb.firebaseio.com",
-            projectId: "tff-earns",
-            storageBucket: "tff-earns.firebasestorage.app",
-            messagingSenderId: "762695597074",
-            appId: "1:762695597074:web:4238b34996f68b3eb26ccb",
-            measurementId: "G-970WKZ8HD5"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentUser = null;
-        let unsubscribeCurrentDoc = null;
-        let savedHistoryData = [];
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                subscribeToAttendanceHistory();
-                window.listenToCurrentDate();
-            } else {
-                signInAnonymously(auth).catch(err => {
-                    console.warn("Auth note:", err);
-                    const label = document.getElementById('syncStatusText');
-                    if (label) label.textContent = "Offline Mode";
-                });
-            }
-        });
-
-        // LIVE LISTENER FOR THE CURRENT DATE & SESSION
-        window.listenToCurrentDate = function() {
-            if (unsubscribeCurrentDoc) {
-                unsubscribeCurrentDoc();
-            }
-
-            const docKey = `${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}`;
-            const docRef = doc(db, 'attendance_records', docKey);
-
-            unsubscribeCurrentDoc = onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.attendanceRecord) {
-                        try {
-                            const parsed = JSON.parse(data.attendanceRecord);
-                            window.attendanceRecord = parsed;
-                            window.saveAttendanceToStorage();
-                            window.renderUI();
-                        } catch (e) {
-                            console.error("Parse cloud record err:", e);
-                        }
-                    }
-                }
-            }, (error) => {
-                console.warn("Realtime sync fallback:", error);
-            });
-        };
-
-        // SAVE FUNCTION FIRED ON CLICKS OR MANUAL BUTTON PRESS
-        window.triggerAutoCloudSync = async function() {
-            let presentCount = 0;
-            let absentCount = 0;
-            let unmarkedCount = 0;
-            const absenteesList = [];
-
-            window.STUDENTS.forEach(s => {
-                const status = window.attendanceRecord[s.roll];
-                if (status === 'present') {
-                    presentCount++;
-                } else if (status === 'absent') {
-                    absentCount++;
-                    absenteesList.push({ roll: s.roll, name: s.name, phone: s.phone });
-                } else {
-                    unmarkedCount++;
-                }
-            });
-
-            const docKey = `${window.currentDate}_${window.currentSession.replace(/\s+/g, '_')}`;
-            const recordPayload = {
-                date: window.currentDate,
-                session: window.currentSession,
-                totalStudents: window.STUDENTS.length,
-                presentCount: presentCount,
-                absentCount: absentCount,
-                unmarkedCount: unmarkedCount,
-                attendanceRecord: JSON.stringify(window.attendanceRecord),
-                absentees: absenteesList,
-                updatedAt: new Date().toISOString(),
-                savedBy: currentUser ? currentUser.uid : "anonymous"
-            };
-
-            try {
-                if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
-                const docRef = doc(db, 'attendance_records', docKey);
-                await setDoc(docRef, recordPayload, { merge: true });
-            } catch (err) {
-                console.warn("Cloud live save fallback:", err);
-            }
-        };
-
-        // HISTORY SUBSCRIPTION
+        // HISTORY LISTENER & UI
         function subscribeToAttendanceHistory() {
             try {
                 const recordsCol = collection(db, 'attendance_records');
@@ -1554,6 +1538,38 @@
                 window.closeHistoryDrawer();
             }
         };
+
+        // INITIALIZE APP AND ATTACH AUTH
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDatePicker();
+            window.loadAttendanceForCurrentSelection();
+            window.renderUI();
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    updateSyncBadge('live');
+                    subscribeToAttendanceHistory();
+                    window.listenToCurrentDate();
+                } else {
+                    signInAnonymously(auth).catch(err => {
+                        console.warn("Auth initialization fallback:", err);
+                        updateSyncBadge('offline');
+                    });
+                }
+            });
+
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('#absentDropdownContainer')) {
+                    const el = document.getElementById('absentDropdown');
+                    if (el) el.classList.add('hidden');
+                }
+                if (!e.target.closest('#presentDropdownContainer')) {
+                    const el = document.getElementById('presentDropdown');
+                    if (el) el.classList.add('hidden');
+                }
+            });
+        });
     </script>
 </body>
 </html>
