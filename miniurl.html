@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>USEAS MiniURL - Fast Notes & PDF Link Shortener</title>
+  <title>USEAS MiniURL - Fast Notes & PDF Link Resolver</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- QRCode.js CDN -->
@@ -21,18 +21,17 @@
               300: '#c0b4fc',
               400: '#9f87f8',
               500: '#7f5af2',
-              600: '#5e43f3', /* Exact USEAS purple */
+              600: '#5e43f3', /* Exact USEAS purple from your image */
               700: '#4e33db',
               800: '#412cb5',
               900: '#372793',
               dark: '#1b1933',
-              bg: '#f6f7fb',
+              bg: '#f6f7fb',  /* Clean light background */
               subtle: '#6c728e'
             }
           },
           boxShadow: {
             'card': '0 8px 30px -4px rgba(94, 67, 243, 0.08), 0 2px 6px -1px rgba(94, 67, 243, 0.04)',
-            'card-hover': '0 16px 36px -6px rgba(94, 67, 243, 0.14)',
             'modal': '0 24px 60px -12px rgba(94, 67, 243, 0.22)'
           }
         }
@@ -79,7 +78,7 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Vibrant gradient progress bar on light background */
+    /* Vibrant gradient progress bar */
     .rainbow-progress-bar {
       background: linear-gradient(90deg, #5e43f3, #8b5cf6, #d946ef, #06b6d4);
       background-size: 200% auto;
@@ -91,7 +90,6 @@
       100% { background-position: 200% 50%; }
     }
 
-    /* Custom light scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -118,7 +116,7 @@
   <!-- ========================================================================= -->
   <div id="redirect-screen" class="hidden fixed inset-0 z-50 bg-[#f6f7fb]/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto">
     
-    <!-- Light Purple Ambient Glows -->
+    <!-- Light Purple Ambient Background Accents -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
       <div class="absolute -top-20 -left-20 w-80 h-80 bg-brand-200/50 rounded-full blur-[80px]"></div>
       <div class="absolute top-1/2 -right-20 w-80 h-80 bg-purple-200/50 rounded-full blur-[90px]"></div>
@@ -131,7 +129,7 @@
       <!-- Category Badge Pill -->
       <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-bold tracking-wider uppercase mb-2">
         <span class="w-2 h-2 rounded-full bg-brand-600 animate-ping"></span>
-        <span id="flight-category-badge">USEAS StudyHub</span>
+        <span id="flight-category-badge">USEAS Course Notes</span>
       </div>
 
       <!-- Lottie Animation Embed (Clean Light Container) -->
@@ -177,7 +175,7 @@
             Target Resource
           </span>
           <span id="flight-alias-tag" class="text-[11px] font-mono font-bold bg-white text-brand-700 border border-brand-200 px-2.5 py-0.5 rounded-lg shadow-sm">
-            /notes/dbms-u2
+            /notes/dbmsunit2
           </span>
         </div>
         <div id="flight-target-title" class="font-extrabold text-sm text-brand-dark truncate">
@@ -197,14 +195,13 @@
           </svg>
         </button>
         <button id="cancel-flight-btn" class="py-3 px-5 bg-white hover:bg-brand-50 text-brand-subtle hover:text-brand-dark text-sm font-bold rounded-2xl transition border border-brand-200 shadow-sm cursor-pointer">
-          Cancel
+          Manage Links
         </button>
       </div>
 
     </div>
   </div>
 
-  <!-- Header -->
   <header class="bg-white border-b border-brand-100 sticky top-0 z-30 shadow-sm">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -213,17 +210,36 @@
         </div>
         <div>
           <div class="text-lg font-black text-brand-600 tracking-tight leading-none">USEAS</div>
-          <div class="text-[10px] font-bold text-brand-subtle tracking-wider uppercase">MiniURL Studio</div>
+          <div class="text-[10px] font-bold text-brand-subtle tracking-wider uppercase">MiniURL Manager</div>
         </div>
       </div>
 
-      <button id="preview-animation-header-btn" class="px-3.5 py-2 bg-brand-50 hover:bg-brand-100 text-brand-600 border border-brand-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-        <span>⚡ Test Animation</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <button id="github-help-btn" class="px-3.5 py-2 bg-brand-50 hover:bg-brand-100 text-brand-600 border border-brand-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+          <span>❓ Fix 404 Guide</span>
+        </button>
+        <button id="preview-animation-header-btn" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm shadow-brand-600/20">
+          <span>⚡ Test Animation</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-8">
+  <div id="gh-notice" class="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
+    <div class="p-4 rounded-2xl bg-brand-50 border border-brand-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2 text-brand-dark">
+        <span class="text-base">💡</span>
+        <span>
+          <strong>GitHub Pages Note:</strong> Make sure this file is named <code class="font-mono bg-white px-2 py-0.5 rounded border border-brand-200 text-brand-600 font-bold">404.html</code> in your GitHub repo root so paths like <code class="font-mono text-brand-600">/notes/*</code> and <code class="font-mono text-brand-600">/pdf/*</code> never 404!
+        </span>
+      </div>
+      <button onclick="document.getElementById('gh-help-modal').classList.remove('hidden')" class="font-bold text-brand-600 hover:text-brand-700 underline whitespace-nowrap cursor-pointer">
+        View Instructions &rarr;
+      </button>
+    </div>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-8">
 
     <!-- Generator Card -->
     <div class="bg-white rounded-3xl p-6 sm:p-8 border border-brand-100 shadow-card space-y-6">
@@ -312,7 +328,7 @@
               type="text" 
               id="slug-input" 
               required
-              placeholder="dbms-u2" 
+              placeholder="dbmsunit2" 
               class="flex-1 py-3 px-3 bg-transparent outline-none text-sm font-mono font-bold text-brand-dark placeholder:text-brand-subtle/50"
             >
             <button 
@@ -326,7 +342,7 @@
           <div class="mt-2 text-xs text-brand-subtle flex items-center gap-1.5 flex-wrap">
             <span class="font-semibold text-brand-dark">Resulting Short Link:</span>
             <span id="live-preview-badge" class="font-mono font-bold text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded-lg border border-brand-100 break-all">
-              https://www.useas.online/notes/dbms-u2
+              https://www.useas.online/notes/dbmsunit2
             </span>
           </div>
         </div>
@@ -390,7 +406,7 @@
               <span>✓</span> MiniURL Generated Successfully!
             </span>
             <div id="result-short-url" class="text-base sm:text-lg font-mono font-black text-brand-dark break-all">
-              https://www.useas.online/notes/dbms-u2
+              https://www.useas.online/notes/dbmsunit2
             </div>
             <p id="result-resource-title" class="text-xs text-brand-subtle font-medium">DBMS Unit 2 (BSc DS)</p>
           </div>
@@ -411,7 +427,6 @@
 
     </div>
 
-    <!-- Links Registry Section -->
     <div class="space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -419,7 +434,7 @@
             <span>Your Generated Links</span>
             <span id="links-count-pill" class="text-xs bg-brand-100 text-brand-700 px-2.5 py-0.5 rounded-full font-mono font-bold">1</span>
           </h3>
-          <p class="text-xs text-brand-subtle">All links are stored locally and open with the light animated transition.</p>
+          <p class="text-xs text-brand-subtle">Saved in your repository configuration so any student can open them.</p>
         </div>
 
         <div class="flex items-center gap-2">
@@ -438,8 +453,8 @@
             class="w-full sm:w-44 px-3 py-2 text-xs bg-white border border-brand-100 rounded-xl focus:border-brand-600 outline-none text-brand-dark"
           >
 
-          <button id="clear-all-btn" class="px-3 py-2 text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-xl font-bold transition whitespace-nowrap cursor-pointer">
-            Clear All
+          <button id="export-code-btn" class="px-3 py-2 text-xs bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 rounded-xl font-bold transition whitespace-nowrap cursor-pointer" title="Export updated file so all devices have your links">
+            💾 Save for All Devices
           </button>
         </div>
       </div>
@@ -476,7 +491,59 @@
     </div>
   </div>
 
-  <!-- Footer -->
+  <!-- GitHub Pages 404 Guide Modal -->
+  <div id="gh-help-modal" class="hidden fixed inset-0 z-50 bg-[#1b1933]/30 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-modal border border-brand-100 space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="font-extrabold text-brand-dark text-base flex items-center gap-2">
+          <span>🚀</span>
+          <span>How to Fix GitHub Pages 404 Error</span>
+        </h3>
+        <button onclick="document.getElementById('gh-help-modal').classList.add('hidden')" class="text-brand-subtle hover:text-brand-dark p-1 text-xl font-bold cursor-pointer leading-none">&times;</button>
+      </div>
+
+      <div class="text-xs text-brand-subtle space-y-3 leading-relaxed">
+        <p>Because GitHub Pages doesn't know what <code class="text-brand-600 font-bold">/notes/dbmsunit2</code> is, it shows the 404 page you saw.</p>
+        
+        <div class="p-3.5 bg-brand-50 rounded-2xl border border-brand-200 text-brand-dark space-y-2">
+          <p class="font-bold text-brand-700">Follow these 2 steps in your GitHub repository:</p>
+          <ol class="list-decimal pl-4 space-y-1.5">
+            <li>Save this file as <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-brand-200 text-brand-600 font-bold">404.html</code> in your main repository root.</li>
+            <li>(Optional) Keep a copy named <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-brand-200 text-brand-600 font-bold">index.html</code> so visiting the root website opens the manager.</li>
+          </ol>
+        </div>
+
+        <p>Now, whenever anyone opens <code class="text-brand-600 font-bold">useas.online/notes/...</code>, GitHub Pages serves <code class="font-bold">404.html</code>, the script detects the path, displays the light animation with the paper airplane Lottie, and safely forwards to your long StudyHub link!</p>
+      </div>
+
+      <button onclick="document.getElementById('gh-help-modal').classList.add('hidden')" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-extrabold rounded-xl transition cursor-pointer">
+        Got it!
+      </button>
+    </div>
+  </div>
+
+  <!-- Export Code Modal -->
+  <div id="export-code-modal" class="hidden fixed inset-0 z-50 bg-[#1b1933]/30 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-modal border border-brand-100 space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="font-extrabold text-brand-dark text-base">Save Links into Code for All Students</h3>
+        <button onclick="document.getElementById('export-code-modal').classList.add('hidden')" class="text-brand-subtle hover:text-brand-dark p-1 text-xl font-bold cursor-pointer leading-none">&times;</button>
+      </div>
+      <p class="text-xs text-brand-subtle">
+        Copy the block below and replace the <code class="text-brand-600 font-bold font-mono">GLOBAL_LINKS_DATABASE</code> variable inside your <code class="text-brand-600 font-bold font-mono">404.html</code> so any student visiting on any phone/PC gets redirected:
+      </p>
+      <textarea id="export-code-textarea" readonly class="w-full h-44 p-3 bg-brand-50 border border-brand-200 rounded-2xl font-mono text-[11px] text-brand-dark outline-none"></textarea>
+      <div class="flex gap-2">
+        <button onclick="downloadUpdatedFile()" class="flex-1 py-2.5 bg-white hover:bg-brand-50 border border-brand-200 text-brand-600 font-bold text-xs rounded-xl cursor-pointer">
+          💾 Download 404.html
+        </button>
+        <button id="copy-code-snippet-btn" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl cursor-pointer">
+          📋 Copy JSON Data
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer class="mt-auto border-t border-brand-100 bg-white py-6 text-center text-xs text-brand-subtle">
     <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p>&copy; USEAS MiniURL &bull; Direct study link resolver for <strong class="text-brand-600 font-bold">useas.online</strong></p>
@@ -490,37 +557,57 @@
   </footer>
 
   <script>
-    const STORAGE_KEY = 'useas_miniurl_links_v4';
-    const DEFAULT_DOMAIN = 'https://www.useas.online';
-    const SAMPLE_LONG_URL = 'https://www.useas.online/studyhubv2/#/Home/SEM%20-%203%20Noteses/DBMS/Unit%20-%202%20Up%20to%2003%20-%2010-%202026%20(%20BSC%20-%20DS%20)';
-
-    const INITIAL_LINKS = [
+    /**
+     * GLOBAL_LINKS_DATABASE:
+     * This database is baked directly into the code so that ANY user opening the link
+     * on ANY computer or phone will be recognized and redirected.
+     */
+    const GLOBAL_LINKS_DATABASE = [
       {
-        id: 'init-dbms-u2',
+        id: 'dbmsunit2-link',
         title: 'DBMS Unit 2 (BSc DS)',
-        category: 'notes', // 'notes' or 'pdf'
+        category: 'notes',
+        slug: 'dbmsunit2',
+        domain: 'https://www.useas.online',
+        longUrl: 'https://www.useas.online/studyhubv2/#/Home/SEM%20-%203%20Noteses/DBMS/Unit%20-%202%20Up%20to%2003%20-%2010-%202026%20(%20BSC%20-%20DS%20)',
+        clicks: 1
+      },
+      {
+        id: 'dbms-u2-alt',
+        title: 'DBMS Unit 2 (Hyphen alias)',
+        category: 'notes',
         slug: 'dbms-u2',
-        domain: DEFAULT_DOMAIN,
-        longUrl: SAMPLE_LONG_URL,
-        clicks: 42
+        domain: 'https://www.useas.online',
+        longUrl: 'https://www.useas.online/studyhubv2/#/Home/SEM%20-%203%20Noteses/DBMS/Unit%20-%202%20Up%20to%2003%20-%2010-%202026%20(%20BSC%20-%20DS%20)',
+        clicks: 0
       }
     ];
+
+    const STORAGE_KEY = 'useas_miniurl_links_v5';
+    const DEFAULT_DOMAIN = 'https://www.useas.online';
+    const SAMPLE_LONG_URL = 'https://www.useas.online/studyhubv2/#/Home/SEM%20-%203%20Noteses/DBMS/Unit%20-%202%20Up%20to%2003%20-%2010-%202026%20(%20BSC%20-%20DS%20)';
 
     let links = [];
     let selectedCategory = 'notes';
     let redirectTimer = null;
 
+    // Load links combining code constants and localStorage additions
     function loadLinks() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-          links = JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          // Merge baked-in items with local items
+          const map = new Map();
+          GLOBAL_LINKS_DATABASE.forEach(item => map.set(`${item.category}/${item.slug}`, item));
+          parsed.forEach(item => map.set(`${item.category}/${item.slug}`, item));
+          links = Array.from(map.values());
         } else {
-          links = [...INITIAL_LINKS];
+          links = [...GLOBAL_LINKS_DATABASE];
           saveLinks();
         }
       } catch (e) {
-        links = [...INITIAL_LINKS];
+        links = [...GLOBAL_LINKS_DATABASE];
       }
     }
 
@@ -534,10 +621,11 @@
 
     /**
      * Checks if current URL opened via a shortened path:
-     * Examples:
-     * - /notes/dbms-u2 or /pdf/dbms-u2
-     * - #/notes/dbms-u2 or #notes/dbms-u2
-     * - ?to=dbms-u2&type=notes
+     * Handles:
+     * - https://useas.online/notes/dbmsunit2  (GitHub Pages 404 handler)
+     * - https://useas.online/pdf/dbmsunit2
+     * - https://useas.online/#/notes/dbmsunit2
+     * - https://useas.online/?to=dbmsunit2&type=notes
      */
     function checkForRedirectTrigger() {
       loadLinks();
@@ -562,7 +650,7 @@
         if (hashMatch) {
           targetCategory = hashMatch[1].toLowerCase();
           targetSlug = hashMatch[2].toLowerCase();
-        } else if (hash !== 'dashboard') {
+        } else if (hash !== 'dashboard' && hash !== '') {
           targetSlug = hash.toLowerCase();
         }
       }
@@ -580,9 +668,13 @@
 
       targetSlug = decodeURIComponent(targetSlug).trim();
 
+      // Look up in database (normalized matching)
       const matched = links.find(item => {
-        const slugMatch = item.slug.toLowerCase() === targetSlug;
+        const itemSlugClean = item.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const targetSlugClean = targetSlug.replace(/[^a-z0-9]/g, '');
+        const slugMatch = (item.slug.toLowerCase() === targetSlug) || (itemSlugClean === targetSlugClean);
         if (!slugMatch) return false;
+        
         if (targetCategory && item.category) {
           return item.category.toLowerCase() === targetCategory;
         }
@@ -591,6 +683,9 @@
 
       if (matched) {
         startRedirectAnimation(matched);
+      } else {
+        // If not registered yet, display a helpful notice
+        showToast(`Route /${targetCategory || 'notes'}/${targetSlug} not found in database`, 'error');
       }
     }
 
@@ -619,7 +714,7 @@
       screen.classList.remove('hidden');
 
       let currentPercent = 0;
-      const durationMs = 2800;
+      const durationMs = 2600;
       const intervalMs = 35;
       const stepIncrement = 100 / (durationMs / intervalMs);
 
@@ -638,7 +733,7 @@
       cancelBtn.onclick = () => {
         clearInterval(redirectTimer);
         screen.classList.add('hidden');
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState({}, document.title, window.location.pathname.replace(/\/(notes|pdf)\/.*/, '/'));
         renderLinks();
       };
 
@@ -669,7 +764,7 @@
       return slug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
     }
 
-    function generateRandomSlug(len = 5) {
+    function generateRandomSlug(len = 6) {
       const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
       let res = '';
       for (let i = 0; i < len; i++) {
@@ -690,7 +785,6 @@
       return `${dom}/${category}/${slug}`;
     }
 
-    // Category Toggle Handler (Notes vs PDF)
     function setCategory(cat) {
       selectedCategory = cat;
       const isNotes = cat === 'notes';
@@ -724,7 +818,7 @@
 
       const domain = getCleanDomain();
       const cat = selectedCategory;
-      const slug = sanitizeSlug(slugInput.value) || 'your-name';
+      const slug = sanitizeSlug(slugInput.value) || 'dbmsunit2';
 
       prefixDisplay.textContent = `${domain}/${cat}/`;
       routeIndicator.textContent = `/${cat}/`;
@@ -767,7 +861,7 @@
               </div>
 
               <div class="flex items-center gap-2">
-                <span class="text-xs font-mono font-bold text-brand-600 truncate">${shortUrl}</span>
+                <a href="${shortUrl}" target="_blank" class="text-xs font-mono font-bold text-brand-600 hover:underline truncate">${shortUrl}</a>
                 <button onclick="copyText('${shortUrl}', 'Copied short URL!')" class="text-xs text-brand-subtle hover:text-brand-600 transition cursor-pointer" title="Copy">
                   📋
                 </button>
@@ -783,7 +877,7 @@
               <button 
                 onclick="testAnimation('${item.id}')" 
                 class="px-3.5 py-2 bg-brand-50 hover:bg-brand-100 border border-brand-200 text-brand-600 rounded-xl transition text-xs font-extrabold flex items-center gap-1 cursor-pointer">
-                ▶ Test Animation
+                ▶ Test
               </button>
 
               <button 
@@ -823,8 +917,9 @@
       const resetDomainBtn = document.getElementById('reset-domain-btn');
       const searchInput = document.getElementById('search-input');
       const categoryFilter = document.getElementById('category-filter');
-      const clearAllBtn = document.getElementById('clear-all-btn');
       const previewHeaderBtn = document.getElementById('preview-animation-header-btn');
+      const githubHelpBtn = document.getElementById('github-help-btn');
+      const exportCodeBtn = document.getElementById('export-code-btn');
 
       // Category Radios
       document.querySelectorAll('input[name="linkCategory"]').forEach(radio => {
@@ -844,7 +939,7 @@
 
       // Random Slug
       randomSlugBtn.addEventListener('click', () => {
-        slugInput.value = generateRandomSlug(5);
+        slugInput.value = generateRandomSlug(6);
         updateLivePreview();
       });
 
@@ -853,14 +948,22 @@
         if (links.length > 0) {
           startRedirectAnimation(links[0]);
         } else {
-          startRedirectAnimation(INITIAL_LINKS[0]);
+          startRedirectAnimation(GLOBAL_LINKS_DATABASE[0]);
         }
       });
+
+      // GitHub Help
+      githubHelpBtn.addEventListener('click', () => {
+        document.getElementById('gh-help-modal').classList.remove('hidden');
+      });
+
+      // Export / Save for all devices
+      exportCodeBtn.addEventListener('click', openExportModal);
 
       // Paste Sample DBMS Link
       pasteSampleBtn.addEventListener('click', () => {
         longUrlInput.value = SAMPLE_LONG_URL;
-        slugInput.value = 'dbms-u2';
+        slugInput.value = 'dbmsunit2';
         titleInput.value = 'DBMS Unit 2 (BSc DS)';
         setCategory('notes');
         updateLivePreview();
@@ -886,7 +989,7 @@
         }
       });
 
-      // Submit Form
+      // Form Submit
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const rawUrl = longUrlInput.value.trim();
@@ -901,17 +1004,17 @@
         }
 
         if (!slug) {
-          slug = generateRandomSlug(5);
+          slug = generateRandomSlug(6);
         }
 
         // Check duplicate within same route
-        const duplicate = links.find(l => 
+        const duplicateIndex = links.findIndex(l => 
           l.slug.toLowerCase() === slug.toLowerCase() && 
           (l.category || 'notes') === category
         );
 
-        if (duplicate) {
-          showToast(`/${category}/${slug} already exists! Choose another name.`, 'error');
+        if (duplicateIndex !== -1) {
+          showToast(`/${category}/${slug} already exists! Choose another name or update it.`, 'error');
           return;
         }
 
@@ -948,7 +1051,7 @@
         showToast(`Created /${category}/${slug}!`, 'success');
       });
 
-      // Filters
+      // Search & Filters
       categoryFilter.addEventListener('change', filterLinks);
       searchInput.addEventListener('input', filterLinks);
 
@@ -967,18 +1070,6 @@
 
         renderLinks(filtered);
       }
-
-      // Clear All
-      clearAllBtn.addEventListener('click', () => {
-        if (links.length === 0) return;
-        showConfirmModal('Delete all saved links?', () => {
-          links = [];
-          saveLinks();
-          renderLinks();
-          document.getElementById('new-link-result').classList.add('hidden');
-          showToast('All links deleted', 'info');
-        });
-      });
 
       // QR modal close
       document.getElementById('close-qr-btn').addEventListener('click', () => {
@@ -1009,11 +1100,11 @@
       testBtn.onclick = () => testAnimation(linkItem.id);
       qrBtn.onclick = () => showQrModal(shortUrl);
 
-      copyText(shortUrl, `Created and copied: /${linkItem.category}/${linkItem.slug}`);
+      copyText(shortUrl, `Created: /${linkItem.category}/${linkItem.slug}`);
     }
 
     function testAnimation(id) {
-      const match = links.find(l => l.id === id) || links[0] || INITIAL_LINKS[0];
+      const match = links.find(l => l.id === id) || links[0] || GLOBAL_LINKS_DATABASE[0];
       startRedirectAnimation(match);
     }
 
@@ -1046,33 +1137,33 @@
       showToast('Link removed', 'info');
     }
 
-    function showConfirmModal(message, onConfirm) {
-      const overlay = document.createElement('div');
-      overlay.className = 'fixed inset-0 z-50 bg-[#1b1933]/30 backdrop-blur-sm flex items-center justify-center p-4';
-      overlay.innerHTML = `
-        <div class="bg-white p-6 max-w-sm w-full text-center space-y-4 rounded-3xl shadow-modal border border-brand-100">
-          <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 mx-auto flex items-center justify-center text-xl font-bold">
-            !
-          </div>
-          <h4 class="font-extrabold text-brand-dark text-base">Please Confirm</h4>
-          <p class="text-xs text-brand-subtle">${message}</p>
-          <div class="flex gap-2 pt-2">
-            <button id="modal-cancel" class="flex-1 py-2.5 px-3 bg-brand-50 hover:bg-brand-100 text-brand-subtle text-xs font-bold rounded-xl cursor-pointer">
-              Cancel
-            </button>
-            <button id="modal-confirm" class="flex-1 py-2.5 px-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl cursor-pointer shadow-sm">
-              Confirm
-            </button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(overlay);
+    function openExportModal() {
+      const modal = document.getElementById('export-code-modal');
+      const textarea = document.getElementById('export-code-textarea');
+      const copyBtn = document.getElementById('copy-code-snippet-btn');
 
-      overlay.querySelector('#modal-cancel').onclick = () => overlay.remove();
-      overlay.querySelector('#modal-confirm').onclick = () => {
-        overlay.remove();
-        onConfirm();
-      };
+      const codeString = 'const GLOBAL_LINKS_DATABASE = ' + JSON.stringify(links, null, 2) + ';';
+      textarea.value = codeString;
+      modal.classList.remove('hidden');
+
+      copyBtn.onclick = () => copyText(codeString, 'Copied database code!');
+    }
+
+    function downloadUpdatedFile() {
+      let pageHtml = document.documentElement.outerHTML;
+      // Inject updated GLOBAL_LINKS_DATABASE into the download file
+      const regex = /const GLOBAL_LINKS_DATABASE = \[[\s\S]*?\];/;
+      const newVar = 'const GLOBAL_LINKS_DATABASE = ' + JSON.stringify(links, null, 2) + ';';
+      pageHtml = pageHtml.replace(regex, newVar);
+
+      const blob = new Blob([pageHtml], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '404.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Downloaded updated 404.html! Push this to GitHub.', 'success');
     }
 
     function copyText(text, message = 'Copied to clipboard!') {
@@ -1132,7 +1223,6 @@
         .replace(/"/g, '&quot;');
     }
 
-    // App Initialization
     window.addEventListener('DOMContentLoaded', () => {
       loadLinks();
       setupEventListeners();
