@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USEAS StudyHub - Link Shortener & Resolver</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QR Code Generator Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: rgba(156, 163, 175, 0.5);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-200">
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <div id="redirect-screen" class="hidden fixed inset-0 z-50 bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center">
+    <div class="max-w-md w-full bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-2xl flex flex-col items-center">
+      <div class="w-16 h-16 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-3xl mb-4 animate-pulse">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <h2 class="text-2xl font-bold mb-2">Redirecting to StudyHub</h2>
+      <p class="text-slate-400 text-sm mb-6">Taking you to your study notes and resources...</p>
+      
+      <div class="w-full bg-slate-700 rounded-full h-2 mb-6 overflow-hidden">
+        <div id="redirect-progress" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
+      </div>
+
+      <div class="p-3 bg-slate-900/80 rounded-lg text-xs font-mono text-slate-300 border border-slate-700/60 w-full truncate mb-6 text-left" id="redirect-target-url">
+        Loading target URL...
+      </div>
+
+      <div class="flex items-center gap-3 w-full">
+        <a id="redirect-manual-btn" href="#" class="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition text-center shadow-lg shadow-blue-600/30">
+          Open Right Now <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-xs"></i>
+        </a>
+        <button id="cancel-redirect-btn" class="py-2.5 px-4 bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium rounded-xl transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-500/20">
+          <i class="fa-solid fa-link"></i>
+        </div>
+        <div>
+          <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">USEAS <span class="text-blue-600">Shortener</span></span>
+          <span class="hidden sm:inline-block text-xs bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full ml-2 font-medium">StudyHub v2</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="theme-toggle-btn" class="p-2.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Toggle Theme">
+          <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
+        <button id="export-btn" class="p-2.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Export Links (JSON)">
+          <i class="fa-solid fa-file-export"></i>
+        </button>
+        <label for="import-file" class="p-2.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" title="Import Links (JSON)">
+          <i class="fa-solid fa-file-import"></i>
+          <input type="file" id="import-file" class="hidden" accept=".json">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-8">
+    
+    <!-- Hero / Description -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none text-9xl">
+        <i class="fa-solid fa-link-slash"></i>
+      </div>
+      <div class="relative z-10 max-w-2xl">
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">Turn Long StudyHub Links into Tiny URLs</h1>
+        <p class="text-blue-100 text-sm sm:text-base leading-relaxed">
+          Create clean, easily shareable short links for your notes, semester folders, and subject drives without breaking internal routing or <code class="bg-blue-800/60 px-1.5 py-0.5 rounded text-xs font-mono">/#/Home/</code> URL hashes.
+        </p>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <section class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-6 shadow-sm">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+        <i class="fa-solid fa-plus-circle text-blue-600"></i> Create a New Short Link
+      </h2>
+
+      <form id="shortener-form" class="space-y-4">
+        <!-- Long URL Input -->
+        <div>
+          <label for="long-url-input" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2">
+            Target StudyHub / Long URL <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-globe"></i>
+            </span>
+            <input 
+              type="url" 
+              id="long-url-input" 
+              required
+              placeholder="https://www.useas.online/studyhubv2/#/Home/SEM%20-%203%20Noteses/DBMS/Unit%20-%202..." 
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition font-mono"
+            >
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Custom Slug / Alias -->
+          <div>
+            <label for="custom-slug-input" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2">
+              Custom Short Slug / Alias
+            </label>
+            <div class="flex rounded-xl shadow-sm">
+              <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-mono">
+                /go/
+              </span>
+              <input 
+                type="text" 
+                id="custom-slug-input" 
+                placeholder="dbms-u2 (optional)" 
+                class="flex-1 py-3 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-r-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition font-mono"
+              >
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1">Leave empty to auto-generate a random 5-character short code.</p>
+          </div>
+
+          <!-- Title / Note -->
+          <div>
+            <label for="title-input" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2">
+              Resource Title / Description
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-tag"></i>
+              </span>
+              <input 
+                type="text" 
+                id="title-input" 
+                placeholder="e.g. DBMS Unit 2 Notes (BSc DS)" 
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2 flex justify-end">
+          <button 
+            type="submit" 
+            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold rounded-xl text-sm transition shadow-lg shadow-blue-600/30 flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-bolt"></i> Generate Tiny Link
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-table-list text-blue-600"></i> My Shortened URLs
+            <span id="links-count" class="text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-mono font-medium">0</span>
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Saved in your browser local storage. Always ready to share.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Search input -->
+          <div class="relative w-full sm:w-64">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Search links..." 
+              class="w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition"
+            >
+          </div>
+          <button id="clear-all-btn" class="px-3 py-2 text-xs bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl font-medium transition flex items-center gap-1.5 whitespace-nowrap">
+            <i class="fa-solid fa-trash-can"></i> Clear All
+          </button>
+        </div>
+      </div>
+
+      <!-- Links Container -->
+      <div id="links-list" class="space-y-3">
+        <!-- Rendered items will appear here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-16 bg-white dark:bg-slate-800/50 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-8">
+        <div class="w-16 h-16 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 text-2xl mb-3">
+          <i class="fa-solid fa-box-open"></i>
+        </div>
+        <h3 class="text-base font-semibold text-slate-800 dark:text-slate-200">No links created yet</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+          Shorten your first StudyHub link using the form above to share simple links like <code>?to=dbms-u2</code> or <code>#dbms-u2</code>.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="qr-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl flex flex-col items-center">
+      <div class="flex justify-between items-center w-full mb-4">
+        <h3 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+          <i class="fa-solid fa-qrcode text-blue-600"></i> QR Code
+        </h3>
+        <button id="close-qr-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="qrcode-container" class="bg-white p-4 rounded-xl shadow-inner mb-4 flex items-center justify-center"></div>
+
+      <p id="qr-link-text" class="text-xs font-mono text-slate-500 dark:text-slate-400 text-center break-all mb-4 px-2"></p>
+
+      <button id="copy-qr-link-btn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
+        <i class="fa-regular fa-copy"></i> Copy Short Link
+      </button>
+    </div>
+  </div>
+
+  <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p>&copy; USEAS StudyHub URL Gateway &bull; Designed for single-file deployment.</p>
+      <p class="font-mono text-[11px] text-slate-400">Supports Hash Routing (<code class="text-blue-500">#slug</code>) &amp; Query Params (<code class="text-blue-500">?to=slug</code>)</p>
+    </div>
+  </footer>
+
+  <script>
+    // Storage Key
+    const STORAGE_KEY = 'useas_studyhub_short_links_v1';
+
+    // Default Seed Links to help the user test right away
+    const DEFAULT_LINKS = [
+      {
+        id: 'seed-1',
+        title: 'DBMS Unit 2 (BSc DS)',
+        slug: 'dbms-u2',
+        longUrl: 'https://www.useas.online/studyhubv2/#/Home/SEM%20-%203%20Noteses/DBMS/Unit%20-%202%20Up%20to%2003%20-%2010-%202026%20(%20BSC%20-%20DS%20)',
+        createdAt: new Date().toISOString(),
+        clicks: 12
+      }
+    ];
+
+    // State Variables
+    let links = [];
+    let qrcodeInstance = null;
+
+    function loadLinks() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          links = JSON.parse(stored);
+        } else {
+          links = [...DEFAULT_LINKS];
+          saveLinks();
+        }
+      } catch (err) {
+        links = [...DEFAULT_LINKS];
+      }
+    }
+
+    function saveLinks() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+      } catch (err) {
+        showToast('Failed to save links to local storage', 'error');
+      }
+    }
+
+    function checkForRedirect() {
+      // Check query parameter '?to=alias' or '?c=alias'
+      const searchParams = new URLSearchParams(window.location.search);
+      let targetSlug = searchParams.get('to') || searchParams.get('c') || searchParams.get('slug');
+
+      // Check hash-based routing: '#alias' (e.g. useas.online/index.html#dbms-u2)
+      if (!targetSlug && window.location.hash) {
+        const hashVal = window.location.hash.substring(1).trim();
+        // Ignore internal routing if someone visits our own page anchor
+        if (hashVal && !hashVal.startsWith('/')) {
+          targetSlug = hashVal;
+        }
+      }
+
+      if (!targetSlug) return; // Stay on dashboard
+
+      // Clean target slug
+      targetSlug = decodeURIComponent(targetSlug).toLowerCase().trim();
+
+      // Look up target
+      loadLinks();
+      const match = links.find(item => item.slug.toLowerCase() === targetSlug);
+
+      if (match) {
+        triggerRedirect(match);
+      } else {
+        showToast(`Short link "${targetSlug}" not found!`, 'error');
+      }
+    }
+
+    function triggerRedirect(linkItem) {
+      // Increase click count
+      linkItem.clicks = (linkItem.clicks || 0) + 1;
+      saveLinks();
+
+      const screen = document.getElementById('redirect-screen');
+      const targetUrlEl = document.getElementById('redirect-target-url');
+      const manualBtn = document.getElementById('redirect-manual-btn');
+      const progressBar = document.getElementById('redirect-progress');
+      const cancelBtn = document.getElementById('cancel-redirect-btn');
+
+      targetUrlEl.textContent = linkItem.longUrl;
+      manualBtn.href = linkItem.longUrl;
+      screen.classList.remove('hidden');
+
+      let progress = 0;
+      let isCancelled = false;
+
+      cancelBtn.onclick = () => {
+        isCancelled = true;
+        screen.classList.add('hidden');
+        // Clean URL to dashboard view without reload
+        window.history.replaceState({}, document.title, window.location.pathname);
+      };
+
+      const interval = setInterval(() => {
+        if (isCancelled) {
+          clearInterval(interval);
+          return;
+        }
+        progress += 20;
+        progressBar.style.width = progress + '%';
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          // Redirect immediately, preserving full long URL hash fragments
+          window.location.replace(linkItem.longUrl);
+        }
+      }, 100);
+    }
+
+    function generateSlug(length = 5) {
+      const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function sanitizeSlug(slug) {
+      return slug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+    }
+
+    function getShortUrlForSlug(slug) {
+      const origin = window.location.origin + window.location.pathname;
+      return `${origin}#${slug}`;
+    }
+
+    function renderLinks(filtered = null) {
+      const items = filtered || links;
+      const listEl = document.getElementById('links-list');
+      const emptyState = document.getElementById('empty-state');
+      const countEl = document.getElementById('links-count');
+
+      countEl.textContent = items.length;
+
+      if (items.length === 0) {
+        listEl.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      listEl.innerHTML = items.map(item => {
+        const shortUrl = getShortUrlForSlug(item.slug);
+        return `
+          <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 hover:border-blue-400 dark:hover:border-blue-500/60 transition rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            
+            <!-- Left Info -->
+            <div class="space-y-1.5 flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">${escapeHtml(item.title || 'Untitled Resource')}</span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 font-mono">
+                  #${escapeHtml(item.slug)}
+                </span>
+                <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                  <i class="fa-solid fa-chart-simple text-[10px]"></i> ${item.clicks || 0} clicks
+                </span>
+              </div>
+
+              <!-- Short URL Pill -->
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-blue-600 dark:text-blue-400 font-mono font-medium truncate">${shortUrl}</span>
+                <button onclick="copyToClipboard('${shortUrl}', 'Short link copied!')" class="p-1 text-slate-400 hover:text-blue-600 transition" title="Copy Short Link">
+                  <i class="fa-regular fa-copy text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Original Long URL -->
+              <div class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-xl font-mono" title="${escapeHtml(item.longUrl)}">
+                <i class="fa-solid fa-arrow-turn-down-right mr-1 opacity-70"></i>${escapeHtml(item.longUrl)}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100 dark:border-slate-700">
+              <button 
+                onclick="showQrModal('${shortUrl}', '${escapeHtml(item.slug)}')" 
+                class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-xs font-medium flex items-center gap-1.5" 
+                title="View QR Code">
+                <i class="fa-solid fa-qrcode text-sm"></i>
+              </button>
+
+              <button 
+                onclick="copyToClipboard('${shortUrl}', 'Share link copied!')" 
+                class="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl transition text-xs font-semibold flex items-center gap-1.5">
+                <i class="fa-regular fa-copy"></i> Copy
+              </button>
+
+              <a 
+                href="${shortUrl}" 
+                target="_blank" 
+                class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition text-xs font-semibold flex items-center gap-1.5 shadow-sm shadow-blue-500/20">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Test
+              </a>
+
+              <button 
+                onclick="deleteLink('${item.id}')" 
+                class="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition" 
+                title="Delete Link">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setupEventListeners() {
+      const form = document.getElementById('shortener-form');
+      const longUrlInput = document.getElementById('long-url-input');
+      const customSlugInput = document.getElementById('custom-slug-input');
+      const titleInput = document.getElementById('title-input');
+      const searchInput = document.getElementById('search-input');
+      const clearAllBtn = document.getElementById('clear-all-btn');
+      const exportBtn = document.getElementById('export-btn');
+      const importFile = document.getElementById('import-file');
+      const themeToggleBtn = document.getElementById('theme-toggle-btn');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const rawUrl = longUrlInput.value.trim();
+        let slug = sanitizeSlug(customSlugInput.value);
+        let title = titleInput.value.trim();
+
+        if (!rawUrl) {
+          showToast('Please provide a long URL.', 'error');
+          return;
+        }
+
+        // Auto-generate slug if empty
+        if (!slug) {
+          slug = generateSlug(5);
+        }
+
+        // Check if slug is unique
+        const exists = links.some(item => item.slug.toLowerCase() === slug.toLowerCase());
+        if (exists) {
+          showToast(`Slug "${slug}" is already in use. Choose another one!`, 'error');
+          return;
+        }
+
+        // Auto-fill title from URL if empty
+        if (!title) {
+          try {
+            const decoded = decodeURIComponent(rawUrl);
+            const segments = decoded.split('/').filter(Boolean);
+            title = segments[segments.length - 1] || 'StudyHub Resource';
+          } catch {
+            title = 'StudyHub Resource';
+          }
+        }
+
+        const newLink = {
+          id: 'link_' + Date.now(),
+          title,
+          slug,
+          longUrl: rawUrl,
+          createdAt: new Date().toISOString(),
+          clicks: 0
+        };
+
+        links.unshift(newLink);
+        saveLinks();
+        renderLinks();
+
+        // Reset inputs
+        longUrlInput.value = '';
+        customSlugInput.value = '';
+        titleInput.value = '';
+
+        const shortLink = getShortUrlForSlug(slug);
+        copyToClipboard(shortLink, `Short URL generated & copied: ${slug}`);
+      });
+
+      // Search Filter
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (!query) {
+          renderLinks();
+          return;
+        }
+        const filtered = links.filter(item => 
+          item.slug.toLowerCase().includes(query) ||
+          item.title.toLowerCase().includes(query) ||
+          item.longUrl.toLowerCase().includes(query)
+        );
+        renderLinks(filtered);
+      });
+
+      // Clear All
+      clearAllBtn.addEventListener('click', () => {
+        if (links.length === 0) return;
+        showConfirm('Are you sure you want to delete all saved short links?', () => {
+          links = [];
+          saveLinks();
+          renderLinks();
+          showToast('All links deleted', 'info');
+        });
+      });
+
+      // Export Links
+      exportBtn.addEventListener('click', () => {
+        if (links.length === 0) {
+          showToast('No links to export!', 'error');
+          return;
+        }
+        const blob = new Blob([JSON.stringify(links, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `useas-short-links-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Links exported successfully!', 'success');
+      });
+
+      // Import Links
+      importFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const imported = JSON.parse(event.target.result);
+            if (Array.isArray(imported)) {
+              let addedCount = 0;
+              imported.forEach(imp => {
+                if (imp.slug && imp.longUrl && !links.some(l => l.slug === imp.slug)) {
+                  links.push(imp);
+                  addedCount++;
+                }
+              });
+              saveLinks();
+              renderLinks();
+              showToast(`Imported ${addedCount} new link(s)!`, 'success');
+            } else {
+              showToast('Invalid JSON structure.', 'error');
+            }
+          } catch (err) {
+            showToast('Failed to parse uploaded JSON.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      // Dark Theme Toggle
+      themeToggleBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('useas_theme', isDark ? 'dark' : 'light');
+        updateThemeIcon(isDark);
+      });
+
+      // QR Modal Close
+      document.getElementById('close-qr-btn').addEventListener('click', hideQrModal);
+      document.getElementById('qr-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'qr-modal') hideQrModal();
+      });
+    }
+
+    function showQrModal(url, slug) {
+      const modal = document.getElementById('qr-modal');
+      const container = document.getElementById('qrcode-container');
+      const textEl = document.getElementById('qr-link-text');
+      const copyBtn = document.getElementById('copy-qr-link-btn');
+
+      container.innerHTML = '';
+      textEl.textContent = url;
+
+      qrcodeInstance = new QRCode(container, {
+        text: url,
+        width: 180,
+        height: 180,
+        colorDark: '#0f172a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      copyBtn.onclick = () => {
+        copyToClipboard(url, 'Link copied!');
+      };
+
+      modal.classList.remove('hidden');
+    }
+
+    function hideQrModal() {
+      document.getElementById('qr-modal').classList.add('hidden');
+    }
+
+    function copyToClipboard(text, successMessage = 'Copied to clipboard!') {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'absolute';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      let successful = false;
+      try {
+        successful = document.execCommand('copy');
+      } catch (err) {
+        successful = false;
+      }
+      document.body.removeChild(textarea);
+
+      if (successful) {
+        showToast(successMessage, 'success');
+      } else {
+        showToast('Could not copy to clipboard', 'error');
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        success: 'bg-emerald-600 text-white',
+        error: 'bg-rose-600 text-white',
+        info: 'bg-slate-800 text-white border border-slate-700'
+      };
+
+      const icons = {
+        success: 'fa-circle-check',
+        error: 'fa-triangle-exclamation',
+        info: 'fa-circle-info'
+      };
+
+      toast.className = `${colors[type] || colors.info} pointer-events-auto px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2.5 transform transition-all duration-300 translate-y-3 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i> <span>${message}</span>`;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-3', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-3', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    // Modal Confirmation without alert/confirm
+    function showConfirm(msg, onConfirm) {
+      const dialog = document.createElement('div');
+      dialog.className = 'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
+      dialog.innerHTML = `
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4">
+          <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-500 mx-auto flex items-center justify-center text-xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <h4 class="font-bold text-slate-900 dark:text-white text-base">Please Confirm</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400">${msg}</p>
+          <div class="flex gap-2">
+            <button id="modal-cancel" class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl">Cancel</button>
+            <button id="modal-confirm" class="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl">Proceed</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(dialog);
+
+      dialog.querySelector('#modal-cancel').onclick = () => dialog.remove();
+      dialog.querySelector('#modal-confirm').onclick = () => {
+        dialog.remove();
+        onConfirm();
+      };
+    }
+
+    function deleteLink(id) {
+      links = links.filter(l => l.id !== id);
+      saveLinks();
+      renderLinks();
+      showToast('Link removed', 'info');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function updateThemeIcon(isDark) {
+      const icon = document.getElementById('theme-icon');
+      if (isDark) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Initial Theme check
+      const savedTheme = localStorage.getItem('useas_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        updateThemeIcon(true);
+      }
+
+      // 2. Setup short link interceptor / resolver
+      checkForRedirect();
+
+      // 3. Listen for in-page hash changes (e.g. if the user clicks a short link on the same domain)
+      window.addEventListener('hashchange', checkForRedirect);
+
+      // 4. Mount event handlers & render
+      loadLinks();
+      setupEventListeners();
+      renderLinks();
+    });
+  </script>
+</body>
+</html>
