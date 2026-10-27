@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Science Course Study Guide - Modules 1, 2, 3 & Final Exam</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --success-bg: #ecfdf5;
+      --success-border: #10b981;
+      --success-text: #065f46;
+      --border: #e2e8f0;
+      --badge-bg: #eff6ff;
+      --badge-text: #1d4ed8;
+      --badge-final-bg: #fdf2f8;
+      --badge-final-text: #9d174d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 36px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .module-banner {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      color: #ffffff;
+      padding: 16px 24px;
+      border-radius: 12px;
+      margin: 40px 0 24px 0;
+      font-size: 1.35rem;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    }
+
+    .module-banner.final-banner {
+      background: linear-gradient(135deg, #831843, #be185d);
+      box-shadow: 0 4px 10px rgba(190, 24, 93, 0.2);
+    }
+
+    .module-banner:first-of-type {
+      margin-top: 10px;
+    }
+
+    .section-card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 26px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      white-space: nowrap;
+    }
+
+    .badge.graded {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .badge.final {
+      background: #fce7f3;
+      color: #be185d;
+    }
+
+    .quiz-item {
+      margin-bottom: 20px;
+    }
+
+    .quiz-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .question {
+      font-weight: 600;
+      font-size: 0.98rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .q-number {
+      color: var(--primary);
+      font-weight: 700;
+      min-width: 20px;
+    }
+
+    .answer-box {
+      background-color: var(--success-bg);
+      border-left: 4px solid var(--success-border);
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.95rem;
+      color: var(--success-text);
+      margin-left: 28px;
+    }
+
+    .answer-box strong {
+      color: #047857;
+    }
+
+    .note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Banner Image -->
+    <div style="text-align: center; margin-bottom: 24px;">
+      <img src="https://file.garden/abrK4_rpWxJegn7w/datasss.jpg" alt="Data Science Header Banner" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); display: block; margin: 0 auto;">
+    </div>
+    <header>
+      <h1>Data Science Complete Certification Study Guide</h1>
+      <p>Module 1, Module 2, Module 3 & Final Exam Solutions</p>
+    </header>
+
+    <!-- ==================== MODULE 1 ==================== -->
+    <div class="module-banner">Module 1: Introduction to Data Science</div>
+
+    <!-- M1 Quiz 1 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Data Science: The Sexiest Job in the 21st Century</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>Why are companies looking for well-rounded individuals when hiring data scientists?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Because data science requires a combination of skills, including subject matter expertise, programming, and communication abilities.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>Why is there a growing demand for data scientists and analytics professionals in various industries?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Because of the digital revolution and the need to analyze big data for effective decision-making.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>Due to the shortage of data scientists, employers are willing to pay top salaries for their talent, with an average base salary for data scientists reported as $112,000.</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> True
+        </div>
+      </div>
+    </section>
+
+    <!-- M1 Quiz 2 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Defining Data Science</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>Imagine you're working for a retail company that wants to optimize its product offerings and marketing strategies. In this scenario, you would use Data Science for:</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Analyzing customer purchase data to identify trends and tailor product recommendations.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What is the role of data analysis in Data Science and how does it contribute to decision-making?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Data analysis involves gathering insights from data and helps make informed decisions.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>In a healthcare context with patient data, medical histories, and treatment outcomes, Data Science can be applied to:</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Analyzing patient data for personalized treatment plans.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">4.</span>
+          <span>Considering an individual with a marketing background transitioning to data science, how might their marketing experience contribute to their data science journey?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Their marketing background might assist in interpreting data to generate actionable insights.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">5.</span>
+          <span>You have just started your career as a data scientist. Which of the following skills should you develop to succeed as a data scientist?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Cultivate curiosity, develop strong positions, and learn to communicate insights effectively through storytelling.
+        </div>
+      </div>
+    </section>
+
+    <!-- M1 Quiz 3 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Graded Quiz: Defining Data Science</h2>
+        <span class="badge graded">Graded</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>You are a data scientist about to start a new project. What would one of your key roles be?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Asking questions to clarify the business need
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>When did the term "data science" come into existence and who is credited with coining the term?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> DJ Patil and Jeff Hammerbacher (circa 2008–2009)
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>As an aspiring data scientist, what primary qualities should you possess to succeed in the field?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Curiosity and storytelling skills.
+        </div>
+      </div>
+    </section>
+
+    <!-- M1 Quiz 4 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: What Makes Someone a Data Scientist?</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>You have the task of defining the role of a data scientist for a retail company that seeks to improve its product offerings and marketing strategies. In this context, a data scientist would primarily engage in which activity?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Analyzing customer purchase data to identify trends and tailor product recommendations.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What is a key characteristic that defines a data scientist?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> A curious mind, fluency in analytics, and effective communication of findings characterize a data scientist.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>Dr. Vincent Granville defines a data scientist as someone who relies solely on statistical models for data analysis.</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> False
+        </div>
+      </div>
+    </section>
+
+    <!-- M1 Quiz 5 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Graded Quiz: What Data Scientists Do</h2>
+        <span class="badge graded">Graded</span>
+      </div>
+      <p class="note">* Note: Questions in this quiz may vary across different exam pools.</p>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>You are a new data scientist. You have been tasked with coming up with a solution for reducing traffic congestion and improving transportation efficiency. How would you go about it?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Gather and analyze streetcar operations data and identify congested routes
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>Imagine you take a taxi ride where the initial fare is a fixed amount, and the fare increases based on both the distance traveled and the time spent in traffic. Which concept in data analysis does this scenario closely resemble?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Regression analysis
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>You have to pick a file format which meets the following conditions: a) uses custom tags to describe data, making it highly self-descriptive for internet-based information sharing b) is readable by both humans and machines c) supports hierarchical (nested) data structure and is widely used for data exchange between different systems</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Extensible Markup Language (XML)
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MODULE 2 ==================== -->
+    <div class="module-banner">Module 2: Data Mining, Big Data, and Machine Learning</div>
+
+    <!-- M2 Quiz 1 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Data Mining</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>What is one of the key considerations when setting up goals for data mining?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> The level of accuracy expected from the results
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What is the purpose of data preprocessing in data mining?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> To ensure the integrity of data, deal with missing data, and remove irrelevant attributes
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>What is the purpose of evaluating data mining results?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> To conduct an out-of-sample forecast to test the predictive capabilities of models (testing model performance on unseen data)
+        </div>
+      </div>
+    </section>
+
+    <!-- M2 Quiz 2 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Big Data and Data Mining</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>What was the key discovery讓我 the Houston Rockets NBA team through the analysis of video tracking data?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Two-point dunks from inside the two-point zone and three-point shots from outside the three-point line provided the best opportunities for high scores.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What is one of the key advantages of using the Cloud for data scientists?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> It allows collaboration among multiple teams on the same data.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>What is Hadoop primarily known for in the context of handling data?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Data analysis and processing
+        </div>
+      </div>
+    </section>
+
+    <!-- M2 Quiz 3 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Graded Quiz: Big Data and Data Mining</h2>
+        <span class="badge graded">Graded</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>What key benefit does cloud computing offer users, particularly in contrast to traditional software installations on their local computers?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Users can access the latest version of applications without purchasing retail copies.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What are the primary advantages of using cloud for data scientists?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> The Cloud enables data scientists to work with large datasets and deploy advanced computing algorithms and tools available centrally.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>What are the common characteristics of Big Data, often called the "V's of Big Data"?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Velocity, Volume, Variety, Veracity, and Value
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">4.</span>
+          <span>How has the interest in data science and business analytics changed over the last few years, and what is the impact on undergraduate courses in this field?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Interest in data science and business analytics has increased, leading to a growing number of students enrolling in related undergraduate courses.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">5.</span>
+          <span>Which open-source technology provides distributed storage and processing of big data, allowing scalability and support for various data formats?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Apache Hadoop
+        </div>
+      </div>
+    </section>
+
+    <!-- M2 Quiz 4 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Regression</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>Which of the following can be addressed using a regression (hedonic) model in the context of housing prices?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> How much does the size of a lot influence housing prices?
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What is the primary purpose of regression hedonic models in the context of housing analysis?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> To analyze the relationships between various factors and housing prices.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>You are ready to buy a house. However, you wonder, "Do houses located near high-voltage power lines sell for more or less than the rest?" This question can be addressed using regression analysis.</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> True
+        </div>
+      </div>
+    </section>
+
+    <!-- M2 Quiz 5 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Deep Learning and Machine Learning</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>Imagine you're working on an AI project that involves creating new content such as images, music, and language. Which artificial intelligence technology would you be primarily focused on?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Generative AI
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What sets deep learning apart from traditional neural networks?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Multiple layers of neural networks
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>In the realm of machine learning, what significant application involves the task of predicting items of interest for users based on their past interactions or behaviors?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Recommender systems for personalized content suggestions
+        </div>
+      </div>
+    </section>
+
+    <!-- M2 Quiz 6 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Graded Quiz: Deep Learning and Machine Learning</h2>
+        <span class="badge graded">Graded</span>
+      </div>
+      <p class="note">* Note: Questions in this quiz may vary across different exam pools.</p>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>What is the concept that refers to data sets of massive scale, rapid generation, and diverse types that challenge traditional analysis methods like those used in relational databases?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Big data
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>How does Generative AI contribute to addressing the challenges faced by data scientists, researchers, and analysts when exploring significant data patterns and insights?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> By enabling the derivation and evaluation of hypotheses from diverse data sources
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>Imagine you're working with generative AI to create new instances of data that resemble your original dataset's patterns. Which model would you choose as the foundational deep learning approach for this task?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Generative Adversarial Networks (GANs) and Variational Autoencoders (VAEs)
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">4.</span>
+          <span>Which technology is characterized by its ability to learn patterns on its own, such as distinguishing between objects like cats and dogs, and even generating speech that sounds like a learning baby?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Deep Learning
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">5.</span>
+          <span>In the context of fintech, which machine learning application functions similarly to recommendation systems used by platforms like Netflix?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Recommendations
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MODULE 3 ==================== -->
+    <div class="module-banner">Module 3: Data Science Applications, Deliverables & Careers</div>
+
+    <!-- M3 Quiz 1 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: The Final Deliverable</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>What is the ultimate purpose of analytics in the context of delivering insights and findings?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> To summarize findings in tables and plots for communication.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What type of graphic did the Deloitte report use to show economic trends?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Time series plots
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>What is the key message in the Deloitte report, "United States Economic Forecast"?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> The report presents a positive view of the robustness of the U.S. economy.
+        </div>
+      </div>
+    </section>
+
+    <!-- M3 Quiz 2 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Data Science Application Domains</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>How does Data Science improve patient care in healthcare?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> By recommending appropriate tests, trials, and treatments for patients using predictive analytics.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>Imagine you're an e-commerce company looking to enhance customer experiences and boost sales. How could data science help you achieve this goal?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> By using algorithms to suggest products based on individual customer preferences.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>As a manager of an online fashion store, you're concerned about customers adding items to their cart but not completing purchases. How can data science assist you in solving this problem and boosting conversion rates?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Analyzing customer behavior to find reasons for cart abandonment and applying strategies to address them.
+        </div>
+      </div>
+    </section>
+
+    <!-- M3 Quiz 3 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Graded Quiz: Data Science Application Domains</h2>
+        <span class="badge graded">Graded</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>You've recently started a small manufacturing business. You've been focused on production but realize the importance of data for better decision-making. What should be your initial step to harness the power of data science to improve your operations?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Document your existing data collection and archiving practices.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>Imagine you are a business executive looking to harness the power of data science to gain a competitive advantage for your company. After hearing about the impact of data science and big data on businesses, what key takeaway can you gather from the example of Netflix's success through data analysis?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Analyzing customer preferences and behaviors can lead to a competitive advantage.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>In the realm of healthcare, how do data science and predictive analytics contribute to improving patient outcomes and assisting physicians?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Data science systems ensure that all physicians have access to the latest information about diseases and treatments / trials and recommend appropriate care.
+        </div>
+      </div>
+    </section>
+
+    <!-- M3 Quiz 4 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: The Report Structure</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>When deciding on the structure of a report, what factors should be considered?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> The length of the document and its purpose.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What key elements should a report's cover page include at a minimum?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Title, author names, affiliations, contact info, publisher, and date of publication
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>What is the purpose of including a table of contents (ToC) in a report, even if it's relatively short (five or fewer pages)?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> To offer a glimpse of the document's structure
+        </div>
+      </div>
+    </section>
+
+    <!-- M3 Quiz 5 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Practice Quiz: Careers and Recruiting in Data Science</h2>
+        <span class="badge">Practice</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>What is a set of key foundational skill required for someone entering a data science team?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Programming skills, algebra, geometry, calculus, basic probability, basic statistics, and knowledge of relational databases.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>Per the expert Dr. Murtaza Haider, what crucial attribute should be prioritized in candidates when forming a data science team?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Passion and curiosity, particularly about the specific business domain.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>Based on the Careers in Data Science video, which career has been ranked number one among the most promising jobs since 2016?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Data science.
+        </div>
+      </div>
+    </section>
+
+    <!-- M3 Quiz 6 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Graded Quiz: Careers and Recruiting in Data Science</h2>
+        <span class="badge graded">Graded</span>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>What are some fundamental skills and knowledge areas that individuals should possess when aspiring to become data scientists?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Proficiency in programming, algebra, geometry, calculus, probability, statistics, and database concepts.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>You are responsible for hiring a data scientist for your e-commerce company. What is your primary consideration when assessing potential candidates?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> You prioritize candidates who demonstrate curiosity, have a sense of humor, storytelling ability, and show a passion for the e-commerce industry.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>Which of these qualities would make you a successful data scientist?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Programming skills, math knowledge, curiosity, and experimentation.
+        </div>
+      </div>
+    </section>
+
+    <!-- M3 Quiz 7 -->
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Quiz Based on Case Study</h2>
+        <span class="badge">Case Study</span>
+      </div>
+      <p class="note">* Note: Questions in this quiz may vary across different exam pools.</p>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>Why did Lila focus on communication and storytelling skills?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> To communicate her findings effectively as a data scientist
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>What is the importance of domain knowledge in data science?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> It allows you to apply data science skills effectively in a specific field.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>What key skills did Lila acquire during her data science education?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Statistics, machine learning, data analysis
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">4.</span>
+          <span>What sources did Lila explore to procure data for her data science project?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Various repositories, websites, and databases
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">5.</span>
+          <span>What does Lila do at the end of her first project as a junior data scientist to effectively convey insights and recommendations to stakeholders?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> She creates a comprehensive report or presentation.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FINAL EXAM ==================== -->
+    <div class="module-banner final-banner">Final Exam</div>
+
+    <section class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Final Comprehensive Assessment</h2>
+        <span class="badge final">Final Exam</span>
+      </div>
+      <p class="note">* Note: Questions in the final exam pool are dynamically randomized.</p>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">1.</span>
+          <span>How can data science systems with predictive analytics benefit healthcare professionals?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> They recommend personalized treatment plans for patients.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">2.</span>
+          <span>Which of these individuals coined the term "data science"?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> DJ Patil and Marjorie Lee Brown
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">3.</span>
+          <span>Which statement is true about the lack of readily available talent in data science?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Millions of jobs will remain vacant
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">4.</span>
+          <span>Which of the following is an important skill for becoming a data scientist?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Be able to tell good stories
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">5.</span>
+          <span>What is one of the key roles digital transformation plays in organizations?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Transforming how the organization operates
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">6.</span>
+          <span>What advantage does cloud computing offer to data scientists?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Provides more computing power than a single physical machine
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">7.</span>
+          <span>What type of data is not organized in a predefined way, like email?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Unstructured data
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">8.</span>
+          <span>Which of the following software provides distributed storage and processing of big data?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Hadoop
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">9.</span>
+          <span>Which statement about the relationship between data science and artificial intelligence (AI) is true?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Data Science can use many of the AI techniques to derive insight from data
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">10.</span>
+          <span>When data mining, which statement is true?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> The success of a data mining exercise largely depends on the quality of the data.
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">11.</span>
+          <span>Which of the following is a reason why data scientists would use generative AI?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> To construct analytical models with coding automation
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="question">
+          <span class="q-number">12.</span>
+          <span>Which of the following is an example of a recommendation engine?</span>
+        </div>
+        <div class="answer-box">
+          <strong>Ans:</strong> Software Facebook uses to deliver advertisements
+        </div>
+      </div>
+    </section>
+
+    <!-- Important Final Note -->
+    <div style="background: #fffbeb; border: 2px dashed #f59e0b; border-radius: 12px; padding: 22px 24px; margin-top: 36px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <span style="font-size: 1.3rem;">📌</span>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: #92400e; margin: 0;">Important Note / గమనిక:</h3>
+      </div>
+      <p style="color: #78350f; font-size: 1rem; line-height: 1.7; font-weight: 600; margin: 0;">
+        ENKA EE COURSE LO ENKOKA MODULE UNDHE ADE MODULE 4 BUT MODULE 4 OPTIONAL NO RAYAKAPOENA PARLEDHU MODULE 3 LO FINAL TEST AYPOYAKA MY PROFILE MEDHA CLICK CHEYANDI TARUVATHA MY LEARNING LOKI VELLENDI COMPLETED LOKI VELTHE ME CERTIFICATE AKKADA UNTADHI
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>

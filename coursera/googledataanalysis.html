@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analytics Course - Complete Solutions & Assignments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --secondary: #0f172a;
+            --accent: #10b981;
+            --accent-light: #ecfdf5;
+            --warning-bg: #fffbeeb0;
+            --warning-border: #f59e0b;
+            --warning-text: #b45309;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px -2px rgba(0,0,0,0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header Styling */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 6px 16px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        h1 {
+            color: var(--secondary);
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Section Headings */
+        h2 {
+            color: var(--secondary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 45px;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 22px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Note Cards */
+        .note-card {
+            background: var(--warning-bg);
+            border-left: 4px solid var(--warning-border);
+            padding: 14px 18px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            color: var(--warning-text);
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px 26px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .question-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.05rem;
+            margin-bottom: 10px;
+        }
+
+        .question-card p {
+            color: var(--text-main);
+            font-size: 0.98rem;
+            line-height: 1.6;
+        }
+
+        /* Image Display */
+        .image-container {
+            margin: 15px 0;
+            text-align: center;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.01);
+        }
+
+        /* Answers Container */
+        .answer {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 14px 18px;
+            margin-top: 15px;
+            color: #065f46;
+            font-weight: 600;
+            white-space: pre-line;
+            border-radius: 0 10px 10px 0;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Copy Button Styling (Used only for specified self-reflection questions) */
+        .copy-btn {
+            background-color: #ffffff;
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            float: right;
+            margin-top: -2px;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .copy-btn:hover {
+            background-color: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 12px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .question-card {
+                padding: 16px 18px;
+            }
+            .copy-btn {
+                float: none;
+                display: block;
+                width: 100%;
+                margin-top: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+    <script>
+        function copyText(buttonElement) {
+            const answerDiv = buttonElement.parentElement;
+            let textToCopy = answerDiv.innerText.replace("Copy Answer", "").trim();
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = buttonElement.innerText;
+                buttonElement.innerText = "✓ Copied";
+                buttonElement.style.backgroundColor = "#10b981";
+                buttonElement.style.color = "#ffffff";
+                setTimeout(() => {
+                    buttonElement.innerText = originalText;
+                    buttonElement.style.backgroundColor = "#ffffff";
+                    buttonElement.style.color = "#065f46";
+                }, 2000);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span class="badge">Complete Course Hub</span>
+            <h1>Data Analytics Course Assignments</h1>
+            <p class="subtitle">Complete reference solutions for Modules 1 through 4</p>
+        </header>
+
+        <!-- MODULE 1 -->
+        <h2>Module 1 - Assignment 1</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>What type of data is primarily represented in the "Quantity" column?</p>
+            <div class="answer">Answer: Numerical data</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>The data in the "Order Date" column is a specific type that can be used to track events over time. What type of data does this column contain?</p>
+            <div class="answer">Answer: Date data</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>In the "Customer Rating" column, most of the entries are numbers from 1 to 5. However, there is one entry that is a word. This is an example of what common data issue?</p>
+            <div class="answer">Answer: Inconsistent data</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>If "Order ID 1005" has a blank entry in the "Customer Rating" column, what is the most important reason a data analyst would need to address this before performing an analysis?</p>
+            <div class="answer">Answer: The blank entry is missing data that could affect calculations like an average rating.</div>
+        </div>
+
+        <h2>Test your knowledge on the data ecosystem</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>In your role as a data professional, you examine a dataset of taxi rides to determine which hour of the day typically has the highest demand. Under which discipline does this example best fall?</p>
+            <div class="answer">Answer: Data analysis</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>Fill in the blank: A _____ encompasses the various elements that interact with one another in order to produce, manage, store, organize, analyze, and share data.</p>
+            <div class="answer">Answer: data ecosystem</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>When building data into business strategy, why is it important to include insights from subject-matter experts? Select all that apply.</p>
+            <div class="answer">Answer:
+- Their experience and human intuition are valuable to data-driven decision-making.
+- They are familiar with the business problem.
+- They can review analysis results and help identify inconsistencies.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>An e-commerce website collects, observes, and analyzes its customers' online behaviors. Then, it uses the insights gained to choose when to put certain products on sale. What business practice does this describe?</p>
+            <div class="answer">Answer: Data-driven decision-making</div>
+        </div>
+
+        <h2>Test your knowledge on data analyst skills</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>Fill in the blank: Analytical skills are the qualities and characteristics associated with using _____ to solve problems.</p>
+            <div class="answer">Answer: facts</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>An acquaintance tells you that they spend many hours each day “playing.” To learn more, you ask them whether they play sports, a musical instrument, or something else. Their answer helps you clarify the meaning of their statement. What does this scenario describe?</p>
+            <div class="answer">Answer: Understanding context</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>Which analytical skill involves the ability to break things down into smaller steps and work with them in an orderly and logical way?</p>
+            <div class="answer">Answer: Technical mindset</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>Fill in the blank: The analytical skill _____ encompasses how someone organizes information.</p>
+            <div class="answer">Answer: data design</div>
+        </div>
+
+        <h2>Test your knowledge on analytical thinking and outcomes</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>Fill in the blank: Analytical thinking involves _____ a problem, then solving it by using data in an organized, step-by-step manner.</p>
+            <div class="answer">Answer: identifying and defining</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>What type of data visualization might an analyst create in order to communicate data insights to others? Select all that apply.</p>
+            <div class="answer">Answer:
+- Chart
+- Map
+- Graph</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>While planning a roadtrip, you figure out all of the specific stops you need to take along the way. You also consider how often you’ll stop for gas, meals, and sleep. Having this information enables you to execute your plan. What does this scenario describe?</p>
+            <div class="answer">Answer: Detail-oriented thinking</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>What is a method for examining and evaluating how a process works currently in order to get to an improved future state?</p>
+            <div class="answer">Answer: Gap analysis</div>
+        </div>
+
+        <h2>Module 1 challenge</h2>
+        <div class="note-card">
+            <span>📌 <strong>Note:</strong> Questions in this final module exam may be changed or randomized for everyone.</span>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>Which of the following statements correctly describe data and data analysis? Select all that apply.</p>
+            <div class="answer">Answer:
+- Data is a collection of facts.
+- One goal of data analysis is to drive informed decision-making.
+- Transforming data is part of the data analysis process.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>Fill in the blank: Data science involves using _____ data to create new ways of modeling and understanding the unknown.</p>
+            <div class="answer">Answer: raw</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>Which of the following activities are elements of data-driven decision-making? Select all that apply.</p>
+            <div class="answer">Answer:
+- Analyze data
+- Uncover trends or patterns
+- Determine the problem to be solved</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>A software company wants to improve its customer experience scores by 3% over the next 30 days. A data professional works to achieve this objective by understanding current scores and how far away they are from desired scores. They then use data insights to help advance the company from where they are now to where they want to be next month. What does this scenario describe?</p>
+            <div class="answer">Answer: Gap analysis</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 5</div>
+            <p>Fill in the blank: Data analysts use a _____ approach in order to identify, describe, and work out challenges or issues.</p>
+            <div class="answer">Answer: problem-oriented</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 6</div>
+            <p>Which of the following are examples of analytical thinking? Select all that apply.</p>
+            <div class="answer">Answer:
+- Considering the best graphical formats to visually communicate information
+- Noting that just because two pieces of data trend in the same direction, it does not necessarily mean they are related
+- Identifying and defining a problem, then solving it by using data in an organized manner</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 7</div>
+            <p>A data team at a national bank plans a project about its customer bill-paying tool. They apply analytical thinking to decide what they want to achieve with the data. This helps ensure the data is valuable and will help them accomplish their goals. Which aspect of analytical thinking does this scenario describe?</p>
+            <div class="answer">Answer: Strategic thinking</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 8</div>
+            <p>What is the purpose of the five whys?</p>
+            <div class="answer">Answer: To reveal the root cause of a problem</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 9</div>
+            <p>A data professional is assigned a challenging data analysis task. In order to be able to work in an orderly and logical manner, they break down larger, more complex elements into smaller pieces. Which analytical skill does this scenario describe?</p>
+            <div class="answer">Answer: Technical mindset</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 10</div>
+            <p>Which of the following examples demonstrate data-driven decision-making? Select all that apply.</p>
+            <div class="answer">Answer:
+- A dentist’s office uses specifics from patient records to track treatment outcomes and improve quality of care.
+- A financial advisor interviews clients to assess their risk tolerance and investment</div>
+        </div>
+
+        <!-- MODULE 2 -->
+        <h2>Module 2 - Assignment 1</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>There are six phases in the data life cycle, which culminate with analyze, archive, and destroy. What is the correct order of the first three phases?</p>
+            <div class="answer">Answer: Plan, capture, manage</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>Fill in the blank: During the _____ phase, data teams decide what kind of data is needed and who will be responsible for it.</p>
+            <div class="answer">Answer: planning</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>A data team considers how and where data will be stored, what tools are required to safeguard it, and how to maintain it properly. What phase of the data life cycle does this scenario describe?</p>
+            <div class="answer">Answer: Manage</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>What is the term for the computer system in which organizations store their data?</p>
+            <div class="answer">Answer: Database</div>
+        </div>
+
+        <h2>Test your knowledge on the data analysis process</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>A junior data analyst is assigned a new project. They define the problem that they need to help solve and confirm they understand expectations. Which step of the data analysis process are they working in?</p>
+            <div class="answer">Answer: Ask</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>What is the term for people who invest time and resources into a project and are interested in the outcome?</p>
+            <div class="answer">Answer: Stakeholders</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>Fill in the blank: In the process step, data analysts may remove _____, which are data points that lie significantly outside the overall pattern of the data and could potentially skew the information.</p>
+            <div class="answer">Answer: outliers</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>Which step of the data analysis process is most likely to involve creating visuals that help people understand complex facts and figures?</p>
+            <div class="answer">Answer: Share</div>
+        </div>
+
+        <h2>Self-Reflection: Review past concepts</h2>
+        <div class="question-card">
+            <div class="question-title">Review past concepts</div>
+            <div class="answer">
+                <button class="copy-btn" onclick="copyText(this)">Copy Answer</button>
+<strong>Part 1: Relationship between the data life cycle and the data analysis process</strong>
+Both frameworks guide how data is handled to drive informed decisions. They are similar because they both follow a structured, sequential progression. They differ because the data life cycle covers the entire lifespan of data from creation to destruction, whereas the data analysis process focuses specifically on solving a problem through analysis.
+
+<strong>Part 2: Relationship between the Ask phase and the Plan stage</strong>
+Both the Ask phase of data analysis and the Plan stage of the data life cycle focus on defining goals and expectations at the start of a project. They are similar in that they establish project scope and identify data needs. They differ because the Ask phase centers on defining the business problem, while the Plan stage focuses on deciding how data will be gathered, managed, and structured throughout its lifecycle.
+            </div>
+        </div>
+
+        <h2>Test your knowledge on the data analysis toolbox</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>What is the term for a digital worksheet that data analysts use to store, organize, and sort data?</p>
+            <div class="answer">Answer: Spreadsheet</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>What is a key difference between a formula and a function?</p>
+            <div class="answer">Answer: A formula is a set of instructions, whereas a function is a preset command.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>What does SQL stand for?</p>
+            <div class="answer">Answer: Structured query language</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>Which tool in the data analysts toolbox is most likely to involve the creation of graphs, maps, or charts?</p>
+            <div class="answer">Answer: Data visualization</div>
+        </div>
+
+        <h2>Module 2 challenge</h2>
+        <div class="note-card">
+            <span>📌 <strong>Note:</strong> Questions in this final module exam may be changed or randomized for everyone.</span>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>Which of the following activities are part of the manage phase of the data life cycle? Select all that apply.</p>
+            <div class="answer">Answer:
+- Determine which tools will be most effective at safeguarding data
+- Consider how best to care for data
+- Choose where the data will be stored</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>Which spreadsheet feature uses a set of instructions to perform calculations, such as multiplication or division?</p>
+            <div class="answer">Answer: Formula</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>Which of the following statements correctly describe the archive and the destroy phases of the data life cycle? Select all that apply.</p>
+            <div class="answer">Answer:
+- A key reason for destroying data is to protect private company information.
+- The archive phase involves storing data.
+- Shredders may be used to destroy data on paper.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>What tasks may occur during the ask step of the data analysis process? Select all that apply.</p>
+            <div class="answer">Answer:
+- Consider the current state compared to the ideal state
+- Define the problem to be solved
+- Stay engaged by having a dialogue with stakeholders</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 5</div>
+            <p>Fill in the blank: During the prepare step of the data analysis process, data is _____ and stored for analysis.</p>
+            <div class="answer">Answer: collected</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 6</div>
+            <p>A data professional at a beauty products enterprise is assigned a task related to customer buying habits. They think about what type of data they need to be successful, as well as optimal project outcomes. What phase of the data life cycle does this scenario describe?</p>
+            <div class="answer">Answer: Plan</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 7</div>
+            <p>Car rental customer experience dataset cleaning scenario</p>
+            <div class="answer">Answer: Process</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 8</div>
+            <p>Step where data team members use tools like SQL to make predictions</p>
+            <div class="answer">Answer: analyze</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 9</div>
+            <p>Key benefits of data visualizations (Select all that apply)</p>
+            <div class="answer">Answer:
+- Visuals enable data professionals to more effectively share insights with others.
+- Data visualizations are more engaging than tables and numbers.
+- Graphs and charts help people understand complex data.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 10</div>
+            <p>University system gathering historical academic data from outside databases and internal records scenario</p>
+            <div class="answer">Answer: capture</div>
+        </div>
+
+        <!-- MODULE 3 -->
+        <h2>Test your knowledge on spreadsheet basics</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>In this spreadsheet, what number is in cell B4?</p>
+            <div class="answer">Answer: 986</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>What spreadsheet feature is used to change the height of a cell to allow the text inside to fit?</p>
+            <div class="answer">Answer: Text wrap</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>In this spreadsheet, which of the following are attributes? Select all that apply.</p>
+            <div class="answer">Answer:
+- Irises
+- Lilies</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>What symbol is used to start a formula?</p>
+            <div class="answer">Answer: Equal sign (=)</div>
+        </div>
+
+        <h2>Test your knowledge on SQL and data visualization</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>Which part of the following query requests that all columns from the table be selected?</p>
+            <div class="answer">Answer: Asterisk (*)</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>Which part of the following query indicates the table from which to retrieve data?</p>
+            <div class="answer">Answer: FROM</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>In the following query, data will be retrieved from which table?</p>
+            <div class="answer">Answer: Inventory</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>In which of the following scenarios would a line chart be the most appropriate visualization?</p>
+            <div class="answer">Answer: When showing the change in someone's salary over time</div>
+        </div>
+
+        <h2>Module 3 challenge</h2>
+        <div class="note-card">
+            <span>📌 <strong>Note:</strong> Questions in this final module exam may be changed or randomized for everyone.</span>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>In this spreadsheet, what type of type of tree is in cell C2?</p>
+            <div class="answer">Answer: White oak</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>In the following query, what will be retrieved from the database?</p>
+            <div class="answer">Answer: All glasses in Storeroom 5 that are bifocals</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>Which of the following statements accurately describe spreadsheet attributes and observations? Select all that apply.</p>
+            <div class="answer">Answer:
+- A spreadsheet row is also referred to as an observation.
+- Attributes are used to label spreadsheet columns.
+- An observation includes all of the attributes contained in its row.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>A junior data analyst at a financial company wants to communicate to stakeholders about which investment products are selected by clients the most... What type of data visualization should they create?</p>
+            <div class="answer">Answer: Bar chart</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 5</div>
+            <p>When working in a spreadsheet, what is the correct syntax for a formula that adds the value in cell F9 to the value in cell G9?</p>
+            <div class="answer">Answer: =F9+G9</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 6</div>
+            <p>Fill in the blank: The SQL clause SELECT * is used to retrieve _____ from a particular table.</p>
+            <div class="answer">Answer: all data</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 7</div>
+            <p>In the following query, which clause indicates the table from which to retrieve data?</p>
+            <div class="answer">Answer: FROM Wood</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 8</div>
+            <p>Which text wrapping feature allows the text within a spreadsheet cell to continue into the next cell, if it is empty.</p>
+            <div class="answer">Answer: Overflow</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 9</div>
+            <p>Which of the following statements accurately describe data visualizations and visualization tools? Select all that apply.</p>
+            <div class="answer">Answer:
+- Tableau makes it possible to integrate data into dashboard-style visualizations.
+- Spreadsheets have visualization tools that enable data professionals to create line or bar charts.
+- The size of the data is often a key factor in choosing an appropriate visualization.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 10</div>
+            <p>A data professional wants the data in column A to be in alphabetical order from A to Z. What spreadsheet feature would enable them to accomplish this task?</p>
+            <div class="answer">Answer: Sort range</div>
+        </div>
+
+        <!-- MODULE 4 -->
+        <h2>Self-Reflection: Business use of data</h2>
+        <div class="question-card">
+            <div class="question-title">1. How could it use data to improve customer experience?</div>
+            <p>An e-commerce platform can analyze customer browsing history and past purchases to provide personalized product recommendations. By understanding individual preferences, the platform streamlines the shopping journey, making it faster and more relevant for every user.</p>
+        </div>
+        <div class="question-card">
+            <div class="question-title">2. What kinds of data would it need to collect?</div>
+            <p>The platform needs to collect user interaction metrics such as clickstream logs, search queries, cart additions, and completed purchase histories. Additionally, it should gather customer feedback ratings and device usage details to comprehensively understand overall user behavior patterns and preferences.</p>
+        </div>
+        <div class="question-card">
+            <div class="question-title">3. How could insights from that data solve a problem?</div>
+            <p>Analyzing purchase drop-off points can reveal why customers frequently abandon their shopping carts, allowing the company to simplify the checkout process. Resolving this specific friction point directly reduces cart abandonment rates and significantly increases overall sales conversion for the business.</p>
+        </div>
+
+        <h2>Self-Reflection: Business cases</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <div class="image-container">
+                <img src="https://file.garden/abrK4_rpWxJegn7w/111.jpg" alt="Business Case Question 1">
+            </div>
+            <div class="answer">
+                <button class="copy-btn" onclick="copyText(this)">Copy Answer</button>
+Examples of fair or unfair practices:
+A major unfair practice is self-selection bias, since participation was voluntary and more motivated or proactive teachers were likely the ones who attended. Additionally, attributing the score difference entirely to the workshop without establishing a pre-workshop baseline creates an unfair and invalid causal conclusion.
+
+How could a data analyst correct the unfair practices:
+A data analyst could correct this by conducting a pre- and post-workshop evaluation to measure individual improvement rather than comparing raw post-workshop scores. They could also implement a randomized controlled trial or use regression analysis to control for confounding variables like prior teaching experience.
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <div class="image-container">
+                <img src="https://file.garden/abrK4_rpWxJegn7w/222.jpg" alt="Business Case Question 2">
+            </div>
+            <div class="answer">
+                <button class="copy-btn" onclick="copyText(this)">Copy Answer</button>
+Examples of fair or unfair practices:
+A fair practice is testing across multiple roadway surfaces, such as dirt roads and race tracks, while collecting both sensor and video data. However, an unfair practice is sampling bias from testing exclusively during the daytime, which ignores low-light vision and night driving conditions.
+
+How could a data analyst correct the unfair practices:
+A data analyst could correct this by expanding the test protocol to collect data across diverse lighting conditions, including dawn, dusk, and nighttime. They should also establish safety benchmarks across every condition before concluding that the car is ready for subsequent phases.
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <div class="image-container">
+                <img src="https://file.garden/abrK4_rpWxJegn7w/333.jpg" alt="Business Case Question 3">
+            </div>
+            <div class="answer">
+                <button class="copy-btn" onclick="copyText(this)">Copy Answer</button>
+Examples of fair or unfair practices:
+A fair practice is surveying actual park visitors directly to gather user feedback before investing in costly new rides. However, an unfair practice is significant sampling bias from surveying only guests queued for roller coasters. This convenience sampling systematically overrepresents thrill-seekers while entirely excluding families, children, and visitors at other attractions.
+
+How could a data analyst correct the unfair practices:
+A data analyst could correct this unfair practice by implementing stratified random sampling across various park locations, including family areas, dining zones, and main exits. They could also collect responses through digital post-visit surveys sent via email or the park mobile app. This approach ensures balanced representation across all visitor demographics.
+            </div>
+        </div>
+
+        <h2>Test your knowledge on making fair business decisions</h2>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>In a data analytics context, what is a business task?</p>
+            <div class="answer">Answer: The question answered, or problem solved, by data analysis</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>Fill in the blank: Fairness means ensuring that bias is neither created nor ____ by the data analysis process.</p>
+            <div class="answer">Answer: reinforced</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>What are some strategies data professionals use to ensure their data analysis is unbiased? Select all that apply.</p>
+            <div class="answer">Answer:
+- Consider the complicated social contexts that could create bias
+- Prioritize fairness during data collection
+- Ensure anything shared with stakeholders is presented in context</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>A data professional notices that their dataset is imbalanced and therefore is not representative of the entire population. They work to get more responses from nondominant groups in order to address this issue and ensure data insights are fair. What does this scenario describe?</p>
+            <div class="answer">Answer: Oversampling</div>
+        </div>
+
+        <h2>Module 4 challenge</h2>
+        <div class="note-card">
+            <span>📌 <strong>Note:</strong> Questions in this final module exam may be changed or randomized for everyone.</span>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 1</div>
+            <p>Which of the following statements accurately describe fairness considerations in data analysis? Select all that apply.</p>
+            <div class="answer">Answer:
+- Effective data analysts help create systems that are fair and inclusive to everyone.
+- Best practices for fairness in data analysis include identifying surrounding factors.
+- A data professional may include self-reported data when prioritizing fairness.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 2</div>
+            <p>A trucking company needs more drivers, so they purchase help-wanted ads online. Research reveals that 97% of truck drivers are men, so the data team decides that men are more likely to be successful applicants. Therefore, they target the ads to male job seekers. What should they have done instead?</p>
+            <div class="answer">Answer: Conduct more research to understand the surrounding factors of this situation.</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 3</div>
+            <p>Which fairness best practice is intended to help data teams understand circumstances that could have an impact on their data insights?</p>
+            <div class="answer">Answer: Identify surrounding factors</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 4</div>
+            <p>On a city train line, peak ridership occurs between 7 AM and 7 PM. The fairness of a passenger survey could be improved by over-sampling riders from which group?</p>
+            <div class="answer">Answer: Passengers who ride the train during off-peak times</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 5</div>
+            <p>Fill in the blank: A junior data analyst works on a ____ when using their analytical skills to address questions or problems for their organization.</p>
+            <div class="answer">Answer: business task</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 6</div>
+            <p>A data professional at a grocery store considers fairness when collecting data. Rather than having store associates share observations, they create a survey that asks customers to provide information about their own shopping experiences. This helps avoid any unconscious bias that might be introduced by the sales associates. Which fairness best practice does this scenario describe?</p>
+            <div class="answer">Answer: Self-reporting</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 7</div>
+            <p>A data analyst at a hospital system researches factors that contribute to low blood pressure. Rather than using only the medical records of patients with low blood pressure, the analyst considers patient demographics, medical history, lifestyle, and more. This enables them to achieve more insightful results. Which fairness best practice does this scenario describe?</p>
+            <div class="answer">Answer: Considering all available data / Considering relevant data</div>
+        </div>
+        <div class="question-card">
+            <div class="question-title">Question 8</div>
+            <p>Fill in the blank: A data professional ensures their data analysis is fair by considering fairness from ____ of a project.</p>
+            <div class="answer">Answer: planning to presentation</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big Data & Apache Spark - Quiz Study Guide</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --card-border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --ans-bg: #ecfdf5;
+      --ans-border: #10b981;
+      --note-bg: #eff6ff;
+      --note-border: #60a5fa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .banner-container {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 2rem;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--card-border);
+      background: #ffffff;
+    }
+
+    .banner-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--card-border);
+    }
+
+    header h1 {
+      font-size: 2.25rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .module-card {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .module-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff;
+      padding: 1rem 1.5rem;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .section-content {
+      padding: 1.5rem;
+    }
+
+    .quiz-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 1rem 0 0.75rem 0;
+      padding-bottom: 0.35rem;
+      border-bottom: 2px solid #e0e7ff;
+    }
+
+    .quiz-title:first-of-type {
+      margin-top: 0;
+    }
+
+    .qa-group {
+      margin-bottom: 1.25rem;
+      padding-left: 0.25rem;
+    }
+
+    .question {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 0.35rem;
+    }
+
+    .answer {
+      background: var(--ans-bg);
+      border-left: 4px solid var(--ans-border);
+      padding: 0.6rem 0.85rem;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.95rem;
+      color: #064e3b;
+    }
+
+    .answer ul {
+      margin-top: 0.3rem;
+      margin-left: 1.2rem;
+    }
+
+    .answer li {
+      margin-bottom: 0.2rem;
+    }
+
+    .note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      font-style: italic;
+    }
+
+    code {
+      background: #f1f5f9;
+      color: #d946ef;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Image Banner -->
+    <div class="banner-container">
+      <img src="https://file.garden/abrK4_rpWxJegn7w/ggggggggggg.jpg" alt="IBM Data Science Professional Certificate">
+    </div>
+
+    <header>
+      <h1>Big Data & Apache Spark Course Guide</h1>
+      <p>Complete Reference: Practice Quizzes, Graded Quizzes, and Final Assessment</p>
+    </header>
+
+    <!-- Module 1 -->
+    <div class="module-card">
+      <div class="module-header">Module 1: Introduction to Big Data</div>
+      <div class="section-content">
+        <div class="quiz-title">Practice Quiz: Introduction to Big Data</div>
+        <div class="qa-group">
+          <div class="question">1. Which statement is true about big data?</div>
+          <div class="answer">Big data comprises any form of data, including videos, photos, and more.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Select the options that illustrate the use of big data technologies. Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>IoT systems</li>
+              <li>Personal assistants, including Google, Alexa and Siri</li>
+              <li>Social media advertising</li>
+            </ul>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Identify a NoSQL database best suited for storing and processing vast amounts of data for big data processing.</div>
+          <div class="answer">MongoDB</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. Identify the use cases of big data in manufacturing.</div>
+          <div class="answer">Predictive maintenance to predict parts replacement</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. What are embarrassingly parallel calculations?</div>
+          <div class="answer">Workloads that can easily be divided and run independently. If one workload fails, it has no impact on the other workloads and is easily rerun.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. Which of the following sources is typically associated with structured data?</div>
+          <div class="answer">Relational database</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">7. Which of the following describes a feature of open-source software?</div>
+          <div class="answer">Free access to the source code</div>
+        </div>
+
+        <div class="quiz-title">Graded Quiz: What Is Big Data?</div>
+        <div class="qa-group">
+          <div class="question">1. Select the statements that describe big data. Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>Data is generated in huge volumes and can be structured, semi-structured, or unstructured.</li>
+              <li>Big Data arrives continuously at enormous speed from multiple sources.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. An internet-enabled connected network of smart devices such as sensors, processors, embedded devices, and communication hardware is known as ____.</div>
+          <div class="answer">Internet of Things</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Which of the following selections does not fall within the category of big data?</div>
+          <div class="answer">Metadata</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. Why is parallel processing important in big data?</div>
+          <div class="answer">It reduces processing times</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. What is the order of units from smallest to largest?</div>
+          <div class="answer">Byte &lt; kilobyte (KB) &lt; megabyte (MB) &lt; gigabyte (GB) &lt; terabyte (TB) &lt; petabyte (PB)</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. Relative to big data, what is the function of Map and Reduce?</div>
+          <div class="answer">Map locates data patterns, and Reduce consolidates and processes data for meaningful analysis.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">7. Select the option that lists the four main dimensions of big data.</div>
+          <div class="answer">Velocity, volume, variety, and veracity</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">8. Scaling in the context of big data refers to:</div>
+          <div class="answer">Adding more computing resources to handle increased data volume and processing demands</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">9. Select the option that lists all the data types associated with big data.</div>
+          <div class="answer">Structured, semi-structured, and unstructured data</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 2 -->
+    <div class="module-card">
+      <div class="module-header">Module 2: Introduction to Hadoop &amp; Hadoop Ecosystem</div>
+      <div class="section-content">
+        <div class="quiz-title">Practice Quiz: Introduction to Hadoop</div>
+        <div class="qa-group">
+          <div class="question">1. ______ released Hadoop to the Apache Software Foundation as an open-source project.</div>
+          <div class="answer">Yahoo</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which open-source product is designed to transfer bulk data between relational database systems and Hadoop?</div>
+          <div class="answer">Sqoop</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Which option represents the correct definition for Map in the MapReduce programming model?</div>
+          <div class="answer">Map processes data into key-value pairs.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. How does HDFS achieve fault tolerance?</div>
+          <div class="answer">By replicating data blocks across multiple DataNodes</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which of the following file formats does Hive support? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>Sequence file</li>
+              <li>Record columnar files</li>
+              <li>Flat files</li>
+            </ul>
+            <div class="note">Note: Hive supports TextFile/Flat files, SequenceFile, RCFile, ORC, and Parquet.</div>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. Which of the following statements is true about HBase?</div>
+          <div class="answer">Runs on top of Hadoop Distributed File System (HDFS)</div>
+        </div>
+
+        <div class="quiz-title">Graded Quiz: Introduction to Hadoop Ecosystem</div>
+        <div class="qa-group">
+          <div class="question">1. Which is a processing unit of Hadoop and an important core component of the Hadoop framework?</div>
+          <div class="answer">MapReduce</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which of the following components are included in Hadoop? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>Yet Another Resource Negotiator (YARN)</li>
+              <li>MapReduce</li>
+              <li>Hadoop Distributed File System (HDFS)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. What is the default block size in Hadoop?</div>
+          <div class="answer">128 megabytes</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. Which statement is true regarding the comparison between traditional RDBMS and Apache Hive?</div>
+          <div class="answer">Traditional RDBMS can handle up to terabytes of data. Hive is designed to handle petabytes of data.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which component of HBase is a centralized service for maintaining configuration information to maintain healthy links between nodes?</div>
+          <div class="answer">ZooKeeper</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. Which of the following statements is true with reference to Hive?</div>
+          <div class="answer">The JDBC client allows Java-based applications to connect to Hive</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">7. Which of the following is a feature of Hadoop Distributed File System (HDFS)?</div>
+          <div class="answer">One cluster can be scaled into hundreds of nodes</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">8. What is Yet Another Resource Negotiator (YARN)?</div>
+          <div class="answer">Resource Manager</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 3 -->
+    <div class="module-card">
+      <div class="module-header">Module 3: Introduction to Apache Spark</div>
+      <div class="section-content">
+        <div class="quiz-title">Practice Quiz: Introduction to Apache Spark</div>
+        <div class="qa-group">
+          <div class="question">1. What are the benefits of working with Apache Spark?</div>
+          <div class="answer">Distributed data processing, real-time streaming, and in-memory processing</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which of the following options can be considered a feature or a characteristic of a functional programming language, for example, Scala?</div>
+          <div class="answer">It follows a declarative programming model.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. What is parallel programming?</div>
+          <div class="answer">It is the simultaneous use of multiple compute resources to solve a computational task.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. How is the Spark Application Architecture configured to scale big data?</div>
+          <div class="answer">Executor programs run on worker nodes and you can add additional worker nodes to scale big data processing incrementally.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which SQL query option can be utilized to showcase the names column from the df DataFrame, which is stored as a view named people? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li><code>df.select(df["name"]).show()</code></li>
+              <li><code>df.select("name").show()</code></li>
+              <li><code>spark.sql("SELECT name FROM people").show()</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="quiz-title">Graded Quiz: Apache Spark</div>
+        <div class="qa-group">
+          <div class="question">1. What are the three main components of Apache Spark architecture?</div>
+          <div class="answer">Data; compute interface; resource management</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. What are DataFrames in Apache Spark?</div>
+          <div class="answer">DataFrames are a distributed collection of data organized into named columns.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. What is Apache Spark?</div>
+          <div class="answer">In-memory framework for distributed data processing</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. What is functional programming?</div>
+          <div class="answer">A style of programming that follows the mathematical function format</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which of the following statements defines Resilient Distributed Datasets (RDDs)? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>RDDs are immutable.</li>
+              <li>RDD is a collection of fault-tolerant elements.</li>
+              <li>RDD is capable of receiving parallel operations.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. What is the primary purpose of parallel programming?</div>
+          <div class="answer">To use multiple compute resources to solve a computational problem</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">7. Which of the following is a benefit of DataFrames?</div>
+          <div class="answer">To scale from kilobytes of data on a single laptop to petabytes on a large cluster</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 4 -->
+    <div class="module-card">
+      <div class="module-header">Module 4: DataFrames &amp; Spark SQL</div>
+      <div class="section-content">
+        <div class="quiz-title">Practice Quiz: Introduction to DataFrames &amp; Spark SQL</div>
+        <div class="qa-group">
+          <div class="question">1. Why are transformations in Spark considered lazy?</div>
+          <div class="answer">Because the results are only computed when evaluated by actions</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which of the following is a characteristic of data sets? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>Strongly-typed</li>
+              <li>Use unified Java and Scala APIs</li>
+            </ul>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Which are the four major phases of Catalyst query optimization?</div>
+          <div class="answer">Analysis, Logical Optimization, Physical Planning, and Code Generation</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. What is the primary goal of data transformation?</div>
+          <div class="answer">To keep only relevant data</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which of the following is an aggregation function? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li><code>countDistinct()</code></li>
+              <li><code>max()</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="quiz-title">Graded Quiz: DataFrames and Spark SQL</div>
+        <div class="qa-group">
+          <div class="question">1. Which of the following statements is true about a directed acyclic graph (DAG)? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>A data structure with edges and vertices</li>
+              <li>In Apache Spark, RDDs are represented by the vertices</li>
+              <li>A new edge is obtained from an older vertex</li>
+            </ul>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which function is applied to create a data set from a sequence?</div>
+          <div class="answer"><code>toDS()</code></div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Which of the following is a feature of Tungsten?</div>
+          <div class="answer">Utilizes CPU registers for storing intermediate data</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. While adhering to best practices, in what order does a typical data engineer perform operations on Apache Spark?</div>
+          <div class="answer">Read, analyze, transform, load, and write</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which data sources can be utilized with Apache Spark SQL?</div>
+          <div class="answer">Parquet files</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. How can you create a Global Temporary view in Spark SQL?</div>
+          <div class="answer">Use the <code>createGlobalTempView</code> function</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">7. Sequence that explains RDD transformation and actions.</div>
+          <div class="answer"><code>1 &gt;&gt; 5 &gt;&gt; 2 &gt;&gt; 4 &gt;&gt; 3</code></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 5 -->
+    <div class="module-card">
+      <div class="module-header">Module 5: Spark Architecture &amp; Runtime Environments</div>
+      <div class="section-content">
+        <div class="quiz-title">Practice Quiz: Spark Architecture</div>
+        <div class="qa-group">
+          <div class="question">1. What are the two main processes associated with an Apache Spark application?</div>
+          <div class="answer">Driver program and executors</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. What is the primary purpose of using an Apache Spark application in local mode?</div>
+          <div class="answer">To facilitate ease of development and testing</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Spark dependencies require driver and cluster executor processes to be able to access the application project. How can you provide this access for Java and Scala-based applications?</div>
+          <div class="answer">By creating an uber-JAR</div>
+        </div>
+
+        <div class="quiz-title">Practice Quiz: Spark Runtime Environments</div>
+        <div class="qa-group">
+          <div class="question">1. Why is Apache Spark considered a valuable programming choice for big data and machine learning?</div>
+          <div class="answer">It efficiently processes large-scale data and empowers the application of machine learning algorithms to predict or identify operational issues.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which of the following statements is true regarding Apache Spark static configuration?</div>
+          <div class="answer">It can be used for application-related properties, such as the application name.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Which of the following options best describes Kubernetes and its primary benefits?</div>
+          <div class="answer">Orchestrates containerized applications on a cluster</div>
+        </div>
+
+        <div class="quiz-title">Graded Quiz: Development and Runtime Environment Options</div>
+        <div class="qa-group">
+          <div class="question">1. An Apache Spark application has two processes: the driver program and the executor. The driver process can be run on which of the following?</div>
+          <div class="answer">Cluster node</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which cluster manager is most suitable for establishing simple clusters?</div>
+          <div class="answer">Spark Standalone</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. The 'spark-submit' script, included with Spark for submitting applications, offers various options/settings. Which option/setting allows you to view available options for a specific cluster manager?</div>
+          <div class="answer"><code>./bin/spark-submit --help</code></div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. What is the advantage of using Spark on IBM Cloud? Select all that apply.</div>
+          <div class="answer">
+            <ul>
+              <li>Enterprise-grade security</li>
+              <li>Pre-existing default configuration</li>
+            </ul>
+          </div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Spark dynamic configuration avoids hardcoding specific values. Which of the following is an example where dynamic configuration can be appropriately used?</div>
+          <div class="answer">Specifying the number of cores to be utilized</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. Which of the following statements accurately describes the method used for configuring Spark?</div>
+          <div class="answer"><strong>Configuration Type:</strong> Properties<br><strong>Parameters:</strong> Adjust and control application behavior</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">7. Which of the following statements is accurate regarding the two driver-deploy modes?</div>
+          <div class="answer">Client mode refers to the mode when the application submitter launches the driver process outside the cluster.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 6 -->
+    <div class="module-card">
+      <div class="module-header">Module 6: Monitoring and Tuning</div>
+      <div class="section-content">
+        <div class="quiz-title">Practice Quiz: Introduction to Monitoring and Tuning</div>
+        <div class="qa-group">
+          <div class="question">1. What information does the Storage tab display in the Apache Spark user interface?</div>
+          <div class="answer">Details about cached resilient distributed datasets (RDDs)</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. Which action triggers job creation and schedules the tasks?</div>
+          <div class="answer"><code>collect()</code> action</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. What are the common areas or reasons for Apache Spark application failure on a cluster?</div>
+          <div class="answer">User code, configuration, application dependencies, resource allocation, network communication</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. Which of the following statements is true about Apache Spark unified memory?</div>
+          <div class="answer">Storage is not allowed to evict executor memory.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which command specifies the number of executor cores for an Apache Spark standalone cluster for the application?</div>
+          <div class="answer">Use the command <code>--total-executor-cores</code> followed by the number of cores.</div>
+        </div>
+
+        <div class="quiz-title">Graded Quiz: Monitoring and Tuning</div>
+        <div class="qa-group">
+          <div class="question">1. Which tabs are included within the Apache Spark User Interface?</div>
+          <div class="answer">Jobs, stages, storage, environment, executor, and SQL</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">2. What happens during job progression if any tasks within a stage fail after several attempts?</div>
+          <div class="answer">Apache Spark marks the task, stage, and job as failed and stops the application</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">3. Syntax, serialization, data validation, and other user errors can occur when running Apache Spark applications. Consider:<br>
+          1. View the driver event log to locate the cause of an application failure.<br>
+          2. If all attempts to run the task fail, Apache Spark reports an error to the driver, and the application is terminated.<br>
+          3. If a task fails due to an error, Apache Spark can attempt to rerun the task for a set number of retries.<br>
+          Select the order of how Apache Spark handles application errors:</div>
+          <div class="answer"><strong>3, 2, 1</strong><br><span class="note">First it retries (3), then if all retries fail it reports and terminates (2), then you view the log to debug (1).</span></div>
+        </div>
+        <div class="qa-group">
+          <div class="question">4. Which of the following is true regarding data persistence?</div>
+          <div class="answer">Stores intermediate calculations for reuse</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">5. Which command specifies the number of executor cores for an Apache Spark Standalone cluster per executor process?</div>
+          <div class="answer">Use the command <code>--executor-cores</code> followed by the number of cores.</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">6. Which workflow options can you monitor using the Apache Spark application UI?</div>
+          <div class="answer">Jobs in progress running as tasks in the executors</div>
+        </div>
+        <div class="qa-group">
+          <div class="question">7. Which of the following statements is true?</div>
+          <div class="answer">Workers in the cluster contain a limited number of cores.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 7 -->
+    <div class="module-card">
+      <div class="module-header">Module 7: Final Assessment</div>
+      <div class="section-content">
+        <div class="quiz-title">Final Assessment Questions &amp; Answers</div>
+        
+        <div class="qa-group">
+          <div class="question">1. Distributed computing for online retail</div>
+          <div class="answer">Distributed computing is a group of computers working together to share the same memory</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">2. Order of data flow in Spark</div>
+          <div class="answer">Data flows from the Hadoop file system into the compute interface and then into different nodes to perform distributed/parallel tasks.</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">3. Characteristics of datasets</div>
+          <div class="answer">Strongly typed; use unified Java and Scala APIs; built on top of DataFrames; are the latest data abstraction added to Spark</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">4. Features belongs to Tungsten</div>
+          <div class="answer">Places intermediate data in CPU registers</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">5. What is used by AIOps tools to facilitate IT operations?</div>
+          <div class="answer">Machine learning</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">6. What is the name of the Spark unified interface?</div>
+          <div class="answer"><code>spark-submit</code></div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">7. Why does Spark queue tasks and wait for available cores?</div>
+          <div class="answer">To maximize parallel processing</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">8. Which action does Apache Spark perform if a task fails?</div>
+          <div class="answer">Attempts to rerun the task for a set number of retries</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">9. Relationship between big data and personal assistants like Google, Alexa, Siri - Select all</div>
+          <div class="answer">
+            <ul>
+              <li><strong>TRUE:</strong> Assistants take questions and provide answers via some of the most advanced neural networks that exist.</li>
+              <li><strong>FALSE:</strong> Assistants base their answers solely on structured data sources.</li>
+              <li><strong>TRUE:</strong> Personal assistants also rely on unstructured data sources, including personal data in the form of photos, videos, and text that people send to each other as the bulk of data collected by consumer goods companies.</li>
+              <li><strong>TRUE:</strong> Personal assistants use data sources, including location tracking and historical shopping data, to help provide predictive answers based on personal preferences.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">10. Main components that describe dimensions of big data</div>
+          <div class="answer">Velocity, Volume, Variety, and Veracity</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">11. What does "scaling out" mean?</div>
+          <div class="answer">Adding nodes to increase capacity</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">12. What has contributed significantly to the launch of the Big Data era?</div>
+          <div class="answer">The usage of social media</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">13. Which best explains Hadoop?</div>
+          <div class="answer">A set of open-source programs and procedures that make up an ecosystem.</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">14. Which explains the process of a driver program?</div>
+          <div class="answer">Create work and send it to the cluster</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">15. Which configuration method enables adjustment of settings on a per-machine basis?</div>
+          <div class="answer">Environment variables<br><span class="note">(Properties = application-related; spark-env.sh / environment variables = per-machine)</span></div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">16. Possible reasons to host Kubernetes on a local machine?</div>
+          <div class="answer">As a development environment</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">17. Licensing types available for open-source software</div>
+          <div class="answer">Public domain, Copyleft, Permissive, General Public License</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">18. How does MapReduce keep track of its tasks?</div>
+          <div class="answer">Using tags</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">19. Your team is switching to Hive from RDBMS - which is a part of Hive that makes it more efficient?</div>
+          <div class="answer">Can handle petabytes of data (handles massive scale compared to RDBMS)</div>
+        </div>
+
+        <div class="qa-group">
+          <div class="question">20. How does Spark Application UI benefit you for monitoring?</div>
+          <div class="answer">Quickly identifies failed jobs and locates the root cause of failure.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Analysis with Python - Master Course & Exam Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent: #7c3aed;
+      --bg: #ffffff;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-hover-border: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --badge-practice-bg: #fef3c7;
+      --badge-practice-text: #92400e;
+      --badge-practice-border: #fde68a;
+      --badge-graded-bg: #dcfce7;
+      --badge-graded-text: #166534;
+      --badge-graded-border: #bbf7d0;
+      --badge-final-bg: #f3e8ff;
+      --badge-final-text: #6b21a8;
+      --badge-final-border: #e9d5ff;
+      --code-bg: #f1f5f9;
+      --code-color: #0369a1;
+      --ans-bg: #f0fdf4;
+      --ans-border: #16a34a;
+      --ans-text: #14532d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.65;
+      padding-bottom: 80px;
+    }
+
+    /* Top Banner Section - Fitted Center */
+    .hero-banner-wrap {
+      width: 100%;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 20px 10px 20px;
+    }
+
+    .hero-banner-img {
+      max-width: 820px;
+      width: 100%;
+      height: auto;
+      max-height: 380px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--card-border);
+    }
+
+    /* Header */
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--card-border);
+      padding: 24px 20px 20px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Navigation Bar */
+    .nav-wrapper {
+      max-width: 1160px;
+      margin: 24px auto 35px auto;
+      padding: 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .nav-btn {
+      background: #f8fafc;
+      color: #334155;
+      text-decoration: none;
+      padding: 9px 20px;
+      border-radius: 9999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 1px solid var(--card-border);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Module Section Container */
+    .module-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      margin-bottom: 40px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      scroll-margin-top: 130px;
+    }
+
+    .module-header {
+      background: #f8fafc;
+      padding: 22px 30px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .module-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .module-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+    }
+
+    /* Sub-sections within module */
+    .section-block {
+      padding: 28px 30px;
+      border-bottom: 1px solid var(--card-border);
+      background: #ffffff;
+    }
+
+    .section-block:last-child {
+      border-bottom: none;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      border: 1px solid transparent;
+    }
+
+    .badge-practice {
+      background-color: var(--badge-practice-bg);
+      color: var(--badge-practice-text);
+      border-color: var(--badge-practice-border);
+    }
+
+    .badge-graded {
+      background-color: var(--badge-graded-bg);
+      color: var(--badge-graded-text);
+      border-color: var(--badge-graded-border);
+    }
+
+    .badge-final {
+      background-color: var(--badge-final-bg);
+      color: var(--badge-final-text);
+      border-color: var(--badge-final-border);
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Notice Banner for Shuffled / Dynamic Quizzes */
+    .exam-notice-banner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .exam-notice-banner svg {
+      flex-shrink: 0;
+    }
+
+    /* Quiz Card Items */
+    .quiz-item {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 18px;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .quiz-item:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transform: translateY(-1px);
+    }
+
+    .quiz-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .question {
+      font-weight: 600;
+      font-size: 1.01rem;
+      color: #1e293b;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .answer-box {
+      background-color: var(--ans-bg);
+      border-left: 4px solid var(--ans-border);
+      border-radius: 4px 8px 8px 4px;
+      padding: 12px 18px;
+      font-size: 0.98rem;
+      color: var(--ans-text);
+      line-height: 1.6;
+    }
+
+    .answer-box strong {
+      color: #15803d;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+
+    .note {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(0, 0, 0, 0.12);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: var(--code-bg);
+      color: var(--code-color);
+      padding: 3px 7px;
+      border-radius: 5px;
+      font-size: 0.9em;
+      border: 1px solid #e2e8f0;
+    }
+
+    .answer-box code {
+      background-color: #dcfce7;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    /* Final Project Evaluation Box Styling */
+    .project-question-img {
+      max-width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      margin: 16px 0 20px 0;
+      display: block;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .copy-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .copy-btn.copied {
+      background: #16a34a;
+    }
+
+    .essay-ans-text {
+      font-size: 0.98rem;
+      line-height: 1.75;
+      color: #1e293b;
+      white-space: pre-line;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Hero Banner Image Fitted in the Middle -->
+  <div class="hero-banner-wrap">
+    <img src="https://file.garden/abrK4_rpWxJegn7w/PPPPPPPPPPP.jpg" alt="Data Analysis Header Banner" class="hero-banner-img">
+  </div>
+
+  <header>
+    <h1>Data Analysis with Python</h1>
+    <p>Complete Reference Guide: Quizzes, Final Exam, and AI-Graded Capstone Project</p>
+  </header>
+
+  <!-- Sticky Module Navigator -->
+  <div class="nav-wrapper">
+    <a href="#module-1" class="nav-btn">Module 1</a>
+    <a href="#module-2" class="nav-btn">Module 2</a>
+    <a href="#module-3" class="nav-btn">Module 3</a>
+    <a href="#module-4" class="nav-btn">Module 4</a>
+    <a href="#module-5" class="nav-btn">Module 5</a>
+    <a href="#module-6" class="nav-btn" style="border-color: #cbd5e1; font-weight: 700; color: var(--accent);">Module 6 (Final Exam & Project)</a>
+  </div>
+
+  <div class="container">
+
+    <!-- MODULE 1 -->
+    <section class="module-card" id="module-1">
+      <div class="module-header">
+        <h2 class="module-title">Module 1: Importing Data Sets</h2>
+        <span class="module-tag">Foundations</span>
+      </div>
+
+      <!-- Practice Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-practice">Practice Quiz</span>
+          <h3 class="section-title">Importing Data Sets</h3>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. Which of the following commands would you use to retrieve only the attribute datatypes of a dataset loaded as pandas data frame df?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>df.dtypes</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. What description best describes the library Pandas?</div>
+          <div class="answer-box"><strong>Answer:</strong> Offers data structures and tools for effective data manipulation and analysis, providing fast access to structured data.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. What does the following method do to the data frame? <code>df.head(12)</code></div>
+          <div class="answer-box"><strong>Answer:</strong> Shows the first 12 rows of the data frame.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. How would you use the describe() method with a data frame df to get a statistical summary of only the columns with numerical values in the data frame?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>df.describe()</code></div>
+        </div>
+      </div>
+
+      <!-- Graded Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-graded">Graded Quiz</span>
+          <h3 class="section-title">Importing Data Sets</h3>
+        </div>
+        
+        <div class="exam-notice-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Note: These questions may be changed or shuffled for everyone.</span>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. What Python library is primarily used for machine learning?</div>
+          <div class="answer-box"><strong>Answer:</strong> scikit-learn</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. Which command correctly replaces the column headers of a DataFrame df with a new list of names stored in headers_list?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>df.columns = headers_list</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. Amira wants to load a file named "A.csv" into a DataFrame so she can start analyzing the data. Which line of code should she use?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>df = pandas.read_csv("A.csv")</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. In a Pandas DataFrame, the column 'make' contains car brand names, such as "Toyota" and "BMW". What is the most likely data type of this column?</div>
+          <div class="answer-box"><strong>Answer:</strong> object</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">5. Zoya wants to view summary statistics — including non-numeric columns — for her DataFrame df. Which command should she use?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>df.describe(include = "all")</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">6. A data analyst has loaded a dataset of used cars and noticed that the first row contains numeric values rather than column names. What does this imply about the dataset?</div>
+          <div class="answer-box"><strong>Answer:</strong> The dataset has no header row and treats the first row as data.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">7. You've created a connection to a database using sqlite3.connect(). Which of the following correctly describes the role of the connect() function?</div>
+          <div class="answer-box"><strong>Answer:</strong> It opens a connection to the specified database file.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">8. You are working with numerical matrix data and need to apply vectorized operations for performance. Which package should you use?</div>
+          <div class="answer-box"><strong>Answer:</strong> NumPy</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">9. In Roma's dataset, Pandas used 0, 1, 2... as column headers. What is a valid way to set appropriate labels from a separate list named cols?</div>
+          <div class="answer-box"><strong>Answer:</strong> Set <code>df.columns = cols</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">10. Jack wants to query a database using Python. Which step must come first after importing the sqlite3 module?</div>
+          <div class="answer-box"><strong>Answer:</strong> Use <code>connect()</code> to establish connection.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 2 -->
+    <section class="module-card" id="module-2">
+      <div class="module-header">
+        <h2 class="module-title">Module 2: Data Wrangling</h2>
+        <span class="module-tag">Preprocessing</span>
+      </div>
+
+      <!-- Practice Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-practice">Practice Quiz</span>
+          <h3 class="section-title">Data Wrangling</h3>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. What is the correct syntax to access a column, say "symboling," from a dataframe, say df?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>df["symboling"]</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. How would you change the name of the column "city_mpg" to "city-L/100km"?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>df.rename(columns={"city_mpg": "city-L/100km"}, inplace=True)</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. What is the primary purpose of normalization?</div>
+          <div class="answer-box"><strong>Answer:</strong> To make the range of the values consistent and make comparing and analyzing values easier.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. Consider the column 'diesel' for car B. What would be the value?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>1</code></div>
+        </div>
+      </div>
+
+      <!-- Graded Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-graded">Graded Quiz</span>
+          <h3 class="section-title">Data Wrangling</h3>
+        </div>
+
+        <div class="exam-notice-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Note: These questions may be changed or shuffled for everyone.</span>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. Which method replaces a missing value in a column with continuous numeric data most appropriately?</div>
+          <div class="answer-box"><strong>Answer:</strong> Use the average of the other values in the column.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. David is preparing a dataset and wants to decide on appropriate bin values during preprocessing. What should he do first?</div>
+          <div class="answer-box"><strong>Answer:</strong> Visualize the distribution using a histogram.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. Leila is preparing data for a machine-learning model. Her dataset contains values like 666, 1.1, 232, and 23.12. What data type should she use for these numbers?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>float</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. Meera is scaling her dataset before feeding it into a model. She wants all features to be on a similar range. What is the purpose of this process?</div>
+          <div class="answer-box"><strong>Answer:</strong> Scale features to similar value ranges.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">5. Which of the following is the primary purpose of the get_dummies() method?</div>
+          <div class="answer-box"><strong>Answer:</strong> To convert categorical values into numerical ones.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">6. Which of the following is the correct sequence of steps in a typical data pre-processing pipeline?</div>
+          <div class="answer-box"><strong>Answer:</strong> Cleaning &rarr; Formatting &rarr; Normalization &rarr; Encoding</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">7. Ahmed wants to prepare the "fuel type" column with values like "gas" and "diesel" for model training. What should he use?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>get_dummies()</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">8. A data scientist finds missing values in the 'Revenue' column that they want to replace with zero before running calculations. Which Pandas function should they use to fill in this missing information?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>fillna()</code></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 3 -->
+    <section class="module-card" id="module-3">
+      <div class="module-header">
+        <h2 class="module-title">Module 3: Exploratory Data Analysis (EDA)</h2>
+        <span class="module-tag">Exploration</span>
+      </div>
+
+      <!-- Practice Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-practice">Practice Quiz</span>
+          <h3 class="section-title">Exploratory Data Analysis</h3>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. Which method produces a scatter plot in Pandas?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>plot.scatter()</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. Select the appropriate description of a pivot table:</div>
+          <div class="answer-box"><strong>Answer:</strong> A pivot table has one variable displayed along the columns and the other variable displayed along the rows.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. Select the scatter plot with a weak correlation:</div>
+          <div class="answer-box"><strong>Answer:</strong> 2nd option between 20000 and 10000 (points widely dispersed without clear directional trend).</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. Consider scatter plots a, b, and c with differing spreads. Which plot has the highest correlation coefficient?</div>
+          <div class="answer-box"><strong>Answer:</strong> They all have the same value.</div>
+        </div>
+      </div>
+
+      <!-- Graded Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-graded">Graded Quiz</span>
+          <h3 class="section-title">Exploratory Data Analysis</h3>
+        </div>
+
+        <div class="exam-notice-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Note: These questions may be changed or shuffled for everyone.</span>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. Priya analyzes a dataset using Pandas and wants a quick summary of key statistics like mean and standard deviation. Which method should she use?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>describe()</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. While analyzing sales and advertising data, a data analyst notices that the Pearson correlation coefficient between the two variables is close to zero. What does this most likely suggest?</div>
+          <div class="answer-box"><strong>Answer:</strong> The sales and advertising data are likely not correlated.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. You have created a pivoted table to compare the average prices of cars. Now you want to visualize this data more clearly. Which method would you use in this scenario?</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> <code>pcolor()</code>
+            <div class="note">Explanation: <code>pcolor()</code> creates a pseudocolor plot / heatmap ideal for pivot table visualization.</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. Sara filters a dataset to include just the 'body-style' and 'price' columns. She then uses groupby with mean() to analyze it. What does this operation calculate?</div>
+          <div class="answer-box"><strong>Answer:</strong> It calculates the average price for each body style.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">5. You have analyzed that as highway miles per gallon (MPG) increase, the car price tends to decrease on a scatter plot with a regression line. What type of correlation exists between highway MPG and price?</div>
+          <div class="answer-box"><strong>Answer:</strong> Negative correlation</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 4 -->
+    <section class="module-card" id="module-4">
+      <div class="module-header">
+        <h2 class="module-title">Module 4: Model Development</h2>
+        <span class="module-tag">Modeling</span>
+      </div>
+
+      <!-- Practice Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-practice">Practice Quiz</span>
+          <h3 class="section-title">Model Development</h3>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. Consider the following lines of code. What is the name of the column that contains the target values?<br>
+          <code>X = df[['highway-mpg']]<br>Y = df['price']<br>lm.fit(X, Y)<br>Yhat = lm.predict(X)</code></div>
+          <div class="answer-box"><strong>Answer:</strong> <code>'price'</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. Residual Plot interpretation:</div>
+          <div class="answer-box"><strong>Answer:</strong> Since the values are randomly distributed on the graph, it indicates the linear model is a good fit.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. Higher-order polynomial vs linear:</div>
+          <div class="answer-box"><strong>Answer:</strong> You cannot compare their R² values to decide which is a better fit.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. Consider the following lines of code. What value does the variable out contain?<br>
+          <code>lm = LinearRegression()<br>X = df[['highway-mpg']]<br>Y = df['price']<br>lm.fit(X, Y)<br>out = lm.score(X, Y)</code></div>
+          <div class="answer-box"><strong>Answer:</strong> The Coefficient of Determination (R²)</div>
+        </div>
+      </div>
+
+      <!-- Graded Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-graded">Graded Quiz</span>
+          <h3 class="section-title">Model Development</h3>
+        </div>
+
+        <div class="exam-notice-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Note: These questions may be changed or shuffled for everyone.</span>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. What does the following line of code do? <code>LinearRegression()</code></div>
+          <div class="answer-box">
+            <strong>Answer:</strong> Creates a linear regression object and stores it in the lm variable
+            <div class="note">Alternative phrasing in options: "Assigns a linear regression model to the lm variable"</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. Jacky observed a residual plot with errors and seen that these errors are increasing consistently with x. What does this show?</div>
+          <div class="answer-box"><strong>Answer:</strong> Residual pattern suggests that a non-linear model may be more appropriate.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. What steps do the following lines of code perform?<br>
+          <code>Input = [('scale', StandardScaler()), ('model', LinearRegression())]<br>pipe = Pipeline(Input)<br>pipe.fit(Z, y)<br>ypipe = pipe.predict(Z)</code></div>
+          <div class="answer-box"><strong>Answer:</strong> Performs a prediction using a linear regression model.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. A data analyst wants to compare two models for predicting house prices. They observed that one model shows a lower mean squared error (MSE) than the other. What does this indicate about a model's performance?</div>
+          <div class="answer-box"><strong>Answer:</strong> It fits the data accurately.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">5. A car price model predicts extremely high values for fuel mileage of 100 MPG. How should you assess this?</div>
+          <div class="answer-box"><strong>Answer:</strong> Assess whether values fall within a reasonable range.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 5 -->
+    <section class="module-card" id="module-5">
+      <div class="module-header">
+        <h2 class="module-title">Module 5: Model Evaluation and Refinement</h2>
+        <span class="module-tag">Validation</span>
+      </div>
+
+      <!-- Practice Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-practice">Practice Quiz</span>
+          <h3 class="section-title">Model Evaluation and Refinement</h3>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. What function randomly splits a data set into training and testing subsets?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>train_test_split()</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. Consider the model in blue and the samples in blue dots. Which model has the best fit?</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> <strong>b</strong>
+            <div class="note">Explanation: <em>a</em> = Degree 1 (Underfitting); <em>b</em> = Good fit (matches true underlying curve); <em>c</em> = High Degree (Overfitting, wiggly curve).</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. Vertical = MSE, Horizontal = order of polynomial. Red = training error, Blue = test error. Which order polynomial should you use?</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> <strong>8</strong>
+            <div class="note">Explanation: Test error reaches its lowest point at order 8. Higher orders result in increasing test error due to overfitting.</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. The following models were all trained on the same data. Select the model with the highest alpha value.</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> <strong>c</strong>
+            <div class="note">Explanation: Highest alpha corresponds to heaviest penalty, yielding the smoothest (underfitted) line. Plot 'c' is the smoothest.</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">5. The following models were all trained on the same data. Select the model with the lowest value for alpha.</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> <strong>a</strong>
+            <div class="note">Explanation: Lowest alpha implies minimal regularization, leading to high variance/wiggly line. Plot 'a' is most wiggly.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graded Quiz -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-graded">Graded Quiz</span>
+          <h3 class="section-title">Model Evaluation and Refinement</h3>
+        </div>
+
+        <div class="exam-notice-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Note: These questions may be changed or shuffled for everyone.</span>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. <code>cross_val_predict(lr_model, X_train, y_train, cv=3)</code> What does this code return?</div>
+          <div class="answer-box"><strong>Answer:</strong> Predicted values of the test set using cross-validation.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. Tune hyperparameters for ridge regression using grid search. What is the correct way to define a list of alpha values?</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> <code>parameter = [{'alpha': [...]}]</code>
+            <div class="note">Expected format for <code>GridSearchCV</code> is a dictionary mapping hyperparameter names to candidate values.</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. Divide data &rarr; linear model &rarr; R² = 0.5 &rarr; 100th order polynomial transform &rarr; R² = 0.99. Which is correct?</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> You should use your test data to test the model further.
+            <div class="note">Explanation: An R² of 0.99 on high-order training is a warning sign of severe overfitting. Test performance must be evaluated.</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. You want to reduce overfitting by controlling the size of coefficients. Which is most suitable?</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> A technique that shrinks coefficients to prevent overfitting.
+            <div class="note">Refers to Ridge Regression (L2 penalty).</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">5. A model closely matches training data, but its curve is highly irregular and deviates from the true underlying function. What does this indicate?</div>
+          <div class="answer-box"><strong>Answer:</strong> The model overfits the training data.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 6 -->
+    <section class="module-card" id="module-6" style="border-color: #cbd5e1;">
+      <div class="module-header" style="background: #faf5ff; border-bottom-color: #f3e8ff;">
+        <h2 class="module-title" style="color: #581c87;">Module 6: Capstone Project & Final Exam</h2>
+        <span class="module-tag" style="background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe;">Capstone</span>
+      </div>
+
+      <!-- Capstone AI Graded Project -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-final">AI Graded Project</span>
+          <h3 class="section-title">Final Project Submission and Evaluation</h3>
+        </div>
+
+        <div class="quiz-item" style="border-color: #e9d5ff; background: #faf5ff;">
+          <div class="question">Evaluation Problem Prompt & Given Metrics:</div>
+          <img src="https://file.garden/abrK4_rpWxJegn7w/EEEEEEEEEEEEEEEEE.png" alt="Final Project Evaluation Metrics and Question" class="project-question-img">
+          
+          <div class="copy-header-bar">
+            <span style="font-size: 0.9rem; font-weight: 700; color: #7e22ce;">Comprehensive Evaluation Submission:</span>
+            <button class="copy-btn" id="copyProjectAnsBtn" onclick="copyProjectAnswer()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              Copy Submission Text
+            </button>
+          </div>
+
+          <div class="answer-box" style="background: #ffffff; border-left-color: #7e22ce; color: #1e293b; border: 1px solid #e9d5ff; border-left-width: 4px;">
+            <div id="projectAnswerContent" class="essay-ans-text">The model's performance metrics indicate a good fit on training data but poor generalization. A Training R² of 0.91 shows the model explains 91% variance in training data, while Test R² of 0.68 shows a significant drop of 23 points, which is a classic sign of overfitting. The model has memorized training patterns rather than learning generalizable relationships. The MSE (Test) of 28,500 is relatively high, indicating large average prediction errors on unseen houses. The residual pattern of "increasing spread with higher predicted prices" indicates heteroscedasticity, meaning the model's errors are not random and its accuracy decreases for expensive houses, violating linear regression assumptions.
+
+Two potential data issues revealed are: First, overfitting due to high model complexity or too many features relative to data size, causing the model to capture noise. Second, heteroscedasticity and non-linearity; house price variance naturally increases with size and grade, and features like waterfront view may have non-linear impact that a simple linear model cannot capture. Also, there may be outliers in high-priced homes and skewed price distribution.
+
+Three improvement strategies: 1) Regularization (Ridge/Lasso): Apply Ridge regression with tuned alpha via cross-validation. This shrinks coefficients and penalizes complexity, reducing the gap between train and test R² and addressing overfitting. 2) Feature Engineering and Transformation: Log-transform the target variable (price) and apply PolynomialFeatures for square footage and grade to capture non-linear relationships, and use StandardScaler for normalization. This will stabilize variance and fix heteroscedasticity. 3) Cross-validation and Robust Evaluation: Implement train_test_split and cross_val_score with K-fold to better estimate performance, and use residual plots and GridSearchCV to tune hyperparameters, ensuring the model is evaluated on unseen data before deployment.
+
+In real-world data analysis, model refinement is iterative. Initial high training scores can be misleading; true success is measured by consistent test performance and well-behaved residuals, requiring continuous evaluation, transformation, and regularization to build a reliable business model.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Exam -->
+      <div class="section-block">
+        <div class="section-header">
+          <span class="badge badge-final">Comprehensive Exam</span>
+          <h3 class="section-title">Final Exam (20 Questions)</h3>
+        </div>
+
+        <div class="exam-notice-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Note: These questions may be changed or shuffled for everyone.</span>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">1. Which character is typically used to separate each value in CSV?</div>
+          <div class="answer-box"><strong>Answer:</strong> A comma</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">2. Data scientist tasked with building ML model to classify emails as spam or not. Which library / definition?</div>
+          <div class="answer-box"><strong>Answer:</strong> Statistical modeling, including regression and classification</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">3. Financial analyst uses Pandas to load transaction logs stored in CSV files on remote server. Two most important factors?</div>
+          <div class="answer-box">
+            <strong>Answer:</strong> Format and file path
+            <div class="note">Note: Both <em>Encoding scheme and file path</em> and <em>Format and file path</em> may appear in answer banks; select <em>Format and file path</em> if available.</div>
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">4. Why do data analysts prefer Python's DB API when working with relational databases?</div>
+          <div class="answer-box"><strong>Answer:</strong> It offers consistent functions for connection, transaction, and query execution.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">5. Jacky wants to fit model y = b0 + b1(x) with single feature and no transformation. Which type?</div>
+          <div class="answer-box"><strong>Answer:</strong> Linear regression</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">6. Jessica uses regression model for estimating used car prices based on highway MPG. She noticed inserting high MPG values reduces predicted prices. Why treat carefully?</div>
+          <div class="answer-box"><strong>Answer:</strong> The model lacks representative data for those input levels.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">7. Which method best describes minimization of evaluation variability by using repeated data partitioning across multiple folds?</div>
+          <div class="answer-box"><strong>Answer:</strong> K-fold cross-validation</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">8. What task does code <code>mean = df["price"].mean() df["price"].replace(np.nan, mean)</code> perform?</div>
+          <div class="answer-box"><strong>Answer:</strong> It fills the missing values in the "price" column with the column's mean.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">9. Using <code>numpy.linspace</code> and <code>pandas.cut</code> for segmenting car price into three equal-width bins. How will binning help?</div>
+          <div class="answer-box"><strong>Answer:</strong> It creates labeled segments for price intervals.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">10. You are applying method that eliminates mean and divides by standard deviation. Which method?</div>
+          <div class="answer-box"><strong>Answer:</strong> Z-score standardization</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">11. Which Pandas method for changing column names after changing units?</div>
+          <div class="answer-box"><strong>Answer:</strong> <code>dataframe.rename()</code></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">12. Method focusing on summarizing key dataset traits and recognizing variable relationships. How does EDA best define this?</div>
+          <div class="answer-box"><strong>Answer:</strong> Reviewing key characteristics and uncovering patterns</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">13. Scatter plot with regression line to examine variable relationships between engine size and price. What does it indicate?</div>
+          <div class="answer-box"><strong>Answer:</strong> Positive linear relationship</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">14. Roma wants to understand data distribution and spot outliers for engine size. Which method?</div>
+          <div class="answer-box"><strong>Answer:</strong> Create a box plot of engine size values.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">15. Reviewing vehicle prices to study how drive system types relate to average price. Organize data into subgroups. Which Pandas method?</div>
+          <div class="answer-box"><strong>Answer:</strong> Group the data using category values</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">16. Build model for predicting used car prices using highway MPG. Which best describes relationship?</div>
+          <div class="answer-box"><strong>Answer:</strong> Features act as independent variables predicting output.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">17. Residuals show clear curve pattern. What can be inferred?</div>
+          <div class="answer-box"><strong>Answer:</strong> The model may be inaccurate in capturing the data structure.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">18. Polynomial regression shows very low error on training set, dropping performance significantly on test. Which best describes?</div>
+          <div class="answer-box"><strong>Answer:</strong> The model is too flexible and overfits the noise rather than the function.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">19. Sofia uses ridge regression, increasing alpha results in smoother curve and poor accuracy on both train and test. What does large alpha indicate?</div>
+          <div class="answer-box"><strong>Answer:</strong> The model is underfitted.</div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">20. Primary purpose of GridSearchCV for evaluating model performance across various values?</div>
+          <div class="answer-box"><strong>Answer:</strong> To help select appropriate hyperparameter values.</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>Data Analysis with Python Complete Study & Exam System &copy; 2026. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function copyProjectAnswer() {
+      const textToCopy = document.getElementById("projectAnswerContent").innerText;
+      const btn = document.getElementById("copyProjectAnsBtn");
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        btn.classList.add("copied");
+        btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+        setTimeout(() => {
+          btn.classList.remove("copied");
+          btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy Submission Text`;
+        }, 2200);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+    }
+  </script>
+</body>
+</html>
