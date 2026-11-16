@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS | Professional Admin</title>
+    <style>
+        :root {
+            --primary: #6a5af9;
+            --bg: #f4f7fa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 0 0 30px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 25px;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2d3436;
+            font-size: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #636e72;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-add {
+            background: #00b894;
+            color: white;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+
+        /* QS Style */
+        .qs-item {
+            background: #f9f9fb;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #edf2f7;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .remove-qs {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: #ff7675;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* List Style */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .list-item:last-child {
+            border: 0;
+        }
+
+        .actions button {
+            margin-left: 5px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .edit-btn {
+            background: #fab1a0;
+            color: white;
+            border: none;
+        }
+
+        .del-btn {
+            background: #ff7675;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- START USEAS ADMIN UNIVERSAL NAVBAR -->
+    <div id="useas-universal-admin-bar"
+        style="all: initial; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <style>
+            #useas-universal-admin-bar {
+                display: block;
+                width: 100%;
+                background: #0f172a;
+                color: #f8fafc;
+                border-bottom: 2px solid #4f46e5;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                position: sticky;
+                top: 0;
+                left: 0;
+                z-index: 99999;
+                box-sizing: border-box;
+            }
+
+            #useas-universal-admin-bar * {
+                box-sizing: border-box;
+                font-family: inherit;
+            }
+
+            .uab-inner {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 10px 20px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .uab-left {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .uab-hub-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: #4f46e5;
+                color: #ffffff !important;
+                padding: 7px 14px;
+                border-radius: 8px;
+                text-decoration: none !important;
+                font-weight: 700;
+                font-size: 13px;
+                transition: background 0.2s;
+            }
+
+            .uab-hub-link:hover {
+                background: #4338ca;
+            }
+
+            .uab-title-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                padding: 5px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                color: #cbd5e1;
+                font-weight: 600;
+            }
+
+            .uab-right {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .uab-dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            .uab-dropbtn {
+                background: rgba(255, 255, 255, 0.1);
+                color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 7px 12px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .uab-dropbtn:hover {
+                background: rgba(255, 255, 255, 0.18);
+            }
+
+            .uab-dropdown-content {
+                display: none;
+                position: absolute;
+                right: 0;
+                top: calc(100% + 5px);
+                background: #1e293b;
+                min-width: 220px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 10px;
+                padding: 6px;
+                z-index: 100000;
+            }
+
+            .uab-dropdown:hover .uab-dropdown-content,
+            .uab-dropdown:focus-within .uab-dropdown-content {
+                display: block;
+            }
+
+            .uab-dropdown-content a {
+                color: #e2e8f0 !important;
+                padding: 8px 12px;
+                text-decoration: none !important;
+                display: block;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 500;
+                transition: all 0.15s;
+            }
+
+            .uab-dropdown-content a:hover {
+                background: #334155;
+                color: #ffffff !important;
+            }
+
+            .uab-dropdown-content a.uab-active-mod {
+                background: #4f46e5;
+                color: #ffffff !important;
+                font-weight: 700;
+            }
+
+            .uab-logout-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: #dc2626;
+                color: #ffffff !important;
+                padding: 7px 14px;
+                border-radius: 8px;
+                text-decoration: none !important;
+                font-weight: 700;
+                font-size: 13px;
+                transition: background 0.2s;
+            }
+
+            .uab-logout-btn:hover {
+                background: #b91c1c;
+            }
+        </style>
+        <div class="uab-inner">
+            <div class="uab-left">
+                <a href="index.html" class="uab-hub-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Admin Hub</span>
+                </a>
+                <span class="uab-title-badge">📢 Notifications Center</span>
+            </div>
+            <div class="uab-right">
+                <div class="uab-dropdown">
+                    <button type="button" class="uab-dropbtn">
+                        <span>Switch Module</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="uab-dropdown-content">
+                        <a href="index.html">🏠 Admin Dashboard Hub</a>
+                        <a href="feedbackadmin.html">💬 Feedback Approvals</a>
+                        <a href="letterhubadmin.html">✉️ Letter Vault</a>
+                        <a href="notificationsadmin.html" class="uab-active-mod">📢 Notifications Center</a>
+                        <a href="paperhubadmin.html">📄 Paper Hub</a>
+                        <a href="studyhubadmin.html">🎓 Study Hub Directory</a>
+                        <a href="ultraabhyaslabadmin.html">🧪 Ultra Abhyas Lab</a>
+                    </div>
+                </div>
+                <a href="/admin/logout" class="uab-logout-btn" title="Sign out of Admin Panel">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- END USEAS ADMIN UNIVERSAL NAVBAR -->
+
+    <div class="admin-container">
+        <div class="card">
+            <h2 id="form-title">Create Notification</h2>
+            <input type="hidden" id="edit-id">
+
+            <label>Notification Title</label>
+            <input type="text" id="title" placeholder="e.g. Daily Quiz #1">
+
+            <label>Content Type</label>
+            <select id="type" onchange="toggleType()">
+                <option value="text">Plain Text</option>
+                <option value="image">Image URL</option>
+                <option value="pdf">PDF Link</option>
+                <option value="qs">Multiple Q&A</option>
+            </select>
+
+            <div id="standard-input">
+                <label>Data (URL or Text)</label>
+                <textarea id="data" rows="3"></textarea>
+            </div>
+
+            <div id="qs-input" style="display:none;">
+                <label>Questions</label>
+                <div id="qs-list">
+                </div>
+                <button class="btn btn-add" onclick="addQsRow()">+ Add Question</button>
+            </div>
+
+            <button class="btn btn-primary" id="submit-btn" onclick="saveNotification()">Publish Notification</button>
+            <button class="btn" id="cancel-btn" style="display:none; width:100%; margin-top:5px;"
+                onclick="resetForm()">Cancel Edit</button>
+        </div>
+
+        <div class="card">
+            <h2>Published History</h2>
+            <div id="history-list">Loading...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAheWdYiiEBUHgbokK7kDPjMEEk7fngYQ",
+            authDomain: "abhyaslabkeys.firebaseapp.com",
+            databaseURL: "https://abhyaslabkeys-default-rtdb.firebaseio.com",
+            projectId: "abhyaslabkeys",
+            storageBucket: "abhyaslabkeys.firebasestorage.app",
+            messagingSenderId: "782150849318",
+            appId: "1:782150849318:web:5eaea4cec185abdbc567e7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'notifications');
+
+        let allData = {};
+
+        // UI Toggles
+        window.toggleType = () => {
+            const type = document.getElementById('type').value;
+            document.getElementById('standard-input').style.display = type === 'qs' ? 'none' : 'block';
+            document.getElementById('qs-input').style.display = type === 'qs' ? 'block' : 'none';
+            if (type === 'qs' && document.getElementById('qs-list').children.length === 0) addQsRow();
+        };
+
+        window.addQsRow = (q = '', a = '') => {
+            const div = document.createElement('div');
+            div.className = 'qs-item';
+            div.innerHTML = `
+            <span class="remove-qs" onclick="this.parentElement.remove()">✕</span>
+            <input type="text" placeholder="Question" class="q-val" value="${q}" style="margin-bottom:5px;">
+            <textarea placeholder="Answer" class="a-val" rows="2">${a}</textarea>
+        `;
+            document.getElementById('qs-list').appendChild(div);
+        };
+
+        // Save/Update
+        window.saveNotification = () => {
+            const id = document.getElementById('edit-id').value;
+            const type = document.getElementById('type').value;
+            const title = document.getElementById('title').value;
+            const date = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            let payload = { title, type, date };
+
+            if (type === 'qs') {
+                const qs = [];
+                document.querySelectorAll('.qs-item').forEach(item => {
+                    qs.push({ q: item.querySelector('.q-val').value, a: item.querySelector('.a-val').value });
+                });
+                payload.questions = qs;
+            } else {
+                payload.data = document.getElementById('data').value;
+            }
+
+            if (id) {
+                update(ref(db, `notifications/${id}`), payload).then(() => { alert("Updated!"); resetForm(); });
+            } else {
+                push(dbRef, payload).then(() => { alert("Published!"); resetForm(); });
+            }
+        };
+
+        // Load History
+        onValue(dbRef, (snap) => {
+            const list = document.getElementById('history-list');
+            allData = snap.val() || {};
+            list.innerHTML = "";
+            Object.entries(allData).reverse().forEach(([id, val]) => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                <div><strong>${val.title}</strong> <br><small>${val.type} | ${val.date}</small></div>
+                <div class="actions">
+                    <button class="edit-btn" onclick="editNode('${id}')">Edit</button>
+                    <button class="del-btn" onclick="deleteNode('${id}')">Delete</button>
+                </div>
+            `;
+                list.appendChild(div);
+            });
+        });
+
+        window.deleteNode = (id) => { if (confirm("Delete this?")) remove(ref(db, `notifications/${id}`)); };
+
+        window.editNode = (id) => {
+            const item = allData[id];
+            document.getElementById('edit-id').value = id;
+            document.getElementById('title').value = item.title;
+            document.getElementById('type').value = item.type;
+            toggleType();
+
+            if (item.type === 'qs') {
+                document.getElementById('qs-list').innerHTML = "";
+                if (item.questions && Array.isArray(item.questions)) {
+                    item.questions.forEach(obj => addQsRow(obj.q, obj.a));
+                } else {
+                    addQsRow(); // Default blank row if array doesn't exist
+                }
+            } else {
+                document.getElementById('data').value = item.data || "";
+            }
+
+            document.getElementById('form-title').innerText = "Edit Notification";
+            document.getElementById('submit-btn').innerText = "Update Now";
+            document.getElementById('cancel-btn').style.display = "block";
+            window.scrollTo(0, 0);
+        };
+
+        window.resetForm = () => {
+            document.getElementById('edit-id').value = "";
+            document.getElementById('title').value = "";
+            document.getElementById('data').value = "";
+            document.getElementById('qs-list').innerHTML = "";
+            document.getElementById('form-title').innerText = "Create Notification";
+            document.getElementById('submit-btn').innerText = "Publish Notification";
+            document.getElementById('cancel-btn').style.display = "none";
+            document.getElementById('type').value = "text";
+            toggleType();
+        };
+    </script>
+</body>
+
+</html>
