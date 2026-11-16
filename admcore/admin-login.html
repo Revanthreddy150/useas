@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS Control Panel | Secure Admin Login</title>
+    <script>
+        const SECURE_GATEWAY = "https://useas-admin-gatekeeper.revanthreddy5292m.workers.dev";
+        if (window.location.hostname !== new URL(SECURE_GATEWAY).hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.startsWith("admin.")) {
+            window.location.replace(SECURE_GATEWAY + (window.location.pathname.includes("/admcore") ? "/admcore/admin-login.html" : "/admin-login.html"));
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-glow: rgba(79, 70, 229, 0.25);
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient background glow */
+        .glow-orb {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0) 70%);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(79, 70, 229, 0.1);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .brand-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            box-shadow: 0 10px 25px var(--primary-glow);
+            margin-bottom: 16px;
+        }
+
+        .brand-header h1 {
+            font-size: 1.65rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .brand-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(79, 70, 229, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 10px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            color: #64748b;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .password-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 14px 48px 14px 44px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .password-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .password-input:focus+.toggle-pass,
+        .password-input:focus~.input-icon {
+            color: #a5b4fc;
+        }
+
+        .toggle-pass {
+            position: absolute;
+            right: 14px;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 1.05rem;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-pass:hover {
+            color: #e2e8f0;
+        }
+
+        .alert-box {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #6ee7b7;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fcd34d;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 15px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.6);
+            background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .btn-spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .card-footer {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-8px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(8px);
+            }
+        }
+
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glow-orb"></div>
+
+    <div class="login-card" id="loginCard">
+        <div class="brand-header">
+            <div class="brand-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h1>USEAS Admin Gateway</h1>
+            <p>Unified Management & Control Room</p>
+            <div class="security-badge">
+                <i class="fa-solid fa-lock"></i> Edge Gatekeeper Active
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert-box">
+            <i id="alertIcon" class="fa-solid fa-circle-exclamation"></i>
+            <span id="alertMsg"></span>
+        </div>
+
+        <form id="loginForm" method="POST" action="/api/login" autocomplete="off">
+            <input type="hidden" name="csrf_token" id="csrfToken" value="">
+
+            <div class="form-group">
+                <div class="form-label">
+                    <span>Admin Authorization Key</span>
+                    <span id="attemptBadge" style="font-size:0.75rem; color:#94a3b8;">Rate limit: 5 tries</span>
+                </div>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-key input-icon"></i>
+                    <input type="password" id="passwordInput" name="password" class="password-input"
+                        placeholder="Enter 1 of 3 authorized keys" required autofocus autocomplete="current-password">
+                    <button type="button" class="toggle-pass" id="togglePassBtn" title="Toggle visibility"
+                        aria-label="Toggle password visibility">
+                        <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="submit-btn">
+                <span class="btn-spinner" id="btnSpinner"></span>
+                <span id="btnText"><i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;"></i> Unlock
+                    Control Panel</span>
+            </button>
+        </form>
+
+        <div class="card-footer">
+            <div><span class="status-dot"></span> Edge Protected &bull; Server-Side Bcrypt Verified</div>
+            <div style="font-size: 0.72rem; color: #64748b;">Direct unauthorized file requests will be rejected</div>
+        </div>
+    </div>
+
+    <script>
+        // Password visibility toggle
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePassBtn = document.getElementById('togglePassBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const loginCard = document.getElementById('loginCard');
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const alertBox = document.getElementById('alertBox');
+        const alertMsg = document.getElementById('alertMsg');
+        const alertIcon = document.getElementById('alertIcon');
+        const attemptBadge = document.getElementById('attemptBadge');
+
+        togglePassBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleIcon.className = isPassword ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+        });
+
+        // Generate and store dynamic client CSRF nonce
+        const csrfNonce = Math.random().toString(36).substring(2) + Date.now().toString(36);
+        document.getElementById('csrfToken').value = csrfNonce;
+
+        function showAlert(message, type = 'danger', icon = 'fa-circle-exclamation') {
+            alertBox.className = `alert-box alert-${type}`;
+            alertIcon.className = `fa-solid ${icon}`;
+            alertMsg.textContent = message;
+            alertBox.style.display = 'flex';
+        }
+
+        function hideAlert() {
+            alertBox.style.display = 'none';
+        }
+
+        // Form Submission via Fetch with Edge Worker Handshake
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+
+            const password = passwordInput.value;
+            if (!password) {
+                showAlert('Please enter an admin password.');
+                return;
+            }
+
+            // UI Loading state
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline-block';
+
+            // Support both /admcore/ and root deployments
+            const isInAdmcore = window.location.pathname.includes('/admcore');
+            const apiEndpoint = isInAdmcore ? '/admcore/api/login' : '/api/login';
+            const defaultTarget = isInAdmcore ? 'index.html' : '/index.html';
+
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': csrfNonce
+                    },
+                    body: JSON.stringify({
+                        password: password,
+                        csrfToken: csrfNonce
+                    })
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (response.ok && data.success) {
+                    showAlert('Authentication successful. Loading hub...', 'success', 'fa-circle-check');
+                    setTimeout(() => {
+                        window.location.href = data.redirect || defaultTarget;
+                    }, 500);
+                } else if (response.status === 429) {
+                    showAlert(data.error || 'Too many failed attempts. Temporary lockout active.', 'warning', 'fa-triangle-exclamation');
+                    loginCard.classList.add('shake-animation');
+                    setTimeout(() => loginCard.classList.remove('shake-animation'), 400);
+                } else {
+                    const errorText = data.error || 'Incorrect admin password.';
+                    showAlert(errorText, 'danger', 'fa-circle-xmark');
+
+                    if (data.remainingAttempts !== undefined) {
+                        attemptBadge.textContent = `${data.remainingAttempts} attempts remaining`;
+                        attemptBadge.style.color = data.remainingAttempts <= 2 ? '#ef4444' : '#f59e0b';
+                    }
+
+                    loginCard.classList.add('shake-animation');
+                    setTimeout(() => loginCard.classList.remove('shake-animation'), 400);
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            } catch (err) {
+                // Network or direct fallback
+                showAlert('Gateway connection error. Re-trying authorization...', 'warning', 'fa-triangle-exclamation');
+                loginForm.submit(); // fallback to standard POST
+            } finally {
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | USEAS</title>
+    <script>
+        const SECURE_GATEWAY = "https://useas-admin-gatekeeper.revanthreddy5292m.workers.dev";
+        if (window.location.hostname !== new URL(SECURE_GATEWAY).hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.startsWith("admin.")) {
+            window.location.replace(SECURE_GATEWAY + (window.location.pathname.includes("/admcore") ? "/admcore/admin-login.html" : "/admin-login.html"));
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDt8SROwFORTZFqVe5xLc3nlDukbOAgdzs",
+            authDomain: "useasnotes.firebaseapp.com",
+            databaseURL: "https://useasnotes-default-rtdb.firebaseio.com",
+            projectId: "useasnotes",
+            storageBucket: "useasnotes.firebasestorage.app",
+            messagingSenderId: "1066601715098",
+            appId: "1:1066601715098:web:880548e333297079d09623",
+            measurementId: "G-48C783281Y"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Scope fix for HTML buttons
+        window.updateStatus = (id, status) => update(ref(db, `feedbacks/${id}`), { status });
+        window.deleteFeedback = (id) => {
+            if(confirm("Are you sure? This cannot be undone.")) remove(ref(db, `feedbacks/${id}`));
+        };
+
+        onValue(ref(db, 'feedbacks'), (snapshot) => {
+            const data = snapshot.val();
+            const pendingDiv = document.getElementById('pendingList');
+            const liveDiv = document.getElementById('liveList');
+            pendingDiv.innerHTML = ''; liveDiv.innerHTML = '';
+
+            for (let id in data) {
+                const item = data[id];
+                const html = `
+                    <div class="admin-card">
+                        <strong>${item.name}</strong> <span class="stars">${"★".repeat(item.rating)}</span>
+                        <p>${item.message}</p>
+                        <div class="btns">
+                            ${item.status === 'pending' ? 
+                                `<button class="btn-app" onclick="updateStatus('${id}', 'approved')">Approve</button>` : 
+                                `<button class="btn-hide" onclick="updateStatus('${id}', 'pending')">Hide</button>`}
+                            <button class="btn-del" onclick="deleteFeedback('${id}')">Delete</button>
+                        </div>
+                    </div>`;
+                
+                if (item.status === 'pending') pendingDiv.innerHTML += html;
+                else liveDiv.innerHTML += html;
+            }
+        });
+    </script>
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 0 0 30px 0; }
+        .page-content { padding: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; margin: auto; }
+        .col { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .admin-card { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .stars { color: #fbbf24; margin-left: 10px; }
+        .btns { margin-top: 10px; display: flex; gap: 10px; }
+        button { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-app { background: #22c55e; }
+        .btn-del { background: #ef4444; }
+        .btn-hide { background: #64748b; }
+        h2 { border-bottom: 2px solid #8b8df8; padding-bottom: 10px; color: #1e293b; }
+    </style>
+</head>
+<body>
+<!-- START USEAS ADMIN UNIVERSAL NAVBAR -->
+<div id="useas-universal-admin-bar" style="all: initial; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <style>
+        #useas-universal-admin-bar {
+            display: block;
+            width: 100%;
+            background: #0f172a;
+            color: #f8fafc;
+            border-bottom: 2px solid #4f46e5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 99999;
+            box-sizing: border-box;
+        }
+        #useas-universal-admin-bar * {
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .uab-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .uab-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .uab-hub-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #4f46e5;
+            color: #ffffff !important;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none !important;
+            font-weight: 700;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .uab-hub-link:hover {
+            background: #4338ca;
+        }
+        .uab-title-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+        .uab-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .uab-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .uab-dropbtn {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .uab-dropbtn:hover {
+            background: rgba(255,255,255,0.18);
+        }
+        .uab-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 5px);
+            background: #1e293b;
+            min-width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 6px;
+            z-index: 100000;
+        }
+        .uab-dropdown:hover .uab-dropdown-content,
+        .uab-dropdown:focus-within .uab-dropdown-content {
+            display: block;
+        }
+        .uab-dropdown-content a {
+            color: #e2e8f0 !important;
+            padding: 8px 12px;
+            text-decoration: none !important;
+            display: block;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .uab-dropdown-content a:hover {
+            background: #334155;
+            color: #ffffff !important;
+        }
+        .uab-dropdown-content a.uab-active-mod {
+            background: #4f46e5;
+            color: #ffffff !important;
+            font-weight: 700;
+        }
+        .uab-logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dc2626;
+            color: #ffffff !important;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none !important;
+            font-weight: 700;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .uab-logout-btn:hover {
+            background: #b91c1c;
+        }
+    </style>
+    <div class="uab-inner">
+        <div class="uab-left">
+            <a href="index.html" class="uab-hub-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Admin Hub</span>
+            </a>
+            <span class="uab-title-badge">💬 Feedback Approvals</span>
+        </div>
+        <div class="uab-right">
+            <div class="uab-dropdown">
+                <button type="button" class="uab-dropbtn">
+                    <span>Switch Module</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="uab-dropdown-content">
+                    <a href="index.html">🏠 Admin Dashboard Hub</a>
+                    <a href="feedbackadmin.html" class="uab-active-mod">💬 Feedback Approvals</a>
+                    <a href="letterhubadmin.html">✉️ Letter Vault</a>
+                    <a href="notificationsadmin.html">📢 Notifications Center</a>
+                    <a href="paperhubadmin.html">📄 Paper Hub</a>
+                    <a href="studyhubadmin.html">🎓 Study Hub Directory</a>
+                    <a href="ultraabhyaslabadmin.html">🧪 Ultra Abhyas Lab</a>
+                </div>
+            </div>
+            <a href="/admin/logout" class="uab-logout-btn" title="Sign out of Admin Panel">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- END USEAS ADMIN UNIVERSAL NAVBAR -->
+
+<div class="page-content">
+    <h1 style="text-align:center; color:#8b8df8;">Admin Control Center</h1>
+    <div class="grid">
+        <div class="col">
+            <h2>Pending Approvals</h2>
+            <div id="pendingList"></div>
+        </div>
+        <div class="col">
+            <h2>Live Feedbacks</h2>
+            <div id="liveList"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

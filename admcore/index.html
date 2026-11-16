@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USEAS Control Center | Unified Admin Hub</title>
+    <script>
+        // Enforce access strictly through the secure Cloudflare Worker Gatekeeper
+        const SECURE_GATEWAY = "https://useas-admin-gatekeeper.revanthreddy5292m.workers.dev";
+        if (window.location.hostname !== new URL(SECURE_GATEWAY).hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.startsWith("admin.")) {
+            window.location.replace(SECURE_GATEWAY + (window.location.pathname.includes("/admcore") ? "/admcore/admin-login.html" : "/admin-login.html"));
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-glow: rgba(79, 70, 229, 0.2);
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header Navbar */
+        .hub-navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--card-border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .brand-info h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+        }
+
+        .brand-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .session-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ecfdf5;
+            color: #065f46;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #a7f3d0;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 9px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 1px solid #fecaca;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #fca5a5;
+            color: #7f1d1d;
+            transform: translateY(-1px);
+        }
+
+        /* Hero Banner */
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+            flex: 1;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+            border-radius: 24px;
+            padding: 36px 40px;
+            color: white;
+            margin-bottom: 36px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px -5px rgba(49, 46, 129, 0.35);
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-desc {
+            font-size: 0.95rem;
+            color: #c7d2fe;
+            max-width: 650px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .hero-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .metric-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* Modules Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+        }
+
+        .section-tag {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 28px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient, linear-gradient(90deg, #4f46e5, #06b6d4));
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .module-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .module-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        .module-chip {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .module-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .module-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .module-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 18px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .module-link-text {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s;
+        }
+
+        .module-card:hover .module-link-text {
+            gap: 10px;
+        }
+
+        .module-db-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            background: #f8fafc;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Specific module theme accents */
+        .card-feedback { --accent-gradient: linear-gradient(90deg, #10b981, #059669); }
+        .card-feedback .module-icon { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .card-feedback .module-chip { background: #ecfdf5; color: #047857; }
+
+        .card-letter { --accent-gradient: linear-gradient(90deg, #6366f1, #4f46e5); }
+        .card-letter .module-icon { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+        .card-letter .module-chip { background: #eef2ff; color: #4338ca; }
+
+        .card-notifications { --accent-gradient: linear-gradient(90deg, #8b5cf6, #7c3aed); }
+        .card-notifications .module-icon { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .card-notifications .module-chip { background: #f5f3ff; color: #6d28d9; }
+
+        .card-paper { --accent-gradient: linear-gradient(90deg, #3b82f6, #2563eb); }
+        .card-paper .module-icon { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .card-paper .module-chip { background: #eff6ff; color: #1d4ed8; }
+
+        .card-study { --accent-gradient: linear-gradient(90deg, #0ea5e9, #0284c7); }
+        .card-study .module-icon { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+        .card-study .module-chip { background: #f0f9ff; color: #0369a1; }
+
+        .card-ultra { --accent-gradient: linear-gradient(90deg, #f59e0b, #d97706); }
+        .card-ultra .module-icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .card-ultra .module-chip { background: #fffbeb; color: #b45309; }
+
+        /* Footer */
+        .hub-footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--card-border);
+            background: #ffffff;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .hub-navbar { padding: 14px 20px; }
+            .hero-banner { padding: 24px; }
+            .hero-title { font-size: 1.5rem; }
+            .modules-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Navigation Header -->
+    <header class="hub-navbar">
+        <div class="brand-container">
+            <div class="brand-logo">
+                <i class="fa-solid fa-shapes"></i>
+            </div>
+            <div class="brand-info">
+                <h1>USEAS Admin Hub</h1>
+                <p>Unified Edge-Protected Control Room</p>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <div class="session-status">
+                <span class="pulse-dot"></span>
+                <span>Active Edge Session</span>
+            </div>
+            <a href="/admin/logout" class="logout-btn" title="Sign out of Admin Panel">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Hero Overview -->
+        <section class="hero-banner">
+            <h2 class="hero-title">Welcome to USEAS Command Center</h2>
+            <p class="hero-desc">
+                All 6 administrative interfaces are unified under this edge-verified hub. Each page is protected by Cloudflare Edge Gatekeeper with strict server-side bcrypt authorization.
+            </p>
+            <div class="hero-metrics">
+                <div class="metric-badge">
+                    <i class="fa-solid fa-shield-check"></i> Edge Gatekeeper: Verified
+                </div>
+                <div class="metric-badge">
+                    <i class="fa-solid fa-cubes"></i> 6 Integrated Modules
+                </div>
+                <div class="metric-badge">
+                    <i class="fa-solid fa-database"></i> Firebase Realtime DB Connected
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Modules Grid -->
+        <div class="section-header">
+            <h2>Administrative Modules</h2>
+            <span class="section-tag">Click any card to launch module</span>
+        </div>
+
+        <div class="modules-grid">
+
+            <!-- 1. Feedback Admin -->
+            <a href="feedbackadmin.html" class="module-card card-feedback">
+                <div>
+                    <div class="module-top">
+                        <div class="module-icon">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <span class="module-chip">Moderation</span>
+                    </div>
+                    <h3 class="module-title">Feedback Approvals</h3>
+                    <p class="module-desc">
+                        Review, approve, hide or delete user submitted ratings and feedback reviews before they go live on USEAS Notes.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <span class="module-link-text">Launch Approvals <i class="fa-solid fa-arrow-right"></i></span>
+                    <span class="module-db-badge">useasnotes</span>
+                </div>
+            </a>
+
+            <!-- 2. Letter Vault -->
+            <a href="letterhubadmin.html" class="module-card card-letter">
+                <div>
+                    <div class="module-top">
+                        <div class="module-icon">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                        </div>
+                        <span class="module-chip">Templates</span>
+                    </div>
+                    <h3 class="module-title">Letter Vault</h3>
+                    <p class="module-desc">
+                        Curate and publish official letter formats, leave applications, category templates, and dynamic document boilerplate.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <span class="module-link-text">Open Vault <i class="fa-solid fa-arrow-right"></i></span>
+                    <span class="module-db-badge">studyhub-33164</span>
+                </div>
+            </a>
+
+            <!-- 3. Notifications Admin -->
+            <a href="notificationsadmin.html" class="module-card card-notifications">
+                <div>
+                    <div class="module-top">
+                        <div class="module-icon">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </div>
+                        <span class="module-chip">Broadcast</span>
+                    </div>
+                    <h3 class="module-title">Notifications Center</h3>
+                    <p class="module-desc">
+                        Publish live announcements, notices, image broadcasts, downloadable PDF links, and interactive multi-question quizzes.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <span class="module-link-text">Manage Notices <i class="fa-solid fa-arrow-right"></i></span>
+                    <span class="module-db-badge">broadcast-db</span>
+                </div>
+            </a>
+
+            <!-- 4. Paper Hub Admin -->
+            <a href="paperhubadmin.html" class="module-card card-paper">
+                <div>
+                    <div class="module-top">
+                        <div class="module-icon">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <span class="module-chip">Examinations</span>
+                    </div>
+                    <h3 class="module-title">Paper Hub Manager</h3>
+                    <p class="module-desc">
+                        Manage past examination question papers, organize by branch, regulation, semester, and manage file links.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <span class="module-link-text">Manage Papers <i class="fa-solid fa-arrow-right"></i></span>
+                    <span class="module-db-badge">paper-repo</span>
+                </div>
+            </a>
+
+            <!-- 5. Study Hub Admin -->
+            <a href="studyhubadmin.html" class="module-card card-study">
+                <div>
+                    <div class="module-top">
+                        <div class="module-icon">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <span class="module-chip">Curriculum</span>
+                    </div>
+                    <h3 class="module-title">Study Hub Directory</h3>
+                    <p class="module-desc">
+                        Configure full academic hierarchy: courses, engineering branches, semester subjects, unit-wise notes, and video lectures.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <span class="module-link-text">Open Curriculum <i class="fa-solid fa-arrow-right"></i></span>
+                    <span class="module-db-badge">studyhub-main</span>
+                </div>
+            </a>
+
+            <!-- 6. Ultra Abhyas Lab Admin -->
+            <a href="ultraabhyaslabadmin.html" class="module-card card-ultra">
+                <div>
+                    <div class="module-top">
+                        <div class="module-icon">
+                            <i class="fa-solid fa-flask-vial"></i>
+                        </div>
+                        <span class="module-chip">Master Keys</span>
+                    </div>
+                    <h3 class="module-title">Ultra Abhyas Lab</h3>
+                    <p class="module-desc">
+                        Master administrative control room for Abhyas Lab security keys, online test access passcodes, and student privileges.
+                    </p>
+                </div>
+                <div class="module-footer">
+                    <span class="module-link-text">Control Room <i class="fa-solid fa-arrow-right"></i></span>
+                    <span class="module-db-badge">abhyaslabkeys</span>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <footer class="hub-footer">
+        <p>&copy; 2026 USEAS Control Panel &bull; Protected by Cloudflare Edge Gatekeeper with Server-Side Bcrypt</p>
+    </footer>
+
+</body>
+</html>
