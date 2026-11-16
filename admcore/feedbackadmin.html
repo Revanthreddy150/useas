@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard | USEAS</title>
+    <script>
+        const SECURE_GATEWAY = "https://useas-admin-gatekeeper.revanthreddy5292m.workers.dev";
+        if (window.location.hostname !== new URL(SECURE_GATEWAY).hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.startsWith("admin.")) {
+            window.location.replace(SECURE_GATEWAY + (window.location.pathname.includes("/admcore") ? "/admcore/admin-login.html" : "/admin-login.html"));
+        }
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <script type="module">

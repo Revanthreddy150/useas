@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MASTER ADMIN | Full Control Dashboard</title>
+    <script>
+        const SECURE_GATEWAY = "https://useas-admin-gatekeeper.revanthreddy5292m.workers.dev";
+        if (window.location.hostname !== new URL(SECURE_GATEWAY).hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.startsWith("admin.")) {
+            window.location.replace(SECURE_GATEWAY + (window.location.pathname.includes("/admcore") ? "/admcore/admin-login.html" : "/admin-login.html"));
+        }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";

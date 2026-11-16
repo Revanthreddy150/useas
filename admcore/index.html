@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USEAS Control Center | Unified Admin Hub</title>
+    <script>
+        // Enforce access strictly through the secure Cloudflare Worker Gatekeeper
+        const SECURE_GATEWAY = "https://useas-admin-gatekeeper.revanthreddy5292m.workers.dev";
+        if (window.location.hostname !== new URL(SECURE_GATEWAY).hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.startsWith("admin.")) {
+            window.location.replace(SECURE_GATEWAY + (window.location.pathname.includes("/admcore") ? "/admcore/admin-login.html" : "/admin-login.html"));
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">

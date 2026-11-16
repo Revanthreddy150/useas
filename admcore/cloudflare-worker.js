@@ -210,6 +210,17 @@ export default {
     const sessionToken = cookies[COOKIE_NAME];
     const isAuthenticated = await verifySignedSessionToken(sessionToken, secret);
 
+    // 0. AUTO-ROUTE ROOT WORKER URL TO /admcore/
+    if (pathname === '/' || pathname === '') {
+      return new Response('', {
+        status: 302,
+        headers: { 
+          'Location': isAuthenticated ? '/admcore/index.html' : '/admcore/admin-login.html',
+          'Cache-Control': 'no-store'
+        }
+      });
+    }
+
     // 1. LOGOUT ROUTE: /admcore/logout, /admcore/admin/logout, /admin/logout, or /logout
     if (
       pathname === '/admin/logout' || 
