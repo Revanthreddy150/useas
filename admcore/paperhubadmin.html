@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Hub - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --bg: #F8F9FB;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 0 0 30px 0;
+            color: #333;
+        }
+
+        .paperhub-content {
+            padding: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #admin-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .tags-wrapper {
+            margin: 10px 0 16px;
+        }
+
+        .tags-input-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .btn-add-tag {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .btn-add-tag:hover {
+            opacity: 0.9;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+            min-height: 32px;
+            padding: 8px;
+            background: #fbfbfb;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .tag-chip {
+            background: #EEF2FF;
+            color: #4F46E5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #C7D2FE;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .tag-remove:hover {
+            color: #b91c1c;
+        }
+
+        .no-tags {
+            font-size: 12px;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .admin-suggested-tag-chip {
+            background: #ffffff;
+            color: #4338ca;
+            border: 1px dashed #a5b4fc;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .admin-suggested-tag-chip:hover {
+            background: #eef2ff;
+            border-color: var(--primary);
+            border-style: solid;
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        #papers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .paper-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .card-preview {
+            height: 140px;
+            background: #eee;
+            overflow: hidden;
+        }
+
+        .card-preview img,
+        .card-preview iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .card-subject {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: auto;
+            padding-top: 8px;
+        }
+
+        .card-tag {
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .admin-btns {
+            display: flex;
+            padding: 10px;
+            gap: 5px;
+            background: #f9f9f9;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .btn {
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            flex: 1;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        #logout-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- START USEAS ADMIN UNIVERSAL NAVBAR -->
+<div id="useas-universal-admin-bar" style="all: initial; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <style>
+        #useas-universal-admin-bar {
+            display: block;
+            width: 100%;
+            background: #0f172a;
+            color: #f8fafc;
+            border-bottom: 2px solid #4f46e5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 99999;
+            box-sizing: border-box;
+        }
+        #useas-universal-admin-bar * {
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .uab-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .uab-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .uab-hub-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #4f46e5;
+            color: #ffffff !important;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none !important;
+            font-weight: 700;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .uab-hub-link:hover {
+            background: #4338ca;
+        }
+        .uab-title-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+        .uab-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .uab-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .uab-dropbtn {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .uab-dropbtn:hover {
+            background: rgba(255,255,255,0.18);
+        }
+        .uab-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 5px);
+            background: #1e293b;
+            min-width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 6px;
+            z-index: 100000;
+        }
+        .uab-dropdown:hover .uab-dropdown-content,
+        .uab-dropdown:focus-within .uab-dropdown-content {
+            display: block;
+        }
+        .uab-dropdown-content a {
+            color: #e2e8f0 !important;
+            padding: 8px 12px;
+            text-decoration: none !important;
+            display: block;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+        .uab-dropdown-content a:hover {
+            background: #334155;
+            color: #ffffff !important;
+        }
+        .uab-dropdown-content a.uab-active-mod {
+            background: #4f46e5;
+            color: #ffffff !important;
+            font-weight: 700;
+        }
+        .uab-logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dc2626;
+            color: #ffffff !important;
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none !important;
+            font-weight: 700;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .uab-logout-btn:hover {
+            background: #b91c1c;
+        }
+    </style>
+    <div class="uab-inner">
+        <div class="uab-left">
+            <a href="index.html" class="uab-hub-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Admin Hub</span>
+            </a>
+            <span class="uab-title-badge">📄 Paper Hub</span>
+        </div>
+        <div class="uab-right">
+            <div class="uab-dropdown">
+                <button type="button" class="uab-dropbtn">
+                    <span>Switch Module</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="uab-dropdown-content">
+                    <a href="index.html">🏠 Admin Dashboard Hub</a>
+                    <a href="feedbackadmin.html">💬 Feedback Approvals</a>
+                    <a href="letterhubadmin.html">✉️ Letter Vault</a>
+                    <a href="notificationsadmin.html">📢 Notifications Center</a>
+                    <a href="paperhubadmin.html" class="uab-active-mod">📄 Paper Hub</a>
+                    <a href="studyhubadmin.html">🎓 Study Hub Directory</a>
+                    <a href="ultraabhyaslabadmin.html">🧪 Ultra Abhyas Lab</a>
+                </div>
+            </div>
+            <a href="/admin/logout" class="uab-logout-btn" title="Sign out of Admin Panel">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- END USEAS ADMIN UNIVERSAL NAVBAR -->
+
+<div class="paperhub-content">
+    <div class="admin-header">
+        <h2 style="color:var(--primary)">🛡️ Paper Hub Control Center</h2>
+        <div style="display:flex; gap:10px;">
+            <a href="index.html" style="background:#4f46e5; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:13px; font-weight:bold;">Admin Hub</a>
+            <a href="/admin/logout" style="background:#ef4444; color:white; padding:8px 15px; border-radius:8px; text-decoration:none; font-size:13px; font-weight:bold;">Logout</a>
+        </div>
+    </div>
+
+    <div id="admin-panel">
+        <h3 style="margin-top:0;"><i class="fa-solid fa-file-pen"></i> Add / Edit Document</h3>
+        <input type="text" id="paper-title" class="admin-input"
+            placeholder="Document Title (e.g. sem - 3 computer organization)">
+        <input type="text" id="paper-subject" class="admin-input" placeholder="Subject / Topic (e.g. Computer Science)">
+        <input type="text" id="paper-link" class="admin-input" placeholder="PDF or Image Link">
+
+        <div class="tags-wrapper">
+            <label style="font-size: 13px; font-weight: bold; color: #374151; display: block;">
+                <i class="fa-solid fa-tags"></i> Paper Tags (Search Keywords & Typo Variations)
+            </label>
+            <div class="tags-input-group">
+                <input type="text" id="paper-tag-input" class="admin-input" style="margin: 0;"
+                    placeholder="Type tag & press Enter or comma (e.g. sem3, computer, organization)...">
+                <button type="button" id="add-tag-btn" class="btn-add-tag"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+            <div id="admin-tags-list" class="tags-list">
+                <span class="no-tags"><i class="fa-solid fa-info-circle"></i> No tags added yet. Type tags above and
+                    press Enter.</span>
+            </div>
+
+            <!-- Suggested Tags Section in admin.html -->
+            <div id="admin-suggested-tags-wrapper" style="display:none; margin-top:10px; background:linear-gradient(135deg, #f0fdf4 0%, #eef2ff 100%); border:1px solid #c7d2fe; border-radius:8px; padding:10px 12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:12px; font-weight:700; color:#3730a3;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6;"></i> Suggested Tags (click to add):</span>
+                    <button type="button" id="admin-add-all-suggestions-btn" style="background:linear-gradient(135deg, #8b5cf6 0%, #4f46e5 100%); color:white; border:none; padding:4px 12px; border-radius:12px; font-size:11px; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-bolt"></i> Add All</button>
+                </div>
+                <div id="admin-suggested-tags-list" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+            </div>
+
+            <small style="color: #6b7280; font-size: 11px; display: block; margin-top: 5px;">
+                💡 Press <strong>Enter</strong> or comma <strong>,</strong> to add tags. You can also paste multiple
+                tags (e.g. sem3, sem 3, computer organization).
+            </small>
+        </div>
+
+        <input type="hidden" id="edit-id">
+        <button id="save-btn"
+            style="background:var(--primary); color:white; border:none; padding:12px; border-radius:8px; width:100%; cursor:pointer; font-weight:bold; margin-top:10px; font-size:15px;">Save
+            to Cloud</button>
+        <button id="cancel-btn"
+            style="background:#e5e7eb; color:#374151; border:none; padding:10px; border-radius:8px; width:100%; cursor:pointer; font-weight:bold; margin-top:8px; display:none;">Cancel
+            Edit</button>
+    </div>
+
+    <!-- Search in Admin -->
+    <div style="max-width: 600px; margin: 0 auto 25px; position: relative;">
+        <input type="text" id="admin-search" class="admin-input"
+            placeholder="🔍 Search papers by title, subject, or tags (e.g. sem 3 or organization)..."
+            style="margin: 0; padding: 12px 18px; border-radius: 25px; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+    </div>
+
+    <div id="papers-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEMuw60DEiC1WDRdQ5vslBKS8LimB_Uj0",
+            authDomain: "studyhub-33164.firebaseapp.com",
+            projectId: "studyhub-33164",
+            storageBucket: "studyhub-33164.firebasestorage.app",
+            messagingSenderId: "918352715015",
+            appId: "1:918352715015:web:ab2ba28aa9456aba32b9a2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const papersCol = collection(db, "papers");
+
+        let loadedPapers = [];
+        let currentTags = [];
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        const ACADEMIC_TAG_DICTIONARY = [
+            { pattern: /computer[\s-_]*organi[sz]ation/i, tags: ['computer organization', 'co', 'compuet organization', 'organization', 'computer architecture', 'coa'] },
+            { pattern: /computer[\s-_]*architecture/i, tags: ['computer architecture', 'coa', 'co'] },
+            { pattern: /data[\s-_]*structure/i, tags: ['data structures', 'dsa', 'ds', 'algorithms'] },
+            { pattern: /algorithm/i, tags: ['algorithms', 'daa', 'dsa'] },
+            { pattern: /database|dbms/i, tags: ['dbms', 'database management', 'database', 'sql'] },
+            { pattern: /operating[\s-_]*system/i, tags: ['operating systems', 'os'] },
+            { pattern: /computer[\s-_]*network|networking/i, tags: ['computer networks', 'cn', 'networking'] },
+            { pattern: /calculus/i, tags: ['calculus', 'math', 'mathematics'] },
+            { pattern: /linear[\s-_]*algebra/i, tags: ['linear algebra', 'algebra', 'math'] },
+            { pattern: /discrete[\s-_]*math/i, tags: ['discrete mathematics', 'dm', 'discrete math'] },
+            { pattern: /physics/i, tags: ['physics', 'applied physics'] },
+            { pattern: /chemistry/i, tags: ['chemistry', 'applied chemistry'] },
+            { pattern: /python/i, tags: ['python', 'python programming'] },
+            { pattern: /java/i, tags: ['java', 'oops java', 'java programming'] },
+            { pattern: /artificial[\s-_]*intelligence|\bai\b/i, tags: ['artificial intelligence', 'ai'] },
+            { pattern: /machine[\s-_]*learning|\bml\b/i, tags: ['machine learning', 'ml'] },
+            { pattern: /software[\s-_]*engineering/i, tags: ['software engineering', 'se'] },
+            { pattern: /digital[\s-_]*logic/i, tags: ['digital logic design', 'dld'] },
+            { pattern: /telugu/i, tags: ['telugu', 'tel'] },
+            { pattern: /hindi/i, tags: ['hindi'] },
+            { pattern: /english/i, tags: ['english', 'communication skills'] },
+            { pattern: /mechanics/i, tags: ['mechanics', 'engineering mechanics'] }
+        ];
+
+        const SUGGEST_STOP_WORDS = new Set([
+            'and', 'the', 'for', 'with', 'from', 'exam', 'paper', 'papers', 
+            'test', 'question', 'questions', 'solutions', 'solution', 'solved', 
+            'notes', 'study', 'material', 'unit', 'chapter', 'part', 'set', 'sem', 'year'
+        ]);
+
+        function getOrdinalSuffix(n) {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        }
+
+        function generateSuggestedTags(title, subject = '', existingTags = []) {
+            if (!title || !title.trim()) return [];
+
+            const raw = title.toLowerCase().trim();
+            const suggestions = new Set();
+            let semNum = null;
+            let midNum = null;
+
+            // 1. Semester variations
+            const semMatch = raw.match(/(?:sem(?:ester)?|year)[\s-_]*([1-8])\b/i) || raw.match(/\b([1-8])(?:st|nd|rd|th)?[\s-_]*(?:sem(?:ester)?)\b/i);
+            if (semMatch) {
+                semNum = semMatch[1];
+                suggestions.add(`sem${semNum}`);
+                suggestions.add(`sem ${semNum}`);
+                suggestions.add(`sem - ${semNum}`);
+                suggestions.add(`semester ${semNum}`);
+                suggestions.add(`${getOrdinalSuffix(semNum)} sem`);
+            }
+
+            // 2. Midterm variations
+            const midMatch = raw.match(/mid(?:term)?[\s-_]*([1-3])\b/i) || raw.match(/\b([1-3])(?:st|nd|rd)?[\s-_]*mid(?:term)?\b/i);
+            if (midMatch) {
+                midNum = midMatch[1];
+                suggestions.add(`mid ${midNum}`);
+                suggestions.add(`mid${midNum}`);
+                suggestions.add(`mid-${midNum}`);
+                suggestions.add(`midterm ${midNum}`);
+            } else if (raw.includes('mid') || raw.includes('midterm')) {
+                suggestions.add('midterm');
+            }
+
+            // 3. Year
+            const yearMatch = raw.match(/\b(20[2-3][0-9])\b/);
+            if (yearMatch) {
+                suggestions.add(yearMatch[1]);
+                suggestions.add(`exam ${yearMatch[1]}`);
+            }
+
+            // 4. Academic Dictionary Rules
+            ACADEMIC_TAG_DICTIONARY.forEach(item => {
+                if (item.pattern.test(raw)) {
+                    item.tags.forEach(t => suggestions.add(t));
+                }
+            });
+
+            // 5. Subject field
+            if (subject && subject.trim()) {
+                const sLower = subject.toLowerCase().trim();
+                if (!SUGGEST_STOP_WORDS.has(sLower)) suggestions.add(sLower);
+            }
+
+            // 6. Meaningful word tokens from title
+            const cleanTokens = raw
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .split(/\s+/)
+                .filter(w => w.length >= 3 && !SUGGEST_STOP_WORDS.has(w) && !/^\d+$/.test(w));
+
+            cleanTokens.forEach(word => {
+                suggestions.add(word);
+            });
+
+            // 7. Contextual combinations with Subject & Mid/Sem
+            cleanTokens.forEach(word => {
+                if (midNum) {
+                    suggestions.add(`${word} mid`);
+                    suggestions.add(`${word}mid`);
+                    suggestions.add(`${word} mid ${midNum}`);
+                }
+                if (semNum) {
+                    suggestions.add(`sem${semNum} ${word}`);
+                }
+            });
+
+            // 8. Meaningful bigrams (2-word phrases)
+            for (let i = 0; i < cleanTokens.length - 1; i++) {
+                const pair = `${cleanTokens[i]} ${cleanTokens[i + 1]}`;
+                suggestions.add(pair);
+                suggestions.add(`${cleanTokens[i]}${cleanTokens[i + 1]}`);
+            }
+
+            // Common typo aliases
+            if (raw.includes('computer')) suggestions.add('compuet');
+            if (raw.includes('organization')) suggestions.add('orgainaztion');
+
+            const existingLower = new Set(existingTags.map(t => String(t).toLowerCase().trim()));
+            const finalSuggestions = Array.from(suggestions).filter(t => {
+                return t && t.length >= 2 && !existingLower.has(t.toLowerCase());
+            });
+
+            return finalSuggestions.slice(0, 14);
+        }
+
+        function updateAdminTagSuggestions() {
+            const wrapper = document.getElementById('admin-suggested-tags-wrapper');
+            const container = document.getElementById('admin-suggested-tags-list');
+            const titleInput = document.getElementById('paper-title');
+            const subjectInput = document.getElementById('paper-subject');
+            if (!wrapper || !container || !titleInput) return;
+
+            const title = titleInput.value.trim();
+            const subject = subjectInput ? subjectInput.value.trim() : '';
+
+            if (!title) {
+                wrapper.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            const suggestions = generateSuggestedTags(title, subject, currentTags);
+            if (suggestions.length === 0) {
+                wrapper.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = suggestions.map(tag => `
+                <button type="button" class="admin-suggested-tag-chip" onclick="addAdminSuggestedTag('${escapeHtml(tag)}')">
+                    <i class="fa-solid fa-plus" style="font-size:9px;"></i> ${escapeHtml(tag)}
+                </button>
+            `).join('');
+
+            wrapper.style.display = 'block';
+        }
+
+        window.addAdminSuggestedTag = (tag) => {
+            if (!tag) return;
+            const exists = currentTags.some(t => t.toLowerCase() === tag.toLowerCase());
+            if (!exists) {
+                currentTags.push(tag);
+                renderTags();
+            }
+        };
+
+        window.addAllAdminSuggestedTags = () => {
+            const titleInput = document.getElementById('paper-title');
+            const subjectInput = document.getElementById('paper-subject');
+            const title = titleInput ? titleInput.value.trim() : '';
+            const subject = subjectInput ? subjectInput.value.trim() : '';
+            const suggestions = generateSuggestedTags(title, subject, currentTags);
+            suggestions.forEach(tag => {
+                const exists = currentTags.some(t => t.toLowerCase() === tag.toLowerCase());
+                if (!exists) currentTags.push(tag);
+            });
+            renderTags();
+        };
+
+        function renderTags() {
+            const list = document.getElementById('admin-tags-list');
+            list.innerHTML = '';
+            if (currentTags.length === 0) {
+                list.innerHTML = '<span class="no-tags"><i class="fa-solid fa-info-circle"></i> No tags added yet. Type tags above and press Enter.</span>';
+                updateAdminTagSuggestions();
+                return;
+            }
+            currentTags.forEach((tag, idx) => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                chip.innerHTML = `${escapeHtml(tag)} <span class="tag-remove" onclick="removeTag(${idx})">&times;</span>`;
+                list.appendChild(chip);
+            });
+            updateAdminTagSuggestions();
+        }
+
+        function addTagFromInput() {
+            const input = document.getElementById('paper-tag-input');
+            const val = input.value;
+            if (!val || !val.trim()) return;
+            const parts = val.split(/[,\n\r;]+/).map(s => s.trim()).filter(Boolean);
+            parts.forEach(p => {
+                if (!currentTags.some(t => t.toLowerCase() === p.toLowerCase())) {
+                    currentTags.push(p);
+                }
+            });
+            input.value = '';
+            renderTags();
+        }
+
+        window.removeTag = (idx) => {
+            currentTags.splice(idx, 1);
+            renderTags();
+        };
+
+        document.getElementById('add-tag-btn').onclick = addTagFromInput;
+        document.getElementById('paper-tag-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addTagFromInput();
+            }
+        });
+        document.getElementById('paper-tag-input').addEventListener('paste', () => {
+            setTimeout(addTagFromInput, 50);
+        });
+
+        document.getElementById('paper-title').addEventListener('input', updateAdminTagSuggestions);
+        document.getElementById('paper-subject').addEventListener('input', updateAdminTagSuggestions);
+        const addAllBtn = document.getElementById('admin-add-all-suggestions-btn');
+        if (addAllBtn) addAllBtn.onclick = window.addAllAdminSuggestedTags;
+
+        function resetForm() {
+            document.getElementById('paper-title').value = "";
+            document.getElementById('paper-subject').value = "";
+            document.getElementById('paper-link').value = "";
+            document.getElementById('edit-id').value = "";
+            const tagInput = document.getElementById('paper-tag-input');
+            if (tagInput) tagInput.value = "";
+            currentTags = [];
+            renderTags();
+            const wrapper = document.getElementById('admin-suggested-tags-wrapper');
+            if (wrapper) wrapper.style.display = 'none';
+            document.getElementById('save-btn').innerText = "Save to Cloud";
+            document.getElementById('cancel-btn').style.display = "none";
+        }
+
+        document.getElementById('cancel-btn').onclick = resetForm;
+
+        // Save / Update logic
+        document.getElementById('save-btn').onclick = async () => {
+            addTagFromInput(); // automatically capture any pending tag typed in the input
+            const title = document.getElementById('paper-title').value.trim();
+            const subject = document.getElementById('paper-subject').value.trim();
+            const link = document.getElementById('paper-link').value.trim();
+            const editId = document.getElementById('edit-id').value;
+            const tags = [...currentTags];
+
+            if (!title || !link) return alert("Please enter Document Title and Link.");
+
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, "papers", editId), { title, subject, link, tags });
+                } else {
+                    await addDoc(papersCol, { title, subject, link, tags, createdAt: new Date() });
+                }
+                resetForm();
+                alert("Success! Paper saved.");
+            } catch (e) {
+                console.error(e);
+                alert("Error saving paper to database.");
+            }
+        };
+
+        // Global functions for buttons
+        window.editMe = (id) => {
+            const item = loadedPapers.find(p => p.id === id);
+            if (!item) return;
+            document.getElementById('paper-title').value = item.title || "";
+            document.getElementById('paper-subject').value = item.subject || "";
+            document.getElementById('paper-link').value = item.link || "";
+            document.getElementById('edit-id').value = item.id;
+
+            if (Array.isArray(item.tags)) {
+                currentTags = [...item.tags];
+            } else if (typeof item.tags === 'string' && item.tags.trim()) {
+                currentTags = item.tags.split(',').map(s => s.trim()).filter(Boolean);
+            } else {
+                currentTags = [];
+            }
+            renderTags();
+
+            document.getElementById('save-btn').innerText = "Update Paper";
+            document.getElementById('cancel-btn').style.display = "block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.deleteMe = async (id) => {
+            if (confirm("Permanently delete this item?")) {
+                try {
+                    await deleteDoc(doc(db, "papers", id));
+                } catch (e) {
+                    alert("Error deleting document.");
+                }
+            }
+        };
+
+        // --- SMART SEARCH & FUZZY MATCHING IN ADMIN ---
+        function normalizeText(text) {
+            if (!text) return '';
+            return String(text).toLowerCase().replace(/[-_.,\/#!$%\^&\*;:{}=\`~()]/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        function compactText(text) {
+            if (!text) return '';
+            return String(text).toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
+        function damerauLevenshtein(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            const l1 = s1.length;
+            const l2 = s2.length;
+            if (l1 === 0) return l2;
+            if (l2 === 0) return l1;
+
+            const d = [];
+            for (let i = 0; i <= l1; i++) {
+                d[i] = [];
+                d[i][0] = i;
+            }
+            for (let j = 0; j <= l2; j++) {
+                d[0][j] = j;
+            }
+
+            for (let i = 1; i <= l1; i++) {
+                for (let j = 1; j <= l2; j++) {
+                    const cost = s1.charAt(i - 1) === s2.charAt(j - 1) ? 0 : 1;
+                    d[i][j] = Math.min(
+                        d[i - 1][j] + 1,      // deletion
+                        d[i][j - 1] + 1,      // insertion
+                        d[i - 1][j - 1] + cost // substitution
+                    );
+                    // Damerau adjacent transposition
+                    if (i > 1 && j > 1 && s1.charAt(i - 1) === s2.charAt(j - 2) && s1.charAt(i - 2) === s2.charAt(j - 1)) {
+                        d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+                    }
+                }
+            }
+            return d[l1][l2];
+        }
+
+        function isFuzzyWordMatch(qWord, tWord) {
+            if (!qWord || !tWord) return false;
+            if (qWord === tWord) return true;
+            if (tWord.includes(qWord) || qWord.includes(tWord)) return true;
+
+            const cQ = compactText(qWord);
+            const cT = compactText(tWord);
+            if (cQ && cT && (cQ === cT || cT.includes(cQ) || cQ.includes(cT))) return true;
+
+            const maxLen = Math.max(qWord.length, tWord.length);
+            if (maxLen < 4) return false;
+
+            const dist = damerauLevenshtein(qWord, tWord);
+            const allowed = maxLen >= 8 ? 2 : 1;
+            return dist <= allowed;
+        }
+
+        function matchesSingleTerm(item, term) {
+            const termClean = term.toLowerCase().trim();
+            if (!termClean) return true;
+
+            const termNorm = normalizeText(termClean);
+            const termCompact = compactText(termClean);
+
+            const title = (item.title || '').toLowerCase();
+            const titleNorm = normalizeText(title);
+            const titleCompact = compactText(title);
+
+            const subject = (item.subject || '').toLowerCase();
+            const subjectNorm = normalizeText(subject);
+
+            const link = (item.link || '').toLowerCase();
+
+            const tags = Array.isArray(item.tags) ? item.tags : [];
+            const tagsLower = tags.map(t => String(t).toLowerCase());
+            const tagsNorm = tags.map(t => normalizeText(t));
+            const tagsCompact = tags.map(t => compactText(t));
+
+            // 1. Substring match
+            if (title.includes(termClean) || subject.includes(termClean) || link.includes(termClean)) return true;
+            if (tagsLower.some(t => t.includes(termClean) || termClean.includes(t))) return true;
+
+            // 2. Compact / Punctuation-Ignored match (e.g. 'sem 3' matches 'sem-3' or 'sem3')
+            if (termCompact.length >= 2) {
+                if (titleCompact.includes(termCompact) || termCompact.includes(titleCompact)) return true;
+                if (tagsCompact.some(tc => tc && (tc.includes(termCompact) || termCompact.includes(tc)))) return true;
+            }
+
+            if (termNorm.length >= 2) {
+                if (titleNorm.includes(termNorm) || subjectNorm.includes(termNorm)) return true;
+                if (tagsNorm.some(tn => tn && (tn.includes(termNorm) || termNorm.includes(tn)))) return true;
+            }
+
+            // 3. Multi-word / Token-based and typo-tolerant matching
+            const queryWords = termNorm.split(/\s+/).filter(Boolean);
+            if (queryWords.length === 0) return false;
+
+            const allTargetWords = [];
+            titleNorm.split(/\s+/).forEach(w => w && allTargetWords.push(w));
+            subjectNorm.split(/\s+/).forEach(w => w && allTargetWords.push(w));
+            tagsNorm.forEach(tn => {
+                tn.split(/\s+/).forEach(w => w && allTargetWords.push(w));
+            });
+            tagsCompact.forEach(tc => tc && allTargetWords.push(tc));
+
+            const allWordsMatch = queryWords.every(qWord => {
+                return allTargetWords.some(tWord => isFuzzyWordMatch(qWord, tWord));
+            });
+
+            if (allWordsMatch) return true;
+
+            const tagFuzzyMatch = tagsLower.some(tag => {
+                const dist = damerauLevenshtein(termClean, tag);
+                const maxLen = Math.max(termClean.length, tag.length);
+                const allowed = maxLen >= 10 ? 3 : (maxLen >= 6 ? 2 : 1);
+                return dist <= allowed;
+            });
+
+            return tagFuzzyMatch;
+        }
+
+        function paperMatchesQuery(item, rawQuery) {
+            if (!rawQuery || !rawQuery.trim()) return true;
+            const query = rawQuery.trim();
+
+            if (/\s+or\s+/i.test(query)) {
+                const orClauses = query.split(/\s+or\s+/i).map(c => c.trim()).filter(Boolean);
+                return orClauses.some(clause => matchesSingleTerm(item, clause));
+            }
+
+            if (query.includes(',')) {
+                const commaClauses = query.split(',').map(c => c.trim()).filter(Boolean);
+                return commaClauses.some(clause => matchesSingleTerm(item, clause));
+            }
+
+            return matchesSingleTerm(item, query);
+        }
+
+        function renderCards(papersList) {
+            const container = document.getElementById('papers-container');
+            container.innerHTML = '';
+
+            if (papersList.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94a3b8; font-size: 14px;">
+                        <i class="fa-solid fa-folder-open" style="font-size: 32px; display: block; margin-bottom: 8px;"></i>
+                        No matching papers found.
+                    </div>
+                `;
+                return;
+            }
+
+            papersList.forEach(item => {
+                const isPdf = item.link.toLowerCase().includes('.pdf') || item.link.includes('drive.google.com');
+                const tags = Array.isArray(item.tags) ? item.tags : [];
+
+                const card = document.createElement('div');
+                card.className = 'paper-card';
+                card.innerHTML = `
+                    <div class="card-preview">
+                        ${isPdf ? `<i class="fas fa-file-pdf" style="font-size:40px; color:#e74c3c; margin:45px auto; display:block; text-align:center;"></i>` : `<img src="${item.link}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80';">`}
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">${escapeHtml(item.title)}</div>
+                        ${item.subject ? `<div class="card-subject"><i class="fa-solid fa-book-bookmark"></i> ${escapeHtml(item.subject)}</div>` : ''}
+                        ${tags.length ? `
+                            <div class="card-tags">
+                                ${tags.slice(0, 5).map(t => `<span class="card-tag" style="cursor:pointer;" onclick="filterAdminByTag('${escapeHtml(t)}')">#${escapeHtml(t)}</span>`).join('')}
+                                ${tags.length > 5 ? `<span class="card-tag" title="${tags.slice(5).map(escapeHtml).join(', ')}">+${tags.length - 5}</span>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="admin-btns">
+                        <button class="btn" style="background:#f39c12" onclick="editMe('${item.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+                        <button class="btn" style="background:#e74c3c" onclick="deleteMe('${item.id}')"><i class="fa-solid fa-trash"></i> Del</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.filterAdminByTag = (tag) => {
+            const searchInput = document.getElementById('admin-search');
+            if (searchInput) {
+                searchInput.value = tag;
+                searchInput.dispatchEvent(new Event('input'));
+            }
+        };
+
+        const adminSearchInput = document.getElementById('admin-search');
+        if (adminSearchInput) {
+            adminSearchInput.addEventListener('input', (e) => {
+                const q = e.target.value.trim();
+                const filtered = loadedPapers.filter(p => paperMatchesQuery(p, q));
+                renderCards(filtered);
+            });
+        }
+
+        // Real-time listener
+        onSnapshot(papersCol, (snapshot) => {
+            loadedPapers = [];
+            snapshot.docs.forEach(d => {
+                const data = d.data() || {};
+                let tags = [];
+                if (Array.isArray(data.tags)) {
+                    tags = data.tags;
+                } else if (typeof data.tags === 'string' && data.tags.trim()) {
+                    tags = data.tags.split(',').map(s => s.trim()).filter(Boolean);
+                }
+                const item = {
+                    id: d.id,
+                    title: data.title || data.name || 'Untitled Document',
+                    subject: data.subject || data.category || '',
+                    link: data.link || data.url || '',
+                    tags: tags
+                };
+                loadedPapers.push(item);
+            });
+
+            const currentSearch = adminSearchInput ? adminSearchInput.value.trim() : '';
+            if (currentSearch) {
+                renderCards(loadedPapers.filter(p => paperMatchesQuery(p, currentSearch)));
+            } else {
+                renderCards(loadedPapers);
+            }
+        });
+    </script>
+</div>
+</body>
+
+</html>
