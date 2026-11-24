@@ -81,6 +81,29 @@
                         <label for="paper-link"><i class="fa-solid fa-link"></i> PDF or Image Link</label>
                         <input type="text" id="paper-link" class="admin-input" placeholder="Direct link to PDF, Image, or Google Drive URL" required>
                     </div>
+                    <div class="form-field full-row">
+                        <label for="paper-tag-input"><i class="fa-solid fa-tags"></i> Paper Tags (Search Keywords & Common Variations)</label>
+                        <div class="tags-input-row">
+                            <input type="text" id="paper-tag-input" class="admin-input" placeholder="Type a tag & press Enter or comma (e.g. sem3, computer, organization)...">
+                            <button type="button" id="addTagBtn" class="btn-tag-add"><i class="fa-solid fa-plus"></i> Add Tag</button>
+                        </div>
+                        <div id="adminTagsContainer" class="tags-badge-container">
+                            <span class="no-tags-hint"><i class="fa-solid fa-circle-info"></i> No tags added yet. Type tags above and press Enter.</span>
+                        </div>
+                        
+                        <!-- Smart Suggested Tags Based on Paper Title -->
+                        <div id="suggestedTagsWrapper" class="suggested-tags-wrapper hidden">
+                            <div class="suggested-tags-header">
+                                <span class="suggested-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Suggested Tags (click to add):</span>
+                                <button type="button" id="addAllSuggestionsBtn" class="btn-add-all-suggestions" title="Add all suggested tags"><i class="fa-solid fa-bolt"></i> Add All</button>
+                            </div>
+                            <div id="suggestedTagsContainer" class="suggested-tags-list"></div>
+                        </div>
+
+                        <p class="form-field-hint">
+                            <i class="fa-solid fa-lightbulb"></i> Tip: Press <strong>Enter</strong> or comma <strong>,</strong> to add tags. You can also paste multiple tags (e.g. sem3, sem 3, computer organization).
+                        </p>
+                    </div>
                 </div>
 
                 <div class="form-buttons">
@@ -99,7 +122,7 @@
         <section class="controls-section">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="mSearch" placeholder="Search papers, exam notes, or document links..." autocomplete="off">
+                <input type="text" id="mSearch" placeholder="Search papers, subjects, or tags (e.g. sem 3 or computer organization)..." autocomplete="off">
                 <button id="clearSearchBtn" class="clear-btn hidden" title="Clear Search"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
@@ -131,6 +154,7 @@
                 <div class="reader-title-group">
                     <span id="readerSubjectBadge" class="reader-subject-tag"><i class="fa-solid fa-book-bookmark"></i> Subject</span>
                     <h2 id="readerTitle" class="reader-title">Document Title</h2>
+                    <div id="readerTagsContainer" class="reader-tags-list"></div>
                 </div>
             </div>
 
