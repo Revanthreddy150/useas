@@ -11,8 +11,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USEAS | Student Portal</title>
-    <link rel="dns-prefetch" href="https://www.useas.info">
-    <link rel="preconnect" href="https://www.useas.info" crossorigin>
+    <link rel="dns-prefetch" href="https://www.useas.online">
+    <link rel="preconnect" href="https://www.useas.online" crossorigin>
     <link rel="dns-prefetch" href="https://revanthreddy150.github.io">
     <link rel="preconnect" href="https://revanthreddy150.github.io" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1533,19 +1533,19 @@
 
         <div class="sidebar-menu-list">
             <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/studyhubv2/')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/studyhubv2/')"><i
                     class="fa-solid fa-book-open"></i> Notes</div>
             <div class="menu-link"
                 onclick="triggerDirectPortalView('https://revanthreddy150.github.io/anikingloginuseas/')"><i
                     class="fa-solid fa-circle-user"></i> My Profile</div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/pdftools')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/pdftools')"><i
                     class="fa-solid fa-file-pdf"></i> PDF Tools</div>
             <div class="menu-link" onclick="triggerDirectPortalView('https://revanthreddy150.github.io/useaschatbot/')">
                 <i class="fa-solid fa-robot"></i> AI Chatbot
             </div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/notifications')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/notifications')"><i
                     class="fa-solid fa-bell"></i> Notifications</div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/feedback')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/feedback')"><i
                     class="fa-solid fa-comment-dots"></i> Feedback</div>
             <div class="menu-link" onclick="triggerDirectPortalView('https://revanthreddy150.github.io/aboutus/')"><i
                     class="fa-solid fa-circle-info"></i> About Us</div>
@@ -1702,10 +1702,10 @@
                             solutions for your lab codes with one click.</p>
                         <div class="lab-btn-group">
                             <button class="lab-btn"
-                                onclick="triggerDirectPortalView('https://www.useas.info/abhyaslabkeys')">Launch Lab <i
+                                onclick="triggerDirectPortalView('https://www.useas.online/abhyaslabkeys')">Launch Lab <i
                                     class="fa-solid fa-arrow-right"></i></button>
                             <button class="lab-btn lab-btn-secondary"
-                                onclick="triggerDirectPortalView('https://www.useas.info/compiler')"><i
+                                onclick="triggerDirectPortalView('https://www.useas.online/compiler')"><i
                                     class="fa-solid fa-terminal"></i> Compiler <i
                                     class="fa-solid fa-arrow-right"></i></button>
                         </div>
@@ -1753,7 +1753,7 @@
                         const letterCard = document.createElement('div');
                         letterCard.className = 'feature-card';
                         letterCard.id = 'letter-templates-card';
-                        letterCard.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/letterhub')");
+                        letterCard.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/letterhub')");
                         letterCard.innerHTML = `
                             <div class="card-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
                             <h4>Letter Templates</h4>
@@ -1791,9 +1791,9 @@
                                 text.includes('paperhub') ||
                                 text === 'papers'
                             ) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/paperhub/')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/paperhub/')");
                             } else if (text.includes('notes') && !text.includes('short')) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/studyhubv2/')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/studyhubv2/')");
                             } else if (
                                 text.includes('alert') ||
                                 text.includes('notification') ||
@@ -1804,11 +1804,11 @@
                                 if (titleEl) {
                                     titleEl.textContent = 'Notifications';
                                 }
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/notifications')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/notifications')");
                             } else if (text.includes('pdf')) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/pdftools')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/pdftools')");
                             } else if (text.includes('feedback')) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/feedback')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/feedback')");
                             } else if (rawOnclick.includes('window.open(')) {
                                 const match = rawOnclick.match(/window\.open\(\s*['"]([^'"]+)['"]/i);
                                 if (match && match[1]) {
@@ -2077,8 +2077,8 @@
             try {
                 const parsed = new URL(url, window.location.href);
                 if (
-                    (window.location.hostname === 'useas.info' || window.location.hostname === 'www.useas.info') &&
-                    (parsed.hostname === 'useas.info' || parsed.hostname === 'www.useas.info')
+                    (window.location.hostname === 'useas.online' || window.location.hostname === 'www.useas.online') &&
+                    (parsed.hostname === 'useas.online' || parsed.hostname === 'www.useas.online')
                 ) {
                     return window.location.origin + parsed.pathname + parsed.search + parsed.hash;
                 }
