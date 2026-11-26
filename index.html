@@ -11,8 +11,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USEAS | Student Portal</title>
-    <link rel="dns-prefetch" href="https://www.useas.online">
-    <link rel="preconnect" href="https://www.useas.online" crossorigin>
+    <link rel="dns-prefetch" href="https://www.useas.info">
+    <link rel="preconnect" href="https://www.useas.info" crossorigin>
     <link rel="dns-prefetch" href="https://revanthreddy150.github.io">
     <link rel="preconnect" href="https://revanthreddy150.github.io" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,7 +52,6 @@
             position: relative;
         }
 
-        /* --- Ambient Canvas Glow Effects --- */
         .ambient-orb-1 {
             position: fixed;
             top: -140px;
@@ -93,7 +92,6 @@
             }
         }
 
-        /* --- Global Header --- */
         header {
             padding: 14px 5%;
             display: flex;
@@ -157,7 +155,6 @@
             transform: translateY(0) scale(0.95);
         }
 
-        /* Login Button Matching Left Menu Icon Theme */
         .student-login-btn {
             background: rgba(255, 255, 255, 0.9);
             color: var(--primary-dark);
@@ -221,7 +218,6 @@
             white-space: nowrap;
         }
 
-        /* --- Student Login & Profile Modal --- */
         .auth-modal-overlay {
             position: fixed;
             inset: 0;
@@ -401,7 +397,6 @@
             gap: 8px;
         }
 
-        /* --- Scanning Animation View --- */
         .scanner-container {
             display: none;
             flex-direction: column;
@@ -466,7 +461,6 @@
             font-weight: 600;
         }
 
-        /* --- Student Profile Card View --- */
         .profile-view-container {
             display: none;
             flex-direction: column;
@@ -611,7 +605,6 @@
             background: #fee2e2;
         }
 
-        /* --- Sidebar Drawer --- */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -753,7 +746,6 @@
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
-        /* --- Content Layout --- */
         .content-area {
             width: 100%;
             flex: 1;
@@ -875,7 +867,6 @@
             }
         }
 
-        /* --- Live Notification / App Promo Banner --- */
         .app-promo-banner {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 243, 255, 0.95) 100%);
             backdrop-filter: blur(20px);
@@ -994,7 +985,6 @@
             transform: translateY(-2px) scale(1.02);
         }
 
-        /* --- Dynamic Auto Image Slider Container --- */
         .slider-wrapper {
             width: 100%;
             margin-bottom: 30px;
@@ -1059,7 +1049,6 @@
             box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
         }
 
-        /* --- Section Headers --- */
         .section-header {
             margin: 32px 0 16px;
             display: flex;
@@ -1086,7 +1075,6 @@
             border-radius: 4px;
         }
 
-        /* --- Lab Banner --- */
         .lab-scroll {
             padding: 5px 0 25px;
         }
@@ -1208,7 +1196,6 @@
             box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
         }
 
-        /* --- Grid Responsiveness & Feature Cards --- */
         .main-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -1336,7 +1323,6 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
         }
 
-        /* --- Footer --- */
         footer {
             text-align: center;
             padding: 35px 20px 25px;
@@ -1372,7 +1358,6 @@
             }
         }
 
-        /* Abhyas logo badge inside Lab Zone card (visible only after login, no background box) */
         .lab-abhyas-badge {
             position: absolute;
             top: 22px;
@@ -1548,19 +1533,19 @@
 
         <div class="sidebar-menu-list">
             <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/studyhubv2/')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/studyhubv2/')"><i
                     class="fa-solid fa-book-open"></i> Notes</div>
             <div class="menu-link"
                 onclick="triggerDirectPortalView('https://revanthreddy150.github.io/anikingloginuseas/')"><i
                     class="fa-solid fa-circle-user"></i> My Profile</div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/pdftools')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/pdftools')"><i
                     class="fa-solid fa-file-pdf"></i> PDF Tools</div>
             <div class="menu-link" onclick="triggerDirectPortalView('https://revanthreddy150.github.io/useaschatbot/')">
                 <i class="fa-solid fa-robot"></i> AI Chatbot
             </div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/notifications')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/notifications')"><i
                     class="fa-solid fa-bell"></i> Notifications</div>
-            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/feedback')"><i
+            <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.info/feedback')"><i
                     class="fa-solid fa-comment-dots"></i> Feedback</div>
             <div class="menu-link" onclick="triggerDirectPortalView('https://revanthreddy150.github.io/aboutus/')"><i
                     class="fa-solid fa-circle-info"></i> About Us</div>
@@ -1570,14 +1555,12 @@
         </div>
     </div>
 
-    <!-- Login & Profile Modal -->
     <div class="auth-modal-overlay" id="student-auth-modal" onclick="handleModalBackdropClick(event)">
         <div class="auth-modal-card">
             <button class="modal-close-btn" onclick="closeStudentModal()" aria-label="Close modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <!-- Step 1: Login Form -->
             <div id="auth-form-view">
                 <div class="modal-header-logo">
                     <img src="https://abhyas.ai/beta/assets/img/logo.png" alt="Abhyas Logo">
@@ -1601,7 +1584,6 @@
                 </div>
             </div>
 
-            <!-- Step 2: Scanning Animation -->
             <div class="scanner-container" id="auth-scanning-view">
                 <div class="scanner-box">
                     <div class="scanner-laser"></div>
@@ -1611,7 +1593,6 @@
                 <div class="scanner-subtext" id="scanning-suc-label">Verifying SUC Code</div>
             </div>
 
-            <!-- Step 3: Student Profile View -->
             <div class="profile-view-container" id="auth-profile-view">
                 <div class="profile-abhyas-logo">
                     <img src="https://abhyas.ai/beta/assets/img/logo.png" alt="Abhyas Logo">
@@ -1721,10 +1702,10 @@
                             solutions for your lab codes with one click.</p>
                         <div class="lab-btn-group">
                             <button class="lab-btn"
-                                onclick="triggerDirectPortalView('https://www.useas.online/abhyaslabkeys')">Launch Lab <i
+                                onclick="triggerDirectPortalView('https://www.useas.info/abhyaslabkeys')">Launch Lab <i
                                     class="fa-solid fa-arrow-right"></i></button>
                             <button class="lab-btn lab-btn-secondary"
-                                onclick="triggerDirectPortalView('https://www.useas.online/compiler')"><i
+                                onclick="triggerDirectPortalView('https://www.useas.info/compiler')"><i
                                     class="fa-solid fa-terminal"></i> Compiler <i
                                     class="fa-solid fa-arrow-right"></i></button>
                         </div>
@@ -1772,7 +1753,7 @@
                         const letterCard = document.createElement('div');
                         letterCard.className = 'feature-card';
                         letterCard.id = 'letter-templates-card';
-                        letterCard.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/letterhub')");
+                        letterCard.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/letterhub')");
                         letterCard.innerHTML = `
                             <div class="card-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
                             <h4>Letter Templates</h4>
@@ -1810,9 +1791,9 @@
                                 text.includes('paperhub') ||
                                 text === 'papers'
                             ) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/paperhub/')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/paperhub/')");
                             } else if (text.includes('notes') && !text.includes('short')) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/studyhubv2/')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/studyhubv2/')");
                             } else if (
                                 text.includes('alert') ||
                                 text.includes('notification') ||
@@ -1823,11 +1804,11 @@
                                 if (titleEl) {
                                     titleEl.textContent = 'Notifications';
                                 }
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/notifications')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/notifications')");
                             } else if (text.includes('pdf')) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/pdftools')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/pdftools')");
                             } else if (text.includes('feedback')) {
-                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.online/feedback')");
+                                card.setAttribute('onclick', "triggerDirectPortalView('https://www.useas.info/feedback')");
                             } else if (rawOnclick.includes('window.open(')) {
                                 const match = rawOnclick.match(/window\.open\(\s*['"]([^'"]+)['"]/i);
                                 if (match && match[1]) {
@@ -1878,9 +1859,7 @@
         </div>
     </div>
 
-    <!-- Navigation, Sidebar & Student Login Script -->
     <script>
-        /* --- Left Sidebar & Navigation Controls --- */
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
@@ -2098,8 +2077,8 @@
             try {
                 const parsed = new URL(url, window.location.href);
                 if (
-                    (window.location.hostname === 'useas.online' || window.location.hostname === 'www.useas.online') &&
-                    (parsed.hostname === 'useas.online' || parsed.hostname === 'www.useas.online')
+                    (window.location.hostname === 'useas.info' || window.location.hostname === 'www.useas.info') &&
+                    (parsed.hostname === 'useas.info' || parsed.hostname === 'www.useas.info')
                 ) {
                     return window.location.origin + parsed.pathname + parsed.search + parsed.hash;
                 }
@@ -2144,7 +2123,6 @@
             }
         }
 
-        // Prefetch target sub-pages as soon as user hovers or touches a card/button
         ['pointerenter', 'touchstart'].forEach(evtName => {
             document.addEventListener(evtName, (e) => {
                 const target = e.target && e.target.closest ? e.target.closest('.feature-card, .menu-link, .lab-btn, .download-mini-btn') : null;
@@ -2157,7 +2135,6 @@
             }, { capture: true, passive: true });
         });
 
-        // Route any dynamic window.open(...) web links (e.g. Firebase-loaded cards or banners) inside the home portal
         window.open = function (url, target, features) {
             if (typeof url === 'string' && /^(https?:|\/)/i.test(url.trim())) {
                 triggerDirectPortalView(url.trim());
@@ -2182,8 +2159,8 @@
         window.goBackPortalStep = goBackPortalStep;
         window.triggerDirectPortalView = triggerDirectPortalView;
 
-        /* --- Student SUC Login & Profile --- */
         const STUDENT_STORAGE_KEY = 'useas_logged_student_v1';
+        const LOGIN_ATTEMPT_KEY = 'useas_login_attempts_v1';
         let badgeAnimTimer = null;
         let pendingHomeBadgeAnimation = false;
 
@@ -2295,6 +2272,33 @@
             }
         }
 
+        function checkLoginCooldown() {
+            try {
+                const raw = localStorage.getItem(LOGIN_ATTEMPT_KEY);
+                if (!raw) return 0;
+                const data = JSON.parse(raw);
+                if (data.count >= 5 && Date.now() < data.lockUntil) {
+                    return Math.ceil((data.lockUntil - Date.now()) / 1000);
+                }
+                if (Date.now() >= data.lockUntil) {
+                    localStorage.removeItem(LOGIN_ATTEMPT_KEY);
+                }
+            } catch (e) { }
+            return 0;
+        }
+
+        function recordFailedLogin() {
+            try {
+                const raw = localStorage.getItem(LOGIN_ATTEMPT_KEY);
+                const data = raw ? JSON.parse(raw) : { count: 0, lockUntil: 0 };
+                data.count += 1;
+                if (data.count >= 5) {
+                    data.lockUntil = Date.now() + 60 * 1000;
+                }
+                localStorage.setItem(LOGIN_ATTEMPT_KEY, JSON.stringify(data));
+            } catch (e) { }
+        }
+
         async function submitSucLogin() {
             const inputEl = document.getElementById('suc-code-input');
             const errorBox = document.getElementById('suc-error-msg');
@@ -2302,6 +2306,13 @@
             const suc = inputEl.value.trim();
 
             errorBox.style.display = 'none';
+
+            const waitSec = checkLoginCooldown();
+            if (waitSec > 0) {
+                errorText.textContent = `Too many attempts. Try again in ${waitSec}s.`;
+                errorBox.style.display = 'flex';
+                return;
+            }
 
             if (!/^\d{10}$/.test(suc)) {
                 errorText.textContent = 'The entered SUC code is wrong or invalid.';
@@ -2314,12 +2325,21 @@
 
             try {
                 const minScanDelay = new Promise(resolve => setTimeout(resolve, 1400));
-                const apiRequest = fetch(`https://student-api.mentalprasad2001.workers.dev/?id=${encodeURIComponent(suc)}`)
-                    .then(res => res.json());
+                const apiRequest = fetch('https://student-api.mentalprasad2001.workers.dev/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ suc: suc })
+                }).then(res => res.json());
 
                 const [result] = await Promise.all([apiRequest, minScanDelay]);
 
                 if (result && result.status === 'success' && result.data && result.data.name) {
+                    try {
+                        localStorage.removeItem(LOGIN_ATTEMPT_KEY);
+                    } catch (e) { }
+
                     const studentRecord = {
                         suc: suc,
                         name: result.data.name,
@@ -2336,11 +2356,13 @@
                     populateProfileView(studentRecord);
                     switchModalView('profile');
                 } else {
+                    recordFailedLogin();
                     switchModalView('form');
-                    errorText.textContent = 'The entered SUC code is wrong or invalid.';
+                    errorText.textContent = (result && result.message) ? result.message : 'The entered SUC code is wrong or invalid.';
                     errorBox.style.display = 'flex';
                 }
             } catch (err) {
+                recordFailedLogin();
                 switchModalView('form');
                 errorText.textContent = 'The entered SUC code is wrong or invalid.';
                 errorBox.style.display = 'flex';
@@ -2363,8 +2385,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
-
-        // Paste your existing obfuscated Firebase & portal initialization script here
     </script>
 </body>
 
