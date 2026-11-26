@@ -127,24 +127,6 @@
             animation: unitSlideIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) both;
         }
         .workspace-layout.with-tree #treeSidebar { display: block; }
-        .tree-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 12px;
-            margin-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-        .tree-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
         .tree-root, .tree-children { list-style: none; margin: 0; padding: 0; }
         .tree-children {
             margin-left: 13px;
@@ -344,10 +326,7 @@
     <div class="bc-box" id="bc">Home</div>
     
     <div class="workspace-layout" id="workspaceLayout">
-        <aside id="treeSidebar" aria-label="Location Tree">
-            <div class="tree-header">
-                <div class="tree-title"><i class="fa-solid fa-sitemap"></i> LOCATION TREE</div>
-            </div>
+        <aside id="treeSidebar" aria-label="Navigation Tree">
             <div id="treeContent"></div>
         </aside>
 
