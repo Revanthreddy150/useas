@@ -1396,9 +1396,7 @@
             max-width: 135px;
             object-fit: contain;
             display: block;
-            filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65))
-                    drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65))
-                    drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+            filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
         }
 
         @media (min-width: 768px) {
@@ -1454,37 +1452,31 @@
         }
 
         @keyframes abhyasLiveFloat {
+
             0%,
             100% {
                 transform: perspective(500px) translateY(0) scale(1) rotateY(0deg) rotateZ(0deg);
-                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(0 2px 4px rgba(0, 0, 0, 0.24));
+                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.24));
             }
 
             25% {
                 transform: perspective(500px) translateY(-4px) scale(1.03) rotateY(6deg) rotateZ(1deg);
-                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(0 5px 8px rgba(0, 0, 0, 0.28));
+                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.28));
             }
 
             50% {
                 transform: perspective(500px) translateY(-6px) scale(1.05) rotateY(0deg) rotateZ(0deg);
-                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(0 7px 10px rgba(0, 0, 0, 0.3));
+                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(0 7px 10px rgba(0, 0, 0, 0.3));
             }
 
             75% {
                 transform: perspective(500px) translateY(-3px) scale(1.03) rotateY(-6deg) rotateZ(-1deg);
-                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65))
-                        drop-shadow(0 4px 7px rgba(0, 0, 0, 0.26));
+                filter: drop-shadow(0.45px 0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(-0.45px -0.45px 0 rgba(0, 0, 0, 0.65)) drop-shadow(0 4px 7px rgba(0, 0, 0, 0.26));
             }
         }
 
         @keyframes poweredByLivePulse {
+
             0%,
             100% {
                 opacity: 0.84;
@@ -1498,6 +1490,7 @@
         }
 
         @keyframes abhyasModalFloat {
+
             0%,
             100% {
                 transform: perspective(500px) translateY(0) scale(1) rotateY(0deg);
@@ -1535,9 +1528,6 @@
             <div class="menu-link" onclick="showPage('home')"><i class="fa-solid fa-house"></i> Home</div>
             <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/studyhubv2/')"><i
                     class="fa-solid fa-book-open"></i> Notes</div>
-            <div class="menu-link"
-                onclick="triggerDirectPortalView('https://revanthreddy150.github.io/anikingloginuseas/')"><i
-                    class="fa-solid fa-circle-user"></i> My Profile</div>
             <div class="menu-link" onclick="triggerDirectPortalView('https://www.useas.online/pdftools')"><i
                     class="fa-solid fa-file-pdf"></i> PDF Tools</div>
             <div class="menu-link" onclick="triggerDirectPortalView('https://revanthreddy150.github.io/useaschatbot/')">
@@ -1702,8 +1692,8 @@
                             solutions for your lab codes with one click.</p>
                         <div class="lab-btn-group">
                             <button class="lab-btn"
-                                onclick="triggerDirectPortalView('https://www.useas.online/abhyaslabkeys')">Launch Lab <i
-                                    class="fa-solid fa-arrow-right"></i></button>
+                                onclick="triggerDirectPortalView('https://www.useas.online/abhyaslabkeys')">Launch Lab
+                                <i class="fa-solid fa-arrow-right"></i></button>
                             <button class="lab-btn lab-btn-secondary"
                                 onclick="triggerDirectPortalView('https://www.useas.online/compiler')"><i
                                     class="fa-solid fa-terminal"></i> Compiler <i
@@ -1736,12 +1726,16 @@
                         const cards = document.querySelectorAll('.feature-card, .menu-link');
                         cards.forEach(card => {
                             const text = (card.textContent || '').trim().toLowerCase();
+                            const onclick = (card.getAttribute('onclick') || '').toLowerCase();
                             if (
                                 text === 'short notes' ||
                                 text.includes('short notes') ||
                                 text === 'crt exams' ||
                                 text.includes('crt exams') ||
-                                text.includes('crtexams')
+                                text.includes('crtexams') ||
+                                text.includes('my profile') ||
+                                text.includes('student info') ||
+                                onclick.includes('anikingloginuseas')
                             ) {
                                 card.remove();
                             }
@@ -1759,17 +1753,7 @@
                             <h4>Letter Templates</h4>
                             <p>Access & generate</p>
                         `;
-                        const cards = Array.from(grid.querySelectorAll('.feature-card'));
-                        const profileCard = cards.find(card => {
-                            const text = (card.textContent || '').toLowerCase();
-                            const onclick = card.getAttribute('onclick') || '';
-                            return text.includes('profile') || onclick.includes('anikingloginuseas');
-                        });
-                        if (profileCard) {
-                            profileCard.after(letterCard);
-                        } else {
-                            grid.appendChild(letterCard);
-                        }
+                        grid.appendChild(letterCard);
                     }
 
                     function updateEssentialCardsLinks() {
