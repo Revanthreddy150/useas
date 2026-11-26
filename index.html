@@ -581,7 +581,7 @@
             background: linear-gradient(145deg, #f8fafc 0%, #eef2ff 100%);
             border: 1px solid rgba(99, 102, 241, 0.22);
             border-radius: 18px;
-            padding: 15px;
+            padding: 16px;
             margin-bottom: 16px;
         }
 
@@ -589,7 +589,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .lab-perf-title {
@@ -615,7 +615,7 @@
             width: 28px;
             height: 28px;
             border-radius: 8px;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             font-size: 0.78rem;
@@ -626,6 +626,48 @@
         .lab-perf-refresh:hover {
             background: #4f46e5;
             color: #ffffff;
+        }
+
+        .lab-check-prompt {
+            text-align: center;
+            padding: 6px 2px 2px;
+        }
+
+        .lab-check-prompt p {
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 11px;
+            line-height: 1.4;
+        }
+
+        .lab-check-btn {
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .lab-check-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 9px 20px rgba(79, 70, 229, 0.35);
+        }
+
+        .lab-check-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .lab-perf-grid {
@@ -723,6 +765,15 @@
             color: #64748b;
             text-align: center;
             padding: 8px 0;
+        }
+
+        .lab-perf-error {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #dc2626;
+            text-align: center;
+            padding: 8px 0 2px;
+            display: none;
         }
 
         .logout-btn {
@@ -1697,38 +1748,51 @@
                     </div>
                 </div>
 
-                <!-- Abhyas Lab Performance Section -->
+                <!-- Abhyas Lab Performance Section (On-Demand Check) -->
                 <div class="lab-perf-section" id="abhyas-lab-perf-section">
                     <div class="lab-perf-header">
                         <div class="lab-perf-title">
                             <i class="fa-solid fa-laptop-code"></i> Abhyas Lab Performance
                         </div>
-                        <button class="lab-perf-refresh" onclick="refreshAbhyasLabPerformance()" title="Refresh Lab Stats">
+                        <button class="lab-perf-refresh" id="lab-refresh-btn" onclick="checkAbhyasLabPerformance()" title="Refresh Lab Stats">
                             <i class="fa-solid fa-rotate-right" id="lab-refresh-icon"></i>
                         </button>
                     </div>
 
-                    <div id="lab-perf-loading" class="lab-perf-status" style="display: none;">
-                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading lab activity...
+                    <!-- Initial state before clicking Check -->
+                    <div class="lab-check-prompt" id="lab-check-prompt">
+                        <p>Click below to check your coding activity days, submitted programs, and live exams.</p>
+                        <button class="lab-check-btn" id="lab-check-btn" onclick="checkAbhyasLabPerformance()">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> Check
+                        </button>
                     </div>
 
-                    <div id="lab-perf-content">
+                    <!-- Loading indicator -->
+                    <div id="lab-perf-loading" class="lab-perf-status" style="display: none;">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Fetching Abhyas Lab performance...
+                    </div>
+
+                    <!-- Error message -->
+                    <div id="lab-perf-error" class="lab-perf-error"></div>
+
+                    <!-- Results area (shown only after Check succeeds) -->
+                    <div id="lab-perf-content" style="display: none;">
                         <div class="lab-perf-grid">
                             <div class="lab-perf-box">
                                 <div class="lab-perf-label">Coding Days</div>
-                                <div class="lab-perf-value" id="lab-coding-days">-</div>
+                                <div class="lab-perf-value" id="lab-coding-days">0</div>
                             </div>
                             <div class="lab-perf-box">
                                 <div class="lab-perf-label">Programs Submitted</div>
-                                <div class="lab-perf-value" id="lab-programs-submitted">-</div>
+                                <div class="lab-perf-value" id="lab-programs-submitted">0</div>
                             </div>
                             <div class="lab-perf-box">
                                 <div class="lab-perf-label">Programs Missed</div>
-                                <div class="lab-perf-value" id="lab-programs-missed">-</div>
+                                <div class="lab-perf-value" id="lab-programs-missed">0</div>
                             </div>
                             <div class="lab-perf-box muted-val">
                                 <div class="lab-perf-label">Days Active</div>
-                                <div class="lab-perf-value" id="lab-days-active">-</div>
+                                <div class="lab-perf-value" id="lab-days-active">0</div>
                             </div>
                         </div>
 
@@ -2344,14 +2408,22 @@
             document.getElementById('auth-profile-view').style.display = viewName === 'profile' ? 'flex' : 'none';
         }
 
+        function resetAbhyasLabSectionUI() {
+            document.getElementById('lab-check-prompt').style.display = 'block';
+            document.getElementById('lab-perf-loading').style.display = 'none';
+            document.getElementById('lab-perf-error').style.display = 'none';
+            document.getElementById('lab-perf-content').style.display = 'none';
+            document.getElementById('lab-refresh-btn').style.display = 'none';
+        }
+
         function renderAbhyasLabPerformance(labData) {
             const act = (labData && labData.activity_summary) || {};
             const tests = (labData && labData.live_tests) || [];
 
-            document.getElementById('lab-coding-days').textContent = act.coding_days ?? '-';
-            document.getElementById('lab-programs-submitted').textContent = act.programs_submitted ?? '-';
-            document.getElementById('lab-programs-missed').textContent = act.programs_missed ?? '-';
-            document.getElementById('lab-days-active').textContent = act.days_active ?? '-';
+            document.getElementById('lab-coding-days').textContent = act.coding_days ?? 0;
+            document.getElementById('lab-programs-submitted').textContent = act.programs_submitted ?? 0;
+            document.getElementById('lab-programs-missed').textContent = act.programs_missed ?? 0;
+            document.getElementById('lab-days-active').textContent = act.days_active ?? 0;
 
             const badge = document.getElementById('lab-test-badge');
             const listEl = document.getElementById('lab-live-tests-list');
@@ -2372,18 +2444,32 @@
                 badge.classList.add('none');
                 listEl.innerHTML = `<div class="lab-perf-status">No open tests available right now.</div>`;
             }
+
+            document.getElementById('lab-check-prompt').style.display = 'none';
+            document.getElementById('lab-perf-loading').style.display = 'none';
+            document.getElementById('lab-perf-error').style.display = 'none';
+            document.getElementById('lab-perf-content').style.display = 'block';
+            document.getElementById('lab-refresh-btn').style.display = 'flex';
         }
 
-        async function fetchAbhyasLabPerformance(suc, showLoader = false) {
-            if (!suc) return null;
+        async function checkAbhyasLabPerformance() {
+            const saved = getSavedStudent();
+            if (!saved || !saved.suc) return;
+
+            const promptEl = document.getElementById('lab-check-prompt');
             const loaderEl = document.getElementById('lab-perf-loading');
             const contentEl = document.getElementById('lab-perf-content');
+            const errorEl = document.getElementById('lab-perf-error');
+            const checkBtn = document.getElementById('lab-check-btn');
             const refreshIcon = document.getElementById('lab-refresh-icon');
 
-            if (showLoader && loaderEl && contentEl) {
-                loaderEl.style.display = 'block';
+            promptEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            loaderEl.style.display = 'block';
+            if (contentEl.style.display === 'block') {
                 contentEl.style.opacity = '0.45';
             }
+            if (checkBtn) checkBtn.disabled = true;
             if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
             try {
@@ -2392,36 +2478,33 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ suc: suc })
+                    body: JSON.stringify({ suc: saved.suc })
                 });
                 const data = await res.json();
 
                 if (res.ok && data && data.status === 'success') {
                     try {
-                        localStorage.setItem(LAB_PERF_STORAGE_KEY, JSON.stringify({ suc: suc, data: data }));
+                        localStorage.setItem(LAB_PERF_STORAGE_KEY, JSON.stringify({ suc: saved.suc, data: data }));
                     } catch (e) { }
                     renderAbhyasLabPerformance(data);
-                    return data;
+                } else {
+                    throw new Error((data && data.message) || 'Unable to fetch lab performance.');
                 }
-            } catch (e) {
+            } catch (err) {
+                loaderEl.style.display = 'none';
+                errorEl.textContent = err.message || 'Unable to fetch lab performance. Try again.';
+                errorEl.style.display = 'block';
+                if (contentEl.style.display !== 'block') {
+                    promptEl.style.display = 'block';
+                }
             } finally {
-                if (loaderEl && contentEl) {
-                    loaderEl.style.display = 'none';
-                    contentEl.style.opacity = '1';
-                }
+                contentEl.style.opacity = '1';
+                if (checkBtn) checkBtn.disabled = false;
                 if (refreshIcon) refreshIcon.classList.remove('fa-spin');
             }
-            return null;
         }
 
-        function refreshAbhyasLabPerformance() {
-            const saved = getSavedStudent();
-            if (saved && saved.suc) {
-                fetchAbhyasLabPerformance(saved.suc, true);
-            }
-        }
-
-        function populateProfileView(student, labData = null) {
+        function populateProfileView(student) {
             const name = student.name || 'Student';
             const parts = name.trim().split(/\s+/);
             const initials = parts.length > 1
@@ -2434,16 +2517,12 @@
             document.getElementById('prof-group').textContent = student.group || '-';
             document.getElementById('prof-email').textContent = student.email || '-';
 
-            if (labData) {
-                renderAbhyasLabPerformance(labData);
+            // Show cached result only if the user already clicked Check earlier; otherwise show Check button
+            const cachedPerf = getSavedLabPerf();
+            if (cachedPerf && cachedPerf.suc === student.suc && cachedPerf.data) {
+                renderAbhyasLabPerformance(cachedPerf.data);
             } else {
-                const cachedPerf = getSavedLabPerf();
-                if (cachedPerf && cachedPerf.suc === student.suc && cachedPerf.data) {
-                    renderAbhyasLabPerformance(cachedPerf.data);
-                } else {
-                    renderAbhyasLabPerformance(null);
-                    fetchAbhyasLabPerformance(student.suc, true);
-                }
+                resetAbhyasLabSectionUI();
             }
         }
 
@@ -2533,7 +2612,6 @@
 
             try {
                 const minScanDelay = new Promise(resolve => setTimeout(resolve, 1400));
-
                 const apiRequest = fetch('https://student-api.mentalprasad2001.workers.dev/', {
                     method: 'POST',
                     headers: {
@@ -2542,16 +2620,7 @@
                     body: JSON.stringify({ suc: suc })
                 }).then(res => res.json());
 
-                // Fetch Abhyas Lab Performance via protected POST request in parallel
-                const labPerfRequest = fetch(ABHYAS_LAB_WORKER_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ suc: suc })
-                }).then(res => res.json()).catch(() => null);
-
-                const [result, labResult] = await Promise.all([apiRequest, labPerfRequest, minScanDelay]);
+                const [result] = await Promise.all([apiRequest, minScanDelay]);
 
                 if (result && result.status === 'success' && result.data && result.data.name) {
                     try {
@@ -2567,14 +2636,11 @@
 
                     try {
                         localStorage.setItem(STUDENT_STORAGE_KEY, JSON.stringify(studentRecord));
-                        if (labResult && labResult.status === 'success') {
-                            localStorage.setItem(LAB_PERF_STORAGE_KEY, JSON.stringify({ suc: suc, data: labResult }));
-                        }
                     } catch (e) { }
 
                     pendingHomeBadgeAnimation = true;
                     updateHeaderLoginButton(true);
-                    populateProfileView(studentRecord, (labResult && labResult.status === 'success') ? labResult : null);
+                    populateProfileView(studentRecord);
                     switchModalView('profile');
                 } else {
                     recordFailedLogin();
@@ -2596,6 +2662,7 @@
                 localStorage.removeItem(LAB_PERF_STORAGE_KEY);
             } catch (e) { }
             updateHeaderLoginButton();
+            resetAbhyasLabSectionUI();
             document.getElementById('suc-code-input').value = '';
             document.getElementById('suc-error-msg').style.display = 'none';
             switchModalView('form');
