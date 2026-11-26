@@ -99,6 +99,126 @@
         .search-icon { position: absolute; left: 36px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        .container.has-tree { max-width: 1280px; }
+
+        /* Workspace Split Layout with Left Location Tree */
+        .workspace-layout { width: 100%; }
+        .workspace-layout.with-tree {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            padding-bottom: 40px;
+        }
+        .main-content-area { flex: 1; min-width: 0; }
+
+        #treeSidebar {
+            display: none;
+            width: 310px;
+            flex-shrink: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            animation: unitSlideIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+        }
+        .workspace-layout.with-tree #treeSidebar { display: block; }
+        .tree-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .tree-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tree-root, .tree-children { list-style: none; margin: 0; padding: 0; }
+        .tree-children {
+            margin-left: 13px;
+            padding-left: 14px;
+            border-left: 2px dashed rgba(108, 92, 231, 0.25);
+        }
+        .tree-node { position: relative; margin: 3px 0; }
+        .tree-children > .tree-node::before {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 17px;
+            width: 12px;
+            height: 2px;
+            background: rgba(108, 92, 231, 0.25);
+        }
+        .tree-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            color: var(--text-main);
+            user-select: none;
+        }
+        .tree-row:hover { background: #f5f3ff; color: var(--primary); }
+        .tree-row.in-path {
+            font-weight: 600;
+            color: var(--primary);
+            background: rgba(108, 92, 231, 0.07);
+        }
+        .tree-row.active {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.28);
+        }
+        .tree-row.active i { color: #ffffff !important; }
+        .tree-row.unit-leaf { font-size: 0.78rem; color: var(--text-muted); padding: 6px 10px; }
+        .tree-row.unit-leaf:hover { color: var(--primary); }
+        .tree-toggle {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            border-radius: 5px;
+            flex-shrink: 0;
+            opacity: 0.75;
+        }
+        .tree-toggle:hover { background: rgba(0, 0, 0, 0.08); opacity: 1; }
+        .tree-toggle-spacer { width: 18px; flex-shrink: 0; }
+        .tree-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+        .tree-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            flex-shrink: 0;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.25);
+        }
+
+        @media (max-width: 860px) {
+            .workspace-layout.with-tree { flex-direction: column; }
+            #treeSidebar { width: 100%; position: static; max-height: 280px; }
+        }
         
         /* Breadcrumb Bar */
         .bc-box { 
@@ -220,18 +340,29 @@
     <input type="text" id="searchInput" class="search-bar" placeholder="Search subjects or topics...">
 </div>
 
-<div class="container">
+<div class="container" id="mainContainer">
     <div class="bc-box" id="bc">Home</div>
     
-    <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 id="viewTitle" style="font-size: 1.1rem; color: var(--primary); font-family: 'Orbitron'; text-transform: uppercase;"></h2>
-        <button id="globalBackBtn" class="back-btn" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i> BACK</button>
-    </div>
+    <div class="workspace-layout" id="workspaceLayout">
+        <aside id="treeSidebar" aria-label="Location Tree">
+            <div class="tree-header">
+                <div class="tree-title"><i class="fa-solid fa-sitemap"></i> LOCATION TREE</div>
+            </div>
+            <div id="treeContent"></div>
+        </aside>
 
-    <div class="grid" id="mainGrid"></div>
+        <div class="main-content-area">
+            <div id="navHeader" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="viewTitle" style="font-size: 1.1rem; color: var(--primary); font-family: 'Orbitron'; text-transform: uppercase;"></h2>
+                <button id="globalBackBtn" class="back-btn" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i> BACK</button>
+            </div>
 
-    <div id="notesArea" style="display:none;">
-        <div id="unitList"></div>
+            <div class="grid" id="mainGrid"></div>
+
+            <div id="notesArea" style="display:none;">
+                <div id="unitList"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -290,6 +421,105 @@
     let loadError = null;
     let path = [];
     let searchTerm = "";
+    const expandedTreePaths = new Set([JSON.stringify([])]);
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function ensureActivePathExpanded() {
+      expandedTreePaths.add(JSON.stringify([]));
+      for (let i = 1; i <= path.length; i++) {
+        expandedTreePaths.add(JSON.stringify(path.slice(0, i)));
+      }
+    }
+
+    function isSameOrPrefixPath(nodePath) {
+      if (nodePath.length > path.length) return false;
+      return nodePath.every((seg, idx) => path[idx] === seg);
+    }
+
+    function renderTree() {
+      const container = document.getElementById('mainContainer');
+      const layout = document.getElementById('workspaceLayout');
+      const treeContent = document.getElementById('treeContent');
+      if (!container || !layout || !treeContent) return;
+
+      const showTree = !isLoading && !loadError && core && path.length > 0 && searchTerm.trim() === '';
+      container.classList.toggle('has-tree', showTree);
+      layout.classList.toggle('with-tree', showTree);
+
+      if (!showTree) {
+        treeContent.innerHTML = '';
+        return;
+      }
+
+      ensureActivePathExpanded();
+
+      const buildNodeHtml = (node, nodePath, label) => {
+        const pathKey = JSON.stringify(nodePath);
+        const encodedPath = encodeURIComponent(pathKey);
+        const isActive = nodePath.length === path.length && isSameOrPrefixPath(nodePath);
+        const inPath = !isActive && isSameOrPrefixPath(nodePath);
+        const isSubject = node && node._type === 'subject';
+        const childKeys = !isSubject && node
+          ? Object.keys(node).filter(k => !k.startsWith('_')).sort((a, b) => (node[a]?._rank || 99) - (node[b]?._rank || 99))
+          : [];
+        const unitItems = isSubject ? (node.units || []) : [];
+        const hasChildren = childKeys.length > 0 || unitItems.length > 0;
+        const isExpanded = expandedTreePaths.has(pathKey);
+
+        let iconClass = 'fa-folder';
+        if (nodePath.length === 0) iconClass = 'fa-house';
+        else if (nodePath.length === 1) iconClass = 'fa-graduation-cap';
+        else if (isSubject) iconClass = 'fa-book-open';
+        else if (isExpanded) iconClass = 'fa-folder-open';
+
+        let childrenHtml = '';
+        if (hasChildren && isExpanded) {
+          childrenHtml = '<ul class="tree-children">';
+          if (isSubject) {
+            const links = node.links || [];
+            unitItems.forEach((u, idx) => {
+              const link = links[idx] || '#';
+              childrenHtml += `
+                <li class="tree-node">
+                  <div class="tree-row unit-leaf" data-tree-pdf="${encodeURIComponent(link)}" title="${escapeHtml(u)}">
+                    <span class="tree-toggle-spacer"></span>
+                    <i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>
+                    <span class="tree-label">${escapeHtml(u)}</span>
+                  </div>
+                </li>`;
+            });
+          } else {
+            childKeys.forEach(k => {
+              childrenHtml += buildNodeHtml(node[k], [...nodePath, k], k);
+            });
+          }
+          childrenHtml += '</ul>';
+        }
+
+        return `
+          <li class="tree-node">
+            <div class="tree-row ${isActive ? 'active' : (inPath ? 'in-path' : '')}" data-tree-nav="${encodedPath}" title="${escapeHtml(label)}">
+              ${hasChildren
+                ? `<span class="tree-toggle" data-tree-toggle="${encodedPath}" title="${isExpanded ? 'Collapse' : 'Expand'}"><i class="fa-solid ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i></span>`
+                : `<span class="tree-toggle-spacer"></span>`}
+              <i class="fa-solid ${iconClass}" style="color:${isActive ? '#fff' : 'var(--primary)'};"></i>
+              <span class="tree-label">${escapeHtml(label)}</span>
+              ${isActive ? '<span class="tree-dot" title="Current location"></span>' : ''}
+            </div>
+            ${childrenHtml}
+          </li>`;
+      };
+
+      treeContent.innerHTML = `<ul class="tree-root">${buildNodeHtml(core, [], 'Home')}</ul>`;
+    }
 
     // Increment visitor count
     try {
@@ -392,6 +622,7 @@
 
         // Wait for live Firebase data instead of flashing stale local data
         if (isLoading) {
+          renderTree();
           if (notesArea) notesArea.style.display = 'none';
           if (navHeader) navHeader.style.display = 'none';
           grid.style.display = 'grid';
@@ -404,6 +635,7 @@
         }
 
         if (loadError || !core || typeof core !== 'object' || Object.keys(core).filter(k => !k.startsWith('_')).length === 0) {
+          renderTree();
           if (notesArea) notesArea.style.display = 'none';
           if (navHeader) navHeader.style.display = 'none';
           grid.style.display = 'grid';
@@ -414,6 +646,8 @@
             </div>`;
           return;
         }
+
+        renderTree();
 
         grid.innerHTML = '';
         unitList.innerHTML = '';
@@ -533,10 +767,51 @@
     };
 
     // Navigation & Actions
-    window.moveIn = (key) => { path.push(key); render(); };
-    window.goBack = () => { path.pop(); render(); };
-    window.jumpTo = (idx) => { path = path.slice(0, idx + 1); render(); };
-    window.jumpToPath = (pathStr) => { path = pathStr.split('/'); render(); };
+    window.moveIn = (key) => { path.push(key); ensureActivePathExpanded(); render(); };
+    window.goBack = () => { path.pop(); ensureActivePathExpanded(); render(); };
+    window.jumpTo = (idx) => { path = path.slice(0, idx + 1); ensureActivePathExpanded(); render(); };
+    window.jumpToPath = (pathStr) => {
+      path = pathStr ? pathStr.split('/') : [];
+      searchTerm = '';
+      const sEl = document.getElementById('searchInput');
+      if (sEl) sEl.value = '';
+      ensureActivePathExpanded();
+      render();
+    };
+
+    // Left Tree Event Delegation
+    const treeContentEl = document.getElementById('treeContent');
+    if (treeContentEl) {
+      treeContentEl.addEventListener('click', (e) => {
+        const toggleEl = e.target.closest('[data-tree-toggle]');
+        if (toggleEl) {
+          e.stopPropagation();
+          const key = decodeURIComponent(toggleEl.getAttribute('data-tree-toggle'));
+          if (expandedTreePaths.has(key)) expandedTreePaths.delete(key);
+          else expandedTreePaths.add(key);
+          renderTree();
+          return;
+        }
+
+        const pdfEl = e.target.closest('[data-tree-pdf]');
+        if (pdfEl) {
+          const url = decodeURIComponent(pdfEl.getAttribute('data-tree-pdf'));
+          window.openPdf(url);
+          return;
+        }
+
+        const navEl = e.target.closest('[data-tree-nav]');
+        if (navEl) {
+          const nextPath = JSON.parse(decodeURIComponent(navEl.getAttribute('data-tree-nav')));
+          path = Array.isArray(nextPath) ? nextPath : [];
+          searchTerm = '';
+          const sEl = document.getElementById('searchInput');
+          if (sEl) sEl.value = '';
+          ensureActivePathExpanded();
+          render();
+        }
+      });
+    }
 
     window.openPdf = (url) => {
       if (url && url !== '#') {
