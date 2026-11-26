@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "repositories": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "questions": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
+}

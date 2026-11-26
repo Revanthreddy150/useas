@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal — Abhyas Lab Keys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue-950: #0a1f4d;
+      --blue-900: #1e3a8a;
+      --blue-800: #1e40af;
+      --blue-700: #1d4ed8;
+      --blue-600: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-400: #60a5fa;
+      --blue-300: #93c5fd;
+      --blue-200: #bfdbfe;
+      --blue-100: #dbeafe;
+      --blue-50: #eff6ff;
+      --blue-25: #f7faff;
+      --white: #ffffff;
+      --text-primary: #0f295c;
+      --text-secondary: #3b5998;
+      --text-muted: #5b7bb5;
+      --shadow-sm: 0 2px 8px rgba(29, 78, 216, 0.06);
+      --shadow-lg: 0 18px 42px rgba(15, 41, 92, 0.18);
+      --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: linear-gradient(180deg, var(--blue-25) 0%, var(--white) 240px, var(--blue-25) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font-family: inherit; }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--blue-100);
+    }
+
+    .navbar-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      color: var(--blue-800);
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      color: var(--white);
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 15px;
+      border-radius: 999px;
+      border: 1px solid var(--blue-200);
+      background: var(--white);
+      color: var(--blue-700);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .nav-pill:hover {
+      background: var(--blue-50);
+      border-color: var(--blue-500);
+    }
+
+    .nav-pill.primary {
+      background: var(--blue-600);
+      border-color: var(--blue-600);
+      color: var(--white);
+    }
+
+    .nav-pill.primary:hover {
+      background: var(--blue-700);
+    }
+
+    .stats-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-100);
+      color: var(--blue-700);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 28px 20px 64px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--blue-900);
+    }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 3.5px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--blue-600);
+    }
+
+    .admin-auth-wrap {
+      max-width: 460px;
+      margin: 44px auto;
+    }
+
+    .panel {
+      background: var(--white);
+      border: 1.5px solid var(--blue-100);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .repo-count-badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--blue-100);
+      color: var(--blue-700);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.16s ease;
+    }
+
+    .btn-primary {
+      background: var(--blue-600);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+    }
+
+    .btn-primary:hover { background: var(--blue-700); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-primary.copied { background: var(--blue-900); }
+
+    .btn-outline {
+      background: var(--white);
+      color: var(--blue-700);
+      border-color: var(--blue-300);
+    }
+
+    .btn-outline:hover {
+      background: var(--blue-50);
+      border-color: var(--blue-600);
+    }
+
+    .btn-sm {
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      border-radius: 9px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--blue-100);
+      padding-bottom: 10px;
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--blue-600);
+      color: var(--white);
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--blue-900);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 13px;
+      border-radius: 10px;
+      border: 1.5px solid var(--blue-200);
+      background: var(--white);
+      color: var(--text-primary);
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 88px;
+    }
+
+    textarea.code-editor {
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      line-height: 1.6;
+      min-height: 210px;
+      tab-size: 4;
+    }
+
+    .notice-banner {
+      padding: 12px 15px;
+      border-radius: 11px;
+      background: var(--blue-50);
+      border: 1.5px solid var(--blue-300);
+      color: var(--blue-900);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--blue-500);
+      pointer-events: none;
+      display: flex;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border-radius: 10px;
+      border: 1.5px solid var(--blue-200);
+      background: var(--white);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .repo-sidebar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .repo-sidebar-item {
+      border: 1.5px solid var(--blue-100);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: var(--white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 0.15s ease;
+    }
+
+    .repo-sidebar-item:hover {
+      border-color: var(--blue-400);
+      background: var(--blue-25);
+    }
+
+    .repo-sidebar-item.active {
+      border-color: var(--blue-600);
+      background: var(--blue-50);
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.1);
+    }
+
+    .admin-question-card {
+      border: 1.5px solid var(--blue-100);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .admin-question-card:hover {
+      border-color: var(--blue-300);
+    }
+
+    .admin-question-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .admin-question-title {
+      font-weight: 700;
+      color: var(--blue-900);
+      font-size: 0.96rem;
+    }
+
+    .admin-question-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .code-preview-mini {
+      background: var(--blue-25);
+      border: 1px solid var(--blue-100);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--blue-950);
+      max-height: 110px;
+      overflow: hidden;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .state-card {
+      background: var(--white);
+      border: 1.5px dashed var(--blue-300);
+      border-radius: 14px;
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .state-card h3 { color: var(--blue-900); margin-bottom: 6px; }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--blue-100);
+      border-top-color: var(--blue-600);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(10, 31, 77, 0.55);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 720px;
+      max-height: 88vh;
+      background: var(--white);
+      border: 4px solid var(--blue-600);
+      border-radius: 18px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid var(--blue-100);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.28rem;
+      font-weight: 800;
+      color: var(--blue-600);
+    }
+
+    .modal-subtitle {
+      margin-top: 3px;
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+    }
+
+    .modal-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--blue-100);
+      background: var(--blue-25);
+      color: var(--blue-700);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .modal-close:hover {
+      background: var(--blue-600);
+      color: var(--white);
+    }
+
+    .modal-body {
+      padding: 16px 24px 22px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .answer-question-box {
+      background: var(--blue-50);
+      border: 1px solid var(--blue-200);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      color: var(--blue-900);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .code-surface {
+      background: var(--white);
+      border: 1.5px solid var(--blue-200);
+      border-radius: 12px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      max-height: 46vh;
+      overflow-y: auto;
+    }
+
+    .code-surface pre {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.87rem;
+      line-height: 1.65;
+      color: var(--blue-950);
+      white-space: pre;
+      tab-size: 4;
+    }
+
+    .modal-footer {
+      padding: 14px 24px 18px;
+      border-top: 1px solid var(--blue-100);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .modal-footer .btn { flex: 1 1 160px; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      background: var(--blue-900);
+      color: var(--white);
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 860px) {
+      .admin-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="brand">
+        <span class="brand-icon">&lt;/&gt;</span>
+        <span>Abhyas Lab Keys <span style="font-weight: 600; color: var(--blue-500);">Admin</span></span>
+      </div>
+      <div class="nav-actions">
+        <span id="admin-user-pill" class="stats-chip" style="display: none;"></span>
+        <a href="./index.html" class="nav-pill">View User Web &rarr;</a>
+        <button type="button" id="sign-out-btn" class="nav-pill primary" style="display: none;">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Auth Loading -->
+    <section id="auth-loading" class="admin-auth-wrap">
+      <div class="panel" style="text-align: center; padding: 40px 24px;">
+        <div class="spinner"></div>
+        <h3 style="color: var(--blue-900);">Checking Admin Session</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 6px;">Connecting to Firebase Authentication...</p>
+      </div>
+    </section>
+
+    <!-- Sign In / Sign Up -->
+    <section id="auth-section" class="admin-auth-wrap" style="display: none;">
+      <div class="panel">
+        <div style="margin-bottom: 18px;">
+          <span class="repo-count-badge" style="display: inline-block; margin-bottom: 10px;">ADMIN ACCESS</span>
+          <h1 style="font-size: 1.45rem; font-weight: 800; color: var(--blue-950);">Abhyas Lab Keys Admin</h1>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 4px;">
+            Sign in to create repositories and manage questions &amp; answers.
+          </p>
+        </div>
+
+        <div class="tabs">
+          <button type="button" class="tab-btn active" id="tab-signin">Sign In</button>
+          <button type="button" class="tab-btn" id="tab-signup">Create Admin Account</button>
+        </div>
+
+        <div id="auth-notice" class="notice-banner" style="display: none;"></div>
+
+        <form id="auth-form">
+          <div class="form-group">
+            <label class="form-label" for="auth-email">Admin Email</label>
+            <input type="email" id="auth-email" class="form-control" placeholder="admin@example.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="auth-password">Password</label>
+            <input type="password" id="auth-password" class="form-control" placeholder="Minimum 6 characters" minlength="6" required />
+          </div>
+          <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 6px;">
+            Sign In to Dashboard
+          </button>
+        </form>
+
+        <div class="notice-banner" style="margin-top: 18px; margin-bottom: 0; font-size: 0.8rem;">
+          <strong>Firebase Setup:</strong> Enable <em>Email/Password</em> in Firebase Console &rarr; Authentication &rarr; Sign-in method, and allow read + authenticated write in Realtime Database Rules.
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Dashboard -->
+    <section id="dashboard-section" style="display: none;">
+      <div class="section-heading">
+        <h2 class="section-title">Admin Workspace</h2>
+        <div id="admin-stats" class="stats-chip">0 Repositories &bull; 0 Keys</div>
+      </div>
+
+      <div id="db-permission-banner" class="notice-banner" style="display: none;"></div>
+
+      <div class="admin-grid">
+        <aside class="panel">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--blue-900);">Repositories</h3>
+            <button type="button" id="new-repo-btn" class="btn btn-primary btn-sm">+ New Repo</button>
+          </div>
+
+          <div class="search-wrap" style="margin-bottom: 10px;">
+            <span class="search-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
+            <input type="search" id="admin-repo-search" class="search-input" placeholder="Filter repositories..." />
+          </div>
+
+          <div id="admin-repo-list" class="repo-sidebar-list">
+            <div style="text-align: center; padding: 24px 8px; color: var(--text-muted); font-size: 0.88rem;">
+              Loading repositories...
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--blue-100);">
+            <button type="button" id="export-json-btn" class="btn btn-outline btn-sm" style="flex: 1;">Export JSON</button>
+            <label for="import-json-input" class="btn btn-outline btn-sm" style="flex: 1; cursor: pointer; text-align: center;">
+              Import JSON
+              <input type="file" id="import-json-input" accept="application/json" style="display: none;" />
+            </label>
+          </div>
+        </aside>
+
+        <div class="panel">
+          <div id="no-repo-selected" style="text-align: center; padding: 54px 20px;">
+            <h3 style="color: var(--blue-900); font-size: 1.15rem; margin-bottom: 8px;">Select or Create a Repository</h3>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; max-width: 440px; margin: 0 auto 18px;">
+              Choose a repository on the left to add, edit, or delete questions and answers, or create a new repository.
+            </p>
+            <button type="button" id="empty-create-repo-btn" class="btn btn-primary btn-sm">+ Create First Repository</button>
+          </div>
+
+          <div id="repo-workspace" style="display: none;">
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--blue-100); margin-bottom: 18px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                  <h2 id="selected-repo-name" style="font-size: 1.3rem; font-weight: 800; color: var(--blue-950);"></h2>
+                  <span id="selected-repo-count" class="repo-count-badge">0 CODES</span>
+                </div>
+                <p id="selected-repo-desc" style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px;"></p>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <button type="button" id="edit-selected-repo-btn" class="btn btn-outline btn-sm">Edit Repo</button>
+                <button type="button" id="delete-selected-repo-btn" class="btn btn-outline btn-sm">Delete Repo</button>
+                <button type="button" id="open-add-question-btn" class="btn btn-primary btn-sm">+ Add Question</button>
+              </div>
+            </div>
+
+            <!-- Add / Edit Question Form -->
+            <form id="question-form" style="display: none; background: var(--blue-25); border: 1.5px solid var(--blue-200); border-radius: 14px; padding: 18px; margin-bottom: 20px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <h3 id="question-form-title" style="font-size: 1rem; font-weight: 800; color: var(--blue-900);">Add New Question</h3>
+                <button type="button" id="cancel-question-form-btn" class="btn btn-outline btn-sm">Cancel</button>
+              </div>
+
+              <input type="hidden" id="editing-question-id" />
+
+              <div style="display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px;">
+                <div class="form-group">
+                  <label class="form-label" for="q-number">Number</label>
+                  <input type="number" id="q-number" class="form-control" min="1" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="q-language">Language / Topic Tag</label>
+                  <input type="text" id="q-language" class="form-control" placeholder="e.g. Python, C, Java, SQL" value="Python" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="q-text">Question Statement</label>
+                <textarea id="q-text" class="form-control" placeholder="e.g. A program to check whether a character is a vowel or not..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="q-answer">Answer / Solution Code (Tab inserts spaces)</label>
+                <textarea id="q-answer" class="form-control code-editor" placeholder="Paste or type the full solution code or answer here..." required></textarea>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="submit" id="save-question-btn" class="btn btn-primary">Save Question &amp; Answer</button>
+              </div>
+            </form>
+
+            <div class="search-wrap" style="margin-bottom: 14px;">
+              <span class="search-icon" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </span>
+              <input type="search" id="admin-question-search" class="search-input" placeholder="Search questions in this repository..." />
+            </div>
+
+            <div id="admin-question-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Create / Edit Repository Modal -->
+  <div id="repo-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="repo-modal-title">
+    <div class="modal-dialog" style="max-width: 500px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="repo-modal-title" class="modal-title">New Repository</h2>
+          <p class="modal-subtitle">Create a named repository to organize lab questions and answers.</p>
+        </div>
+        <button type="button" class="modal-close" id="close-repo-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="repo-form">
+        <div class="modal-body">
+          <input type="hidden" id="editing-repo-id" />
+          <div class="form-group">
+            <label class="form-label" for="repo-name-input">Repository Name</label>
+            <input type="text" id="repo-name-input" class="form-control" placeholder="e.g. Python Lo List" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="repo-desc-input">Short Description (optional)</label>
+            <input type="text" id="repo-desc-input" class="form-control" placeholder="e.g. Lab programs on Python lists" />
+          </div>
+          <div class="form-group" style="margin-bottom: 4px;">
+            <label class="form-label" for="repo-order-input">Display Order</label>
+            <input type="number" id="repo-order-input" class="form-control" min="1" value="1" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="save-repo-btn" class="btn btn-primary">Save Repository</button>
+          <button type="button" id="cancel-repo-modal-btn" class="btn btn-outline">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div id="confirm-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="confirm-modal-title" class="modal-title">Confirm Action</h2>
+        </div>
+        <button type="button" class="modal-close" id="close-confirm-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-modal-message" style="color: var(--blue-900); font-size: 0.95rem; line-height: 1.55;"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="confirm-yes-btn" class="btn btn-primary">Confirm</button>
+        <button type="button" id="confirm-no-btn" class="btn btn-outline">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Answer Modal -->
+  <div id="preview-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 id="preview-modal-title" class="modal-title">Answer Preview</h2>
+          <p id="preview-modal-subtitle" class="modal-subtitle"></p>
+        </div>
+        <button type="button" class="modal-close" id="close-preview-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="preview-question-box" class="answer-question-box"></div>
+        <div class="code-surface">
+          <pre><code id="preview-code-content"></code></pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="preview-copy-btn" class="btn btn-primary">COPY</button>
+        <button type="button" id="preview-close-btn" class="btn btn-outline">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      onValue,
+      push,
+      set,
+      update,
+      remove
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFShk6wkLYNFcd7WYSidxIAqcL55te7z8",
+      authDomain: "exams-f7881.firebaseapp.com",
+      databaseURL: "https://exams-f7881-default-rtdb.firebaseio.com",
+      projectId: "exams-f7881",
+      storageBucket: "exams-f7881.firebasestorage.app",
+      messagingSenderId: "297962721940",
+      appId: "1:297962721940:web:a2d351b464ad337e2c9a81",
+      measurementId: "G-9WF1R5EHL5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    isSupported().then((ok) => { if (ok) getAnalytics(app); }).catch(() => {});
+
+    const state = {
+      user: null,
+      authMode: "signin",
+      repos: {},
+      questionsByRepo: {},
+      selectedRepoId: null,
+      repoSearch: "",
+      questionSearch: "",
+      pendingConfirmAction: null,
+      unsubRepos: null,
+      unsubQuestions: null
+    };
+
+    const authLoading = document.getElementById("auth-loading");
+    const authSection = document.getElementById("auth-section");
+    const dashboardSection = document.getElementById("dashboard-section");
+    const adminUserPill = document.getElementById("admin-user-pill");
+    const signOutBtn = document.getElementById("sign-out-btn");
+
+    const tabSignin = document.getElementById("tab-signin");
+    const tabSignup = document.getElementById("tab-signup");
+    const authForm = document.getElementById("auth-form");
+    const authEmail = document.getElementById("auth-email");
+    const authPassword = document.getElementById("auth-password");
+    const authSubmitBtn = document.getElementById("auth-submit-btn");
+    const authNotice = document.getElementById("auth-notice");
+
+    const adminStats = document.getElementById("admin-stats");
+    const dbPermissionBanner = document.getElementById("db-permission-banner");
+    const adminRepoSearch = document.getElementById("admin-repo-search");
+    const adminRepoList = document.getElementById("admin-repo-list");
+    const newRepoBtn = document.getElementById("new-repo-btn");
+    const emptyCreateRepoBtn = document.getElementById("empty-create-repo-btn");
+    const exportJsonBtn = document.getElementById("export-json-btn");
+    const importJsonInput = document.getElementById("import-json-input");
+
+    const noRepoSelected = document.getElementById("no-repo-selected");
+    const repoWorkspace = document.getElementById("repo-workspace");
+    const selectedRepoName = document.getElementById("selected-repo-name");
+    const selectedRepoCount = document.getElementById("selected-repo-count");
+    const selectedRepoDesc = document.getElementById("selected-repo-desc");
+    const editSelectedRepoBtn = document.getElementById("edit-selected-repo-btn");
+    const deleteSelectedRepoBtn = document.getElementById("delete-selected-repo-btn");
+    const openAddQuestionBtn = document.getElementById("open-add-question-btn");
+
+    const questionForm = document.getElementById("question-form");
+    const questionFormTitle = document.getElementById("question-form-title");
+    const cancelQuestionFormBtn = document.getElementById("cancel-question-form-btn");
+    const editingQuestionId = document.getElementById("editing-question-id");
+    const qNumber = document.getElementById("q-number");
+    const qLanguage = document.getElementById("q-language");
+    const qText = document.getElementById("q-text");
+    const qAnswer = document.getElementById("q-answer");
+    const saveQuestionBtn = document.getElementById("save-question-btn");
+    const adminQuestionSearch = document.getElementById("admin-question-search");
+    const adminQuestionList = document.getElementById("admin-question-list");
+
+    const repoModal = document.getElementById("repo-modal");
+    const repoModalTitle = document.getElementById("repo-modal-title");
+    const closeRepoModalBtn = document.getElementById("close-repo-modal");
+    const cancelRepoModalBtn = document.getElementById("cancel-repo-modal-btn");
+    const repoForm = document.getElementById("repo-form");
+    const editingRepoId = document.getElementById("editing-repo-id");
+    const repoNameInput = document.getElementById("repo-name-input");
+    const repoDescInput = document.getElementById("repo-desc-input");
+    const repoOrderInput = document.getElementById("repo-order-input");
+
+    const confirmModal = document.getElementById("confirm-modal");
+    const confirmModalTitle = document.getElementById("confirm-modal-title");
+    const confirmModalMessage = document.getElementById("confirm-modal-message");
+    const confirmYesBtn = document.getElementById("confirm-yes-btn");
+    const confirmNoBtn = document.getElementById("confirm-no-btn");
+    const closeConfirmModalBtn = document.getElementById("close-confirm-modal");
+
+    const previewModal = document.getElementById("preview-modal");
+    const previewModalTitle = document.getElementById("preview-modal-title");
+    const previewModalSubtitle = document.getElementById("preview-modal-subtitle");
+    const previewQuestionBox = document.getElementById("preview-question-box");
+    const previewCodeContent = document.getElementById("preview-code-content");
+    const previewCopyBtn = document.getElementById("preview-copy-btn");
+    const previewCloseBtn = document.getElementById("preview-close-btn");
+    const closePreviewModalBtn = document.getElementById("close-preview-modal");
+
+    const toastEl = document.getElementById("toast");
+    let toastTimer = null;
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getSortedRepos() {
+      return Object.entries(state.repos || {})
+        .map(([id, data]) => ({ id, ...data }))
+        .sort((a, b) => {
+          const orderA = Number.isFinite(Number(a.order)) ? Number(a.order) : 9999;
+          const orderB = Number.isFinite(Number(b.order)) ? Number(b.order) : 9999;
+          if (orderA !== orderB) return orderA - orderB;
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        });
+    }
+
+    function getRepoQuestions(repoId) {
+      const raw = state.questionsByRepo?.[repoId] || {};
+      return Object.entries(raw)
+        .map(([id, data]) => ({ id, ...data }))
+        .sort((a, b) => {
+          const numA = Number.isFinite(Number(a.number)) ? Number(a.number) : 99999;
+          const numB = Number.isFinite(Number(b.number)) ? Number(b.number) : 99999;
+          if (numA !== numB) return numA - numB;
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        });
+    }
+
+    function showDbPermissionHelp(err) {
+      const msg = err?.message || "Database error";
+      const uid = state.user?.uid || "<your-uid>";
+      dbPermissionBanner.style.display = "block";
+      dbPermissionBanner.innerHTML = `
+        <strong>Firebase Database Notice:</strong> ${escapeHtml(msg)}<br />
+        Ensure Realtime Database Rules allow authenticated writes (your UID: <code>${escapeHtml(uid)}</code>).
+      `;
+    }
+
+    function clearDbPermissionHelp() {
+      dbPermissionBanner.style.display = "none";
+      dbPermissionBanner.innerHTML = "";
+    }
+
+    function setAuthMode(mode) {
+      state.authMode = mode;
+      authNotice.style.display = "none";
+      if (mode === "signin") {
+        tabSignin.classList.add("active");
+        tabSignup.classList.remove("active");
+        authSubmitBtn.textContent = "Sign In to Dashboard";
+      } else {
+        tabSignup.classList.add("active");
+        tabSignin.classList.remove("active");
+        authSubmitBtn.textContent = "Create Admin Account";
+      }
+    }
+
+    tabSignin.addEventListener("click", () => setAuthMode("signin"));
+    tabSignup.addEventListener("click", () => setAuthMode("signup"));
+
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      authNotice.style.display = "none";
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+
+      authSubmitBtn.disabled = true;
+      try {
+        if (state.authMode === "signin") {
+          await signInWithEmailAndPassword(auth, email, password);
+          showToast("Signed in successfully!");
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password);
+          showToast("Admin account created and signed in!");
+        }
+      } catch (err) {
+        let friendly = err?.message || "Authentication failed.";
+        if (err?.code === "auth/operation-not-allowed") {
+          friendly = "Email/Password sign-in is disabled in Firebase Console. Enable it in Authentication -> Sign-in method -> Email/Password.";
+        } else if (err?.code === "auth/invalid-credential" || err?.code === "auth/wrong-password" || err?.code === "auth/user-not-found") {
+          friendly = "Invalid email or password. If you haven't created an admin account yet, switch to 'Create Admin Account'.";
+        } else if (err?.code === "auth/email-already-in-use") {
+          friendly = "This email is already registered. Switch to 'Sign In' to log in.";
+        }
+        authNotice.style.display = "block";
+        authNotice.textContent = friendly;
+      } finally {
+        authSubmitBtn.disabled = false;
+      }
+    });
+
+    signOutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      showToast("Signed out.");
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      authLoading.style.display = "none";
+      state.user = user;
+
+      if (user) {
+        authSection.style.display = "none";
+        dashboardSection.style.display = "block";
+        adminUserPill.style.display = "inline-flex";
+        adminUserPill.textContent = user.email || "Admin";
+        signOutBtn.style.display = "inline-flex";
+        startDatabaseListeners();
+      } else {
+        stopDatabaseListeners();
+        dashboardSection.style.display = "none";
+        adminUserPill.style.display = "none";
+        signOutBtn.style.display = "none";
+        authSection.style.display = "block";
+      }
+    });
+
+    function startDatabaseListeners() {
+      stopDatabaseListeners();
+
+      state.unsubRepos = onValue(
+        ref(db, "repositories"),
+        (snapshot) => {
+          clearDbPermissionHelp();
+          state.repos = snapshot.val() || {};
+          const repos = getSortedRepos();
+
+          if (state.selectedRepoId && !state.repos[state.selectedRepoId]) {
+            state.selectedRepoId = repos[0]?.id || null;
+          } else if (!state.selectedRepoId && repos.length > 0) {
+            state.selectedRepoId = repos[0].id;
+          }
+
+          renderStats();
+          renderRepoSidebar();
+          renderWorkspace();
+        },
+        (err) => showDbPermissionHelp(err)
+      );
+
+      state.unsubQuestions = onValue(
+        ref(db, "questions"),
+        (snapshot) => {
+          clearDbPermissionHelp();
+          state.questionsByRepo = snapshot.val() || {};
+          renderStats();
+          renderRepoSidebar();
+          renderWorkspace();
+        },
+        (err) => showDbPermissionHelp(err)
+      );
+    }
+
+    function stopDatabaseListeners() {
+      if (typeof state.unsubRepos === "function") {
+        state.unsubRepos();
+        state.unsubRepos = null;
+      }
+      if (typeof state.unsubQuestions === "function") {
+        state.unsubQuestions();
+        state.unsubQuestions = null;
+      }
+    }
+
+    function renderStats() {
+      const repos = getSortedRepos();
+      let totalQuestions = 0;
+      for (const r of repos) totalQuestions += getRepoQuestions(r.id).length;
+      adminStats.textContent = `${repos.length} ${repos.length === 1 ? "Repository" : "Repositories"} • ${totalQuestions} ${totalQuestions === 1 ? "Key" : "Keys"}`;
+    }
+
+    function renderRepoSidebar() {
+      const repos = getSortedRepos();
+      const filter = state.repoSearch.trim().toLowerCase();
+      const visible = filter
+        ? repos.filter((r) => (r.name || "").toLowerCase().includes(filter))
+        : repos;
+
+      if (repos.length === 0) {
+        adminRepoList.innerHTML = `
+          <div style="text-align: center; padding: 24px 8px; color: var(--text-muted); font-size: 0.88rem;">
+            No repositories yet. Click <strong>+ New Repo</strong> to create one.
+          </div>
+        `;
+        return;
+      }
+
+      if (visible.length === 0) {
+        adminRepoList.innerHTML = `
+          <div style="text-align: center; padding: 20px 8px; color: var(--text-muted); font-size: 0.88rem;">
+            No repositories match "${escapeHtml(state.repoSearch)}".
+          </div>
+        `;
+        return;
+      }
+
+      adminRepoList.innerHTML = "";
+      for (const repo of visible) {
+        const count = getRepoQuestions(repo.id).length;
+        const item = document.createElement("div");
+        item.className = `repo-sidebar-item ${repo.id === state.selectedRepoId ? "active" : ""}`;
+        item.innerHTML = `
+          <div style="min-width: 0;">
+            <div style="font-weight: 700; color: var(--blue-950); font-size: 0.93rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${escapeHtml(repo.name)}
+            </div>
+            <div style="font-size: 0.77rem; color: var(--text-muted);">Order #${repo.order || 1}</div>
+          </div>
+          <span class="repo-count-badge">${count}</span>
+        `;
+        item.addEventListener("click", () => {
+          state.selectedRepoId = repo.id;
+          hideQuestionForm();
+          renderRepoSidebar();
+          renderWorkspace();
+        });
+        adminRepoList.appendChild(item);
+      }
+    }
+
+    function renderWorkspace() {
+      const repoId = state.selectedRepoId;
+      const repo = repoId ? state.repos?.[repoId] : null;
+
+      if (!repo) {
+        noRepoSelected.style.display = "block";
+        repoWorkspace.style.display = "none";
+        return;
+      }
+
+      noRepoSelected.style.display = "none";
+      repoWorkspace.style.display = "block";
+
+      const questions = getRepoQuestions(repoId);
+      selectedRepoName.textContent = repo.name;
+      selectedRepoCount.textContent = `${questions.length} ${questions.length === 1 ? "CODE" : "CODES"}`;
+      selectedRepoDesc.textContent = repo.description || "No description provided.";
+
+      const qFilter = state.questionSearch.trim().toLowerCase();
+      const visibleQuestions = qFilter
+        ? questions.filter(
+            (q) =>
+              (q.question || "").toLowerCase().includes(qFilter) ||
+              (q.answer || "").toLowerCase().includes(qFilter)
+          )
+        : questions;
+
+      if (questions.length === 0) {
+        adminQuestionList.innerHTML = `
+          <div class="state-card">
+            <h3>No questions in ${escapeHtml(repo.name)}</h3>
+            <p>Click <strong>+ Add Question</strong> above to add the first question and answer key.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (visibleQuestions.length === 0) {
+        adminQuestionList.innerHTML = `
+          <div class="state-card">
+            <h3>No matching questions</h3>
+            <p>No questions matched "${escapeHtml(state.questionSearch)}".</p>
+          </div>
+        `;
+        return;
+      }
+
+      adminQuestionList.innerHTML = "";
+      visibleQuestions.forEach((item, idx) => {
+        const num = item.number || idx + 1;
+        const card = document.createElement("div");
+        card.className = "admin-question-card";
+        card.innerHTML = `
+          <div class="admin-question-head">
+            <div>
+              <div class="admin-question-title">
+                <span style="color: var(--blue-600);">&#9670;</span> ${num}. ${escapeHtml(item.question)}
+              </div>
+              <div style="margin-top: 4px;">
+                <span class="repo-count-badge">${escapeHtml(item.language || "CODE")}</span>
+              </div>
+            </div>
+            <div class="admin-question-actions">
+              <button type="button" class="btn btn-outline btn-sm btn-preview">Preview / Copy</button>
+              <button type="button" class="btn btn-outline btn-sm btn-edit-q">Edit</button>
+              <button type="button" class="btn btn-outline btn-sm btn-del-q">Delete</button>
+            </div>
+          </div>
+          <div class="code-preview-mini">${escapeHtml(item.answer)}</div>
+        `;
+
+        card.querySelector(".btn-preview").addEventListener("click", () => openPreviewModal(repo, item, num));
+        card.querySelector(".btn-edit-q").addEventListener("click", () => startEditQuestion(item, num));
+        card.querySelector(".btn-del-q").addEventListener("click", () => confirmDeleteQuestion(repoId, item, num));
+        adminQuestionList.appendChild(card);
+      });
+    }
+
+    function openRepoModal(repoId = null) {
+      if (repoId && state.repos?.[repoId]) {
+        const repo = state.repos[repoId];
+        editingRepoId.value = repoId;
+        repoModalTitle.textContent = "Edit Repository";
+        repoNameInput.value = repo.name || "";
+        repoDescInput.value = repo.description || "";
+        repoOrderInput.value = repo.order || 1;
+      } else {
+        editingRepoId.value = "";
+        repoModalTitle.textContent = "New Repository";
+        repoNameInput.value = "";
+        repoDescInput.value = "";
+        repoOrderInput.value = getSortedRepos().length + 1;
+      }
+      repoModal.classList.add("open");
+      setTimeout(() => repoNameInput.focus(), 50);
+    }
+
+    function closeRepoModal() {
+      repoModal.classList.remove("open");
+    }
+
+    repoForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = repoNameInput.value.trim();
+      const description = repoDescInput.value.trim();
+      const order = Number(repoOrderInput.value) || 1;
+      const id = editingRepoId.value;
+      if (!name) return;
+
+      try {
+        const now = Date.now();
+        if (id) {
+          await update(ref(db, `repositories/${id}`), { name, description, order, updatedAt: now });
+          showToast("Repository updated!");
+        } else {
+          const newRef = push(ref(db, "repositories"));
+          await set(newRef, { name, description, order, createdAt: now, updatedAt: now });
+          state.selectedRepoId = newRef.key;
+          showToast("Repository created!");
+        }
+        closeRepoModal();
+      } catch (err) {
+        showDbPermissionHelp(err);
+        showToast("Failed to save repository.");
+      }
+    });
+
+    function openAddQuestionForm() {
+      if (!state.selectedRepoId) return;
+      const existing = getRepoQuestions(state.selectedRepoId);
+      const maxNum = existing.reduce((max, q) => Math.max(max, Number(q.number) || 0), 0);
+
+      editingQuestionId.value = "";
+      questionFormTitle.textContent = "Add New Question";
+      saveQuestionBtn.textContent = "Save Question & Answer";
+      qNumber.value = maxNum + 1;
+      qLanguage.value = qLanguage.value || "Python";
+      qText.value = "";
+      qAnswer.value = "";
+      questionForm.style.display = "block";
+      qText.focus();
+    }
+
+    function startEditQuestion(item, num) {
+      editingQuestionId.value = item.id;
+      questionFormTitle.textContent = `Edit Question #${num}`;
+      saveQuestionBtn.textContent = "Update Question & Answer";
+      qNumber.value = item.number || num;
+      qLanguage.value = item.language || "Python";
+      qText.value = item.question || "";
+      qAnswer.value = item.answer || "";
+      questionForm.style.display = "block";
+      questionForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      qText.focus();
+    }
+
+    function hideQuestionForm() {
+      questionForm.style.display = "none";
+      editingQuestionId.value = "";
+    }
+
+    questionForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const repoId = state.selectedRepoId;
+      if (!repoId) return;
+
+      const number = Number(qNumber.value) || 1;
+      const language = qLanguage.value.trim() || "Code";
+      const question = qText.value.trim();
+      const answer = qAnswer.value;
+      if (!question || !answer.trim()) return;
+
+      saveQuestionBtn.disabled = true;
+      try {
+        const now = Date.now();
+        const qId = editingQuestionId.value;
+        if (qId) {
+          await update(ref(db, `questions/${repoId}/${qId}`), {
+            number,
+            language,
+            question,
+            answer,
+            updatedAt: now
+          });
+          showToast("Question updated!");
+        } else {
+          const newQRef = push(ref(db, `questions/${repoId}`));
+          await set(newQRef, {
+            number,
+            language,
+            question,
+            answer,
+            createdAt: now,
+            updatedAt: now
+          });
+          showToast("Question & answer added!");
+        }
+        hideQuestionForm();
+      } catch (err) {
+        showDbPermissionHelp(err);
+        showToast("Failed to save question.");
+      } finally {
+        saveQuestionBtn.disabled = false;
+      }
+    });
+
+    qAnswer.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const start = qAnswer.selectionStart;
+        const end = qAnswer.selectionEnd;
+        qAnswer.value = qAnswer.value.substring(0, start) + "    " + qAnswer.value.substring(end);
+        qAnswer.selectionStart = qAnswer.selectionEnd = start + 4;
+      }
+    });
+
+    function openConfirmModal(title, message, onConfirm) {
+      confirmModalTitle.textContent = title;
+      confirmModalMessage.textContent = message;
+      state.pendingConfirmAction = onConfirm;
+      confirmModal.classList.add("open");
+    }
+
+    function closeConfirmModal() {
+      confirmModal.classList.remove("open");
+      state.pendingConfirmAction = null;
+    }
+
+    confirmYesBtn.addEventListener("click", async () => {
+      const fn = state.pendingConfirmAction;
+      closeConfirmModal();
+      if (typeof fn === "function") await fn();
+    });
+
+    function confirmDeleteSelectedRepo() {
+      const repoId = state.selectedRepoId;
+      const repo = state.repos?.[repoId];
+      if (!repoId || !repo) return;
+
+      const qCount = getRepoQuestions(repoId).length;
+      openConfirmModal(
+        "Delete Repository",
+        `Delete "${repo.name}" and all ${qCount} ${qCount === 1 ? "question" : "questions"} inside it? This cannot be undone.`,
+        async () => {
+          try {
+            await remove(ref(db, `repositories/${repoId}`));
+            await remove(ref(db, `questions/${repoId}`));
+            showToast("Repository deleted.");
+          } catch (err) {
+            showDbPermissionHelp(err);
+            showToast("Failed to delete repository.");
+          }
+        }
+      );
+    }
+
+    function confirmDeleteQuestion(repoId, item, num) {
+      openConfirmModal(
+        "Delete Question",
+        `Delete Question #${num}: "${item.question}"?`,
+        async () => {
+          try {
+            await remove(ref(db, `questions/${repoId}/${item.id}`));
+            showToast("Question deleted.");
+          } catch (err) {
+            showDbPermissionHelp(err);
+            showToast("Failed to delete question.");
+          }
+        }
+      );
+    }
+
+    function openPreviewModal(repo, item, num) {
+      previewModalTitle.textContent = `Question ${num}`;
+      previewModalSubtitle.textContent = repo.name;
+      previewQuestionBox.textContent = `${num}. ${item.question}`;
+      previewCodeContent.textContent = item.answer || "";
+      previewCopyBtn.textContent = "COPY";
+      previewCopyBtn.classList.remove("copied");
+      previewModal.classList.add("open");
+    }
+
+    previewCopyBtn.addEventListener("click", async () => {
+      const text = previewCodeContent.textContent || "";
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        previewCopyBtn.textContent = "✓ COPIED";
+        previewCopyBtn.classList.add("copied");
+        showToast("Answer copied!");
+      } catch {
+        showToast("Copy failed.");
+      }
+    });
+
+    exportJsonBtn.addEventListener("click", () => {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        repositories: state.repos,
+        questions: state.questionsByRepo
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `abhyas-lab-keys-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Backup exported as JSON!");
+    });
+
+    importJsonInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!data || typeof data !== "object" || !data.repositories) {
+          showToast("Invalid backup JSON format.");
+          return;
+        }
+
+        openConfirmModal(
+          "Import JSON Backup",
+          "This will merge imported repositories and questions into Firebase Realtime Database. Continue?",
+          async () => {
+            const updates = {};
+            for (const [rId, repo] of Object.entries(data.repositories || {})) {
+              updates[`repositories/${rId}`] = repo;
+            }
+            for (const [rId, qMap] of Object.entries(data.questions || {})) {
+              for (const [qId, qObj] of Object.entries(qMap || {})) {
+                updates[`questions/${rId}/${qId}`] = qObj;
+              }
+            }
+            await update(ref(db), updates);
+            showToast("JSON imported successfully!");
+          }
+        );
+      } catch {
+        showToast("Could not parse JSON file.");
+      }
+    });
+
+    adminRepoSearch.addEventListener("input", (e) => {
+      state.repoSearch = e.target.value;
+      renderRepoSidebar();
+    });
+
+    adminQuestionSearch.addEventListener("input", (e) => {
+      state.questionSearch = e.target.value;
+      renderWorkspace();
+    });
+
+    newRepoBtn.addEventListener("click", () => openRepoModal());
+    emptyCreateRepoBtn.addEventListener("click", () => openRepoModal());
+    editSelectedRepoBtn.addEventListener("click", () => openRepoModal(state.selectedRepoId));
+    deleteSelectedRepoBtn.addEventListener("click", confirmDeleteSelectedRepo);
+    openAddQuestionBtn.addEventListener("click", openAddQuestionForm);
+    cancelQuestionFormBtn.addEventListener("click", hideQuestionForm);
+
+    closeRepoModalBtn.addEventListener("click", closeRepoModal);
+    cancelRepoModalBtn.addEventListener("click", closeRepoModal);
+    closeConfirmModalBtn.addEventListener("click", closeConfirmModal);
+    confirmNoBtn.addEventListener("click", closeConfirmModal);
+
+    const closePreview = () => previewModal.classList.remove("open");
+    closePreviewModalBtn.addEventListener("click", closePreview);
+    previewCloseBtn.addEventListener("click", closePreview);
+
+    [repoModal, confirmModal, previewModal].forEach((modal) => {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.remove("open");
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeRepoModal();
+        closeConfirmModal();
+        closePreview();
+      }
+    });
+  </script>
+</body>
+</html>

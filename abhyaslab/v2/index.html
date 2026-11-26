@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abhyas Lab Keys</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue-950: #0a1f4d;
+      --blue-900: #1e3a8a;
+      --blue-800: #1e40af;
+      --blue-700: #1d4ed8;
+      --blue-600: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-400: #60a5fa;
+      --blue-300: #93c5fd;
+      --blue-200: #bfdbfe;
+      --blue-100: #dbeafe;
+      --blue-50: #eff6ff;
+      --blue-25: #f7faff;
+      --white: #ffffff;
+      --text-primary: #0f295c;
+      --text-secondary: #3b5998;
+      --text-muted: #5b7bb5;
+      --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--white);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input {
+      font-family: inherit;
+    }
+
+    .user-shell {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 52px 20px 64px;
+    }
+
+    .user-brand-title {
+      display: flex;
+      flex-direction: column;
+      font-size: clamp(2rem, 4vw, 2.45rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      color: var(--blue-600);
+      margin-bottom: 28px;
+    }
+
+    /* Repositories Grid */
+    .repo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .repo-card {
+      position: relative;
+      background: var(--white);
+      border: 1.5px solid var(--blue-100);
+      border-radius: 14px;
+      padding: 20px 22px 18px;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.04);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      min-height: 92px;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+      text-align: left;
+    }
+
+    .repo-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--blue-500);
+      box-shadow: 0 8px 22px rgba(37, 99, 235, 0.1);
+    }
+
+    .repo-card:focus-visible {
+      outline: 3px solid var(--blue-400);
+      outline-offset: 2px;
+    }
+
+    .repo-count-badge {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--blue-100);
+      color: var(--blue-600);
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .repo-title {
+      font-size: 1.04rem;
+      font-weight: 800;
+      color: var(--blue-950);
+      line-height: 1.35;
+      padding-right: 76px;
+    }
+
+    .repo-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--blue-600);
+    }
+
+    .repo-card:hover .repo-action {
+      color: var(--blue-800);
+    }
+
+    /* Empty / Loading State */
+    .state-card {
+      grid-column: 1 / -1;
+      background: var(--white);
+      border: 1.5px dashed var(--blue-300);
+      border-radius: 14px;
+      padding: 44px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+      list-style: none;
+    }
+
+    .state-card h3 {
+      color: var(--blue-900);
+      font-size: 1.08rem;
+      margin-bottom: 6px;
+    }
+
+    .state-card p {
+      font-size: 0.9rem;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--blue-100);
+      border-top-color: var(--blue-600);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(10, 31, 77, 0.55);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-dialog {
+      width: 100%;
+      max-width: 720px;
+      max-height: 88vh;
+      background: var(--white);
+      border: 4px solid var(--blue-600);
+      border-radius: 18px;
+      box-shadow: 0 18px 42px rgba(15, 41, 92, 0.22);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalIn 0.18s ease-out;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--blue-100);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--white);
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--blue-600);
+      line-height: 1.3;
+    }
+
+    .modal-subtitle {
+      margin-top: 4px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .modal-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--blue-100);
+      background: var(--blue-25);
+      color: var(--blue-700);
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--blue-600);
+      border-color: var(--blue-600);
+      color: var(--white);
+    }
+
+    .modal-search-bar {
+      padding: 12px 24px;
+      background: var(--blue-25);
+      border-bottom: 1px solid var(--blue-100);
+    }
+
+    .search-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--blue-500);
+      pointer-events: none;
+      display: flex;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      border-radius: 10px;
+      border: 1.5px solid var(--blue-200);
+      background: var(--white);
+      color: var(--text-primary);
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--blue-600);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .modal-body {
+      padding: 12px 24px 22px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Questions List */
+    .question-list {
+      list-style: none;
+    }
+
+    .question-item {
+      border-bottom: 1px solid var(--blue-50);
+    }
+
+    .question-item:last-child {
+      border-bottom: none;
+    }
+
+    .question-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 15px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--blue-600);
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.5;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .question-btn:hover {
+      background: var(--blue-50);
+      color: var(--blue-800);
+    }
+
+    .question-diamond {
+      color: var(--blue-600);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      flex-shrink: 0;
+    }
+
+    /* Answer Modal */
+    .answer-question-box {
+      background: var(--blue-50);
+      border: 1px solid var(--blue-200);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 8px;
+      margin-bottom: 14px;
+      color: var(--blue-900);
+      font-weight: 700;
+      font-size: 0.96rem;
+      line-height: 1.5;
+    }
+
+    .answer-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .code-surface {
+      background: var(--white);
+      border: 1.5px solid var(--blue-200);
+      border-radius: 12px;
+      padding: 16px 18px;
+      overflow-x: auto;
+      max-height: 48vh;
+      overflow-y: auto;
+    }
+
+    .code-surface pre {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.87rem;
+      line-height: 1.65;
+      color: var(--blue-950);
+      white-space: pre;
+      tab-size: 4;
+    }
+
+    .modal-footer {
+      padding: 14px 24px 18px;
+      border-top: 1px solid var(--blue-100);
+      background: var(--white);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1 1 180px;
+      padding: 13px 20px;
+      border-radius: 11px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.16s ease;
+    }
+
+    .btn-primary {
+      background: var(--blue-600);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-700);
+    }
+
+    .btn-primary.copied {
+      background: var(--blue-900);
+    }
+
+    .btn-outline {
+      background: var(--white);
+      color: var(--blue-700);
+      border-color: var(--blue-300);
+    }
+
+    .btn-outline:hover {
+      background: var(--blue-50);
+      border-color: var(--blue-600);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      background: var(--blue-900);
+      color: var(--white);
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 12px 28px rgba(10, 31, 77, 0.24);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 700px) {
+      .repo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-header,
+      .modal-body,
+      .modal-footer,
+      .modal-search-bar {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="user-shell">
+    <h1 class="user-brand-title">
+      <span>Abhyas</span>
+      <span>Lab Keys</span>
+    </h1>
+
+    <section id="repo-grid" class="repo-grid" aria-label="Repositories">
+      <div class="state-card">
+        <div class="spinner"></div>
+        <h3>Loading Repositories</h3>
+        <p>Fetching repositories and lab keys...</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Questions Modal -->
+  <div id="questions-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="questions-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 id="questions-modal-title" class="modal-title">Repository</h2>
+          <p id="questions-modal-subtitle" class="modal-subtitle"></p>
+        </div>
+        <button type="button" class="modal-close" id="close-questions-modal" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-search-bar">
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input
+            type="search"
+            id="question-search-input"
+            class="search-input"
+            placeholder="Filter questions in this repository..."
+            aria-label="Filter questions in this repository"
+          />
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <ul id="question-list" class="question-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Answer Modal with Copy Option -->
+  <div id="answer-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="answer-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 id="answer-modal-title" class="modal-title">Solution Key</h2>
+          <p id="answer-modal-repo" class="modal-subtitle"></p>
+        </div>
+        <button type="button" class="modal-close" id="close-answer-modal" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="answer-question-text" class="answer-question-box"></div>
+        <div class="answer-meta">
+          <span id="answer-language-label">ANSWER / CODE</span>
+          <span>Click Copy to copy full solution</span>
+        </div>
+        <div class="code-surface">
+          <pre><code id="answer-code-content"></code></pre>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="copy-answer-btn" class="btn btn-primary">COPY</button>
+        <button type="button" id="back-to-questions-btn" class="btn btn-outline">&larr; BACK TO QUESTIONS</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFShk6wkLYNFcd7WYSidxIAqcL55te7z8",
+      authDomain: "exams-f7881.firebaseapp.com",
+      databaseURL: "https://exams-f7881-default-rtdb.firebaseio.com",
+      projectId: "exams-f7881",
+      storageBucket: "exams-f7881.firebasestorage.app",
+      messagingSenderId: "297962721940",
+      appId: "1:297962721940:web:a2d351b464ad337e2c9a81",
+      measurementId: "G-9WF1R5EHL5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    isSupported().then((ok) => { if (ok) getAnalytics(app); }).catch(() => {});
+
+    const state = {
+      repos: {},
+      questionsByRepo: {},
+      questionSearchQuery: "",
+      activeRepoId: null,
+      activeQuestionId: null,
+      loadedRepos: false,
+      loadedQuestions: false,
+      dbError: null
+    };
+
+    const repoGrid = document.getElementById("repo-grid");
+    const questionsModal = document.getElementById("questions-modal");
+    const questionsModalTitle = document.getElementById("questions-modal-title");
+    const questionsModalSubtitle = document.getElementById("questions-modal-subtitle");
+    const questionSearchInput = document.getElementById("question-search-input");
+    const questionList = document.getElementById("question-list");
+    const closeQuestionsModalBtn = document.getElementById("close-questions-modal");
+
+    const answerModal = document.getElementById("answer-modal");
+    const answerModalTitle = document.getElementById("answer-modal-title");
+    const answerModalRepo = document.getElementById("answer-modal-repo");
+    const answerQuestionText = document.getElementById("answer-question-text");
+    const answerLanguageLabel = document.getElementById("answer-language-label");
+    const answerCodeContent = document.getElementById("answer-code-content");
+    const copyAnswerBtn = document.getElementById("copy-answer-btn");
+    const backToQuestionsBtn = document.getElementById("back-to-questions-btn");
+    const closeAnswerModalBtn = document.getElementById("close-answer-modal");
+    const toastEl = document.getElementById("toast");
+
+    let toastTimer = null;
+    let copyResetTimer = null;
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2400);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getSortedRepos() {
+      return Object.entries(state.repos || {})
+        .map(([id, data]) => ({ id, ...data }))
+        .sort((a, b) => {
+          const orderA = Number.isFinite(Number(a.order)) ? Number(a.order) : 9999;
+          const orderB = Number.isFinite(Number(b.order)) ? Number(b.order) : 9999;
+          if (orderA !== orderB) return orderA - orderB;
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        });
+    }
+
+    function getRepoQuestions(repoId) {
+      const raw = state.questionsByRepo?.[repoId] || {};
+      return Object.entries(raw)
+        .map(([id, data]) => ({ id, ...data }))
+        .sort((a, b) => {
+          const numA = Number.isFinite(Number(a.number)) ? Number(a.number) : 99999;
+          const numB = Number.isFinite(Number(b.number)) ? Number(b.number) : 99999;
+          if (numA !== numB) return numA - numB;
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        });
+    }
+
+    function renderRepositories() {
+      if (state.dbError) {
+        repoGrid.innerHTML = `
+          <div class="state-card">
+            <h3>Unable to load repositories</h3>
+            <p>${escapeHtml(state.dbError)}</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (!state.loadedRepos || !state.loadedQuestions) return;
+
+      const repos = getSortedRepos();
+      if (repos.length === 0) {
+        repoGrid.innerHTML = `
+          <div class="state-card">
+            <h3>No repositories available</h3>
+            <p>Lab repositories and questions will appear here once published.</p>
+          </div>
+        `;
+        return;
+      }
+
+      repoGrid.innerHTML = "";
+      for (const repo of repos) {
+        const count = getRepoQuestions(repo.id).length;
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "repo-card";
+        card.innerHTML = `
+          <span class="repo-count-badge">${count} ${count === 1 ? "CODE" : "CODES"}</span>
+          <div class="repo-title">${escapeHtml(repo.name)} (${count})</div>
+          <div class="repo-action">VIEW REPOSITORY</div>
+        `;
+        card.addEventListener("click", () => openQuestionsModal(repo.id));
+        repoGrid.appendChild(card);
+      }
+    }
+
+    function openQuestionsModal(repoId) {
+      const repo = state.repos?.[repoId];
+      if (!repo) return;
+
+      state.activeRepoId = repoId;
+      state.questionSearchQuery = "";
+      questionSearchInput.value = "";
+
+      renderQuestionsList();
+      questionsModal.classList.add("open");
+      answerModal.classList.remove("open");
+
+      if (window.location.hash !== `#repo=${repoId}`) {
+        history.replaceState(null, "", `#repo=${repoId}`);
+      }
+    }
+
+    function renderQuestionsList() {
+      const repoId = state.activeRepoId;
+      const repo = state.repos?.[repoId];
+      if (!repo) return;
+
+      const allQuestions = getRepoQuestions(repoId);
+      questionsModalTitle.textContent = `${repo.name} (${allQuestions.length})`;
+      questionsModalSubtitle.textContent = repo.description || "Click any question below to view and copy its answer.";
+
+      const qFilter = state.questionSearchQuery.trim().toLowerCase();
+      const visibleQuestions = qFilter
+        ? allQuestions.filter((q) => (q.question || "").toLowerCase().includes(qFilter))
+        : allQuestions;
+
+      if (allQuestions.length === 0) {
+        questionList.innerHTML = `
+          <li class="state-card" style="margin: 16px 0;">
+            <h3>No questions added yet</h3>
+            <p>Check back soon for questions in this repository.</p>
+          </li>
+        `;
+        return;
+      }
+
+      if (visibleQuestions.length === 0) {
+        questionList.innerHTML = `
+          <li class="state-card" style="margin: 16px 0;">
+            <h3>No matching questions</h3>
+            <p>Try a different keyword inside ${escapeHtml(repo.name)}.</p>
+          </li>
+        `;
+        return;
+      }
+
+      questionList.innerHTML = "";
+      visibleQuestions.forEach((item, index) => {
+        const displayNum = item.number || index + 1;
+        const li = document.createElement("li");
+        li.className = "question-item";
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "question-btn";
+        btn.innerHTML = `
+          <span class="question-diamond">&#9670;</span>
+          <span>${displayNum}. ${escapeHtml(item.question)}</span>
+        `;
+        btn.addEventListener("click", () => openAnswerModal(repoId, item.id, displayNum));
+        li.appendChild(btn);
+        questionList.appendChild(li);
+      });
+    }
+
+    function openAnswerModal(repoId, questionId, displayNum) {
+      const repo = state.repos?.[repoId];
+      const questionObj = state.questionsByRepo?.[repoId]?.[questionId];
+      if (!repo || !questionObj) return;
+
+      state.activeRepoId = repoId;
+      state.activeQuestionId = questionId;
+
+      const num = questionObj.number || displayNum || 1;
+      answerModalTitle.textContent = `Question ${num}`;
+      answerModalRepo.textContent = repo.name;
+      answerQuestionText.textContent = `${num}. ${questionObj.question || ""}`;
+      answerLanguageLabel.textContent = (questionObj.language || "SOLUTION CODE").toUpperCase();
+      answerCodeContent.textContent = questionObj.answer || "";
+
+      copyAnswerBtn.textContent = "COPY";
+      copyAnswerBtn.classList.remove("copied");
+
+      questionsModal.classList.remove("open");
+      answerModal.classList.add("open");
+    }
+
+    function closeAllModals() {
+      questionsModal.classList.remove("open");
+      answerModal.classList.remove("open");
+      state.activeQuestionId = null;
+      if (window.location.hash.startsWith("#repo=")) {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+      }
+    }
+
+    async function copyCurrentAnswer() {
+      const text = answerCodeContent.textContent || "";
+      if (!text) return;
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const temp = document.createElement("textarea");
+          temp.value = text;
+          temp.style.position = "fixed";
+          temp.style.opacity = "0";
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand("copy");
+          document.body.removeChild(temp);
+        }
+
+        copyAnswerBtn.textContent = "✓ COPIED TO CLIPBOARD";
+        copyAnswerBtn.classList.add("copied");
+        showToast("Answer copied to clipboard!");
+
+        clearTimeout(copyResetTimer);
+        copyResetTimer = setTimeout(() => {
+          copyAnswerBtn.textContent = "COPY";
+          copyAnswerBtn.classList.remove("copied");
+        }, 2000);
+      } catch {
+        showToast("Could not copy automatically. Please select and copy manually.");
+      }
+    }
+
+    questionSearchInput.addEventListener("input", (e) => {
+      state.questionSearchQuery = e.target.value;
+      renderQuestionsList();
+    });
+
+    closeQuestionsModalBtn.addEventListener("click", closeAllModals);
+    closeAnswerModalBtn.addEventListener("click", closeAllModals);
+
+    backToQuestionsBtn.addEventListener("click", () => {
+      answerModal.classList.remove("open");
+      if (state.activeRepoId && state.repos?.[state.activeRepoId]) {
+        renderQuestionsList();
+        questionsModal.classList.add("open");
+      }
+    });
+
+    copyAnswerBtn.addEventListener("click", copyCurrentAnswer);
+
+    questionsModal.addEventListener("click", (e) => {
+      if (e.target === questionsModal) closeAllModals();
+    });
+
+    answerModal.addEventListener("click", (e) => {
+      if (e.target === answerModal) closeAllModals();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (answerModal.classList.contains("open")) {
+          backToQuestionsBtn.click();
+        } else if (questionsModal.classList.contains("open")) {
+          closeAllModals();
+        }
+      }
+    });
+
+    onValue(
+      ref(db, "repositories"),
+      (snapshot) => {
+        state.repos = snapshot.val() || {};
+        state.loadedRepos = true;
+        state.dbError = null;
+        renderRepositories();
+
+        if (questionsModal.classList.contains("open") && state.activeRepoId) {
+          if (state.repos[state.activeRepoId]) {
+            renderQuestionsList();
+          } else {
+            closeAllModals();
+          }
+        }
+
+        if (window.location.hash.startsWith("#repo=") && !questionsModal.classList.contains("open") && !answerModal.classList.contains("open")) {
+          const hashRepoId = window.location.hash.replace("#repo=", "");
+          if (state.repos[hashRepoId]) openQuestionsModal(hashRepoId);
+        }
+      },
+      (error) => {
+        state.dbError = error?.message || "Failed to connect to Firebase.";
+        renderRepositories();
+      }
+    );
+
+    onValue(
+      ref(db, "questions"),
+      (snapshot) => {
+        state.questionsByRepo = snapshot.val() || {};
+        state.loadedQuestions = true;
+        state.dbError = null;
+        renderRepositories();
+
+        if (questionsModal.classList.contains("open") && state.activeRepoId) {
+          renderQuestionsList();
+        }
+        if (answerModal.classList.contains("open") && state.activeRepoId && state.activeQuestionId) {
+          const q = state.questionsByRepo?.[state.activeRepoId]?.[state.activeQuestionId];
+          if (q) {
+            answerQuestionText.textContent = `${q.number || 1}. ${q.question || ""}`;
+            answerCodeContent.textContent = q.answer || "";
+          }
+        }
+      },
+      (error) => {
+        state.dbError = error?.message || "Failed to load questions from Firebase.";
+        renderRepositories();
+      }
+    );
+  </script>
+</body>
+</html>
