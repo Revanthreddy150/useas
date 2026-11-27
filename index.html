@@ -575,7 +575,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Abhyas Lab Performance Section inside Profile */
         .lab-perf-section {
             width: 100%;
             background: linear-gradient(145deg, #f8fafc 0%, #eef2ff 100%);
@@ -1485,6 +1484,14 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
         }
 
+        #courses-card {
+            display: none;
+        }
+
+        body.student-logged-in #courses-card {
+            display: flex;
+        }
+
         footer {
             text-align: center;
             padding: 35px 20px 25px;
@@ -1748,7 +1755,6 @@
                     </div>
                 </div>
 
-                <!-- Abhyas Lab Performance Section (On-Demand Check) -->
                 <div class="lab-perf-section" id="abhyas-lab-perf-section">
                     <div class="lab-perf-header">
                         <div class="lab-perf-title">
@@ -1759,7 +1765,6 @@
                         </button>
                     </div>
 
-                    <!-- Initial state before clicking Check -->
                     <div class="lab-check-prompt" id="lab-check-prompt">
                         <p>Click below to check your coding activity days, submitted programs, and live exams.</p>
                         <button class="lab-check-btn" id="lab-check-btn" onclick="checkAbhyasLabPerformance()">
@@ -1767,15 +1772,12 @@
                         </button>
                     </div>
 
-                    <!-- Loading indicator -->
                     <div id="lab-perf-loading" class="lab-perf-status" style="display: none;">
                         <i class="fa-solid fa-circle-notch fa-spin"></i> Fetching Abhyas Lab performance...
                     </div>
 
-                    <!-- Error message -->
                     <div id="lab-perf-error" class="lab-perf-error"></div>
 
-                    <!-- Results area (shown only after Check succeeds) -->
                     <div id="lab-perf-content" style="display: none;">
                         <div class="lab-perf-grid">
                             <div class="lab-perf-box">
@@ -1943,12 +1945,30 @@
                         grid.appendChild(letterCard);
                     }
 
+                    function ensureCoursesCard() {
+                        let coursesCard = document.getElementById('courses-card');
+                        if (!coursesCard) {
+                            coursesCard = document.createElement('div');
+                            coursesCard.className = 'feature-card';
+                            coursesCard.id = 'courses-card';
+                            coursesCard.setAttribute('onclick', "triggerDirectPortalView('https://useasonline.github.io/useascourses/')");
+                            coursesCard.innerHTML = `
+                                <span class="new-badge">New</span>
+                                <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                                <h4>Courses</h4>
+                                <p>Skill courses & certificates</p>
+                            `;
+                            grid.appendChild(coursesCard);
+                        }
+                    }
+
                     function updateEssentialCardsLinks() {
                         const paperHubCard = document.getElementById('paper-hub-card');
                         if (paperHubCard) paperHubCard.remove();
 
                         const cards = document.querySelectorAll('.feature-card');
                         cards.forEach(card => {
+                            if (card.id === 'courses-card') return;
                             const text = (card.textContent || '').trim().toLowerCase();
                             const rawOnclick = card.getAttribute('onclick') || '';
                             const onclick = rawOnclick.toLowerCase();
@@ -1992,6 +2012,7 @@
                     function ensureCustomCards() {
                         removeUnwantedCards();
                         ensureLetterTemplatesCard();
+                        ensureCoursesCard();
                         updateEssentialCardsLinks();
                     }
 
@@ -2517,7 +2538,6 @@
             document.getElementById('prof-group').textContent = student.group || '-';
             document.getElementById('prof-email').textContent = student.email || '-';
 
-            // Show cached result only if the user already clicked Check earlier; otherwise show Check button
             const cachedPerf = getSavedLabPerf();
             if (cachedPerf && cachedPerf.suc === student.suc && cachedPerf.data) {
                 renderAbhyasLabPerformance(cachedPerf.data);
@@ -2668,6 +2688,7 @@
             switchModalView('form');
         }
 
+        updateHeaderLoginButton(false);
         document.addEventListener('DOMContentLoaded', () => updateHeaderLoginButton(false));
     </script>
 
